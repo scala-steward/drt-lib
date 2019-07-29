@@ -1,0 +1,21 @@
+project/target
+target
+*.class
+*.log
+.~*
+.#*
+*.DS_Store
+
+# sbt specific
+.sbtopts
+.cache/
+.history/
+.lib/
+dist/*
+
+# IntelliJ IDEA
+.idea
+*.iml
+out
+*.sc
+
