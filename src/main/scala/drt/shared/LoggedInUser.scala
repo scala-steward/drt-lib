@@ -55,6 +55,7 @@ object Roles {
     ForecastView,
     BorderForceStaff,
     PortOperatorStaff,
+    PortFeedUpload,
     ViewConfig
   ) ++ portRoles
 
