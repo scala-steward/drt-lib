@@ -9,6 +9,7 @@ ThisBuild / version := "0.1.0"
 ThisBuild / organization := "uk.gov.homeoffice"
 ThisBuild / organizationName := "drt"
 
+val artifactory = "https://artifactory.digital.homeoffice.gov.uk/"
 
 lazy val root = project.in(file(".")).
   aggregate(crossJS, crossJVM).
@@ -27,17 +28,15 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= libDeps
   ).
   jvmSettings(
-    crossScalaVersions := supportedScalaVersions
+    crossScalaVersions := supportedScalaVersions,
+    publishTo := Some("release" at artifactory + "artifactory/libs-release")
   ).
   jsSettings(
-    crossScalaVersions := supportedScalaVersions
+    crossScalaVersions := supportedScalaVersions,
+    publishTo := Some("release" at artifactory + "artifactory/libs-release")
   )
 
 lazy val crossJVM = cross.jvm
 lazy val crossJS = cross.js
 
-publishTo := {
-  val artifactory = "https://artifactory.digital.homeoffice.gov.uk/"
 
-  Some("release" at artifactory + "artifactory/libs-release")
-}
