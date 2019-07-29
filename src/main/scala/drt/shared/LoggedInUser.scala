@@ -160,3 +160,7 @@ case object BorderForceStaff extends Role {
 case object PortOperatorStaff extends Role {
   override val name: String = "port-operator-staff"
 }
+
+case object PortFeedUpload extends Role {
+  override val name: String = "port-feed-upload"
+}
