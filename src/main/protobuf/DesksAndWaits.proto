@@ -1,0 +1,20 @@
+syntax = "proto2";
+
+package server.protobuf.messages;
+
+
+message DesksAndWaitsStateMessage {
+    repeated DesksAndWaitsMessage desksAndWaits = 1;
+}
+
+message DesksAndWaitsUpdatesMessage {
+    repeated DesksAndWaitsMessage desksAndWaits = 1;
+}
+
+message DesksAndWaitsMessage {
+    optional string terminal = 1;
+    optional string queue = 2;
+    optional int64 minute = 3;
+    optional int64 desks = 4;
+    optional int64 waits = 5;
+}

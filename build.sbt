@@ -14,8 +14,10 @@ val artifactory = "https://artifactory.digital.homeoffice.gov.uk/"
 lazy val root = project.in(file(".")).
   aggregate(crossJS, crossJVM).
   settings(
+    name := "drt-lib",
     publish := {},
-    publishLocal := {}
+    publishLocal := {},
+    libraryDependencies ++= libDeps
   )
 
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
@@ -29,7 +31,11 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
   ).
   jvmSettings(
     crossScalaVersions := supportedScalaVersions,
-    publishTo := Some("release" at artifactory + "artifactory/libs-release")
+    publishTo := Some("release" at artifactory + "artifactory/libs-release"),
+    PB.targets in Compile := Seq(
+      scalapb.gen() -> (sourceManaged in Compile).value
+    ),
+    PB.protoSources in Compile := Seq(file("src/main/protobuf"))
   ).
   jsSettings(
     crossScalaVersions := supportedScalaVersions,
@@ -38,5 +44,3 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
 
 lazy val crossJVM = cross.jvm
 lazy val crossJS = cross.js
-
-
