@@ -7,7 +7,7 @@ lazy val supportedScalaVersions = List(scala212, scala211)
 ThisBuild / scalaVersion := "2.11.12"
 ThisBuild / organization := "uk.gov.homeoffice"
 ThisBuild / organizationName := "drt"
-ThisBuild / version := "0.2.0"
+ThisBuild / version := "0.3.0"
 
 val artifactory = "https://artifactory.digital.homeoffice.gov.uk/"
 
