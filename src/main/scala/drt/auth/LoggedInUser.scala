@@ -1,4 +1,4 @@
-package drt.shared
+package drt.auth
 
 import ujson.Js.Value
 import upickle.Js
@@ -10,7 +10,7 @@ case class LoggedInUser(userName: String, id: String, email: String, roles: Set[
 }
 
 object LoggedInUser {
-  implicit val rw: RW[AirportConfig] = macroRW
+  implicit val rw: RW[LoggedInUser] = macroRW
 }
 
 case class ShouldReload(shouldReload: Boolean)
@@ -34,6 +34,11 @@ object Roles {
     EDIAccess,
     EMAAccess,
     LGWAccess,
+    GLAAccess,
+    LCYAccess,
+    BFSAccess,
+    LPLAccess,
+    NCLAccess,
     LHRAccess,
     LTNAccess,
     MANAccess,
@@ -56,7 +61,9 @@ object Roles {
     BorderForceStaff,
     PortOperatorStaff,
     PortFeedUpload,
-    ViewConfig
+    ViewConfig,
+    TerminalDashboard,
+    ArrivalSource
   ) ++ portRoles
 
   def parse(roleName: String): Option[Role] = availableRoles.find(role => role.name == roleName)
@@ -68,6 +75,14 @@ case object NoOpRole extends Role {
 
 case object StaffEdit extends Role {
   override val name: String = "staff:edit"
+}
+
+case object TerminalDashboard extends Role {
+  override val name: String = "terminal-dashboard"
+}
+
+case object ArrivalSource extends Role {
+  override val name: String = "arrival-source"
 }
 
 case object ApiView extends Role {
@@ -108,6 +123,26 @@ case object EMAAccess extends Role {
 
 case object LGWAccess extends Role {
   override val name: String = "LGW"
+}
+
+case object GLAAccess extends Role {
+  override val name: String = "GLA"
+}
+
+case object LCYAccess extends Role {
+  override val name: String = "LCY"
+}
+
+case object BFSAccess extends Role {
+  override val name: String = "BFS"
+}
+
+case object LPLAccess extends Role {
+  override val name: String = "LPL"
+}
+
+case object NCLAccess extends Role {
+  override val name: String = "NCL"
 }
 
 case object LHRAccess extends Role {
