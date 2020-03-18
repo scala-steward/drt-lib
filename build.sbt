@@ -1,13 +1,12 @@
 import Dependencies._
 
-lazy val scala212 = "2.12.8"
-lazy val scala211 = "2.11.12"
-lazy val supportedScalaVersions = List(scala212, scala211)
+lazy val scala = "2.12.8"
 
-ThisBuild / scalaVersion := "2.11.12"
+
+ThisBuild / scalaVersion := scala
 ThisBuild / organization := "uk.gov.homeoffice"
 ThisBuild / organizationName := "drt"
-ThisBuild / version := "0.3.0"
+ThisBuild / version := sys.env.getOrElse("DRONE_BUILD_NUMBER", sys.env.getOrElse("BUILD_ID", "DEV"))
 
 val artifactory = "https://artifactory.digital.homeoffice.gov.uk/"
 
@@ -30,7 +29,6 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= libDeps
   ).
   jvmSettings(
-    crossScalaVersions := supportedScalaVersions,
     publishTo := Some("release" at artifactory + "artifactory/libs-release"),
     PB.targets in Compile := Seq(
       scalapb.gen() -> (sourceManaged in Compile).value
@@ -38,7 +36,6 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
     PB.protoSources in Compile := Seq(file("src/main/protobuf"))
   ).
   jsSettings(
-    crossScalaVersions := supportedScalaVersions,
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
   )
 
