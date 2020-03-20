@@ -79,7 +79,7 @@ case object StaffEdit extends Role {
 }
 
 case object StaffMovementsEdit extends Role {
-  override val name: String = "staff-movement:edit"
+  override val name: String = "staff-movements:edit"
 }
 
 case object TerminalDashboard extends Role {

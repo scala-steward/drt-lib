@@ -6,9 +6,9 @@ class LoggedInUserSpec extends WordSpec with MustMatchers {
 
   "LoggedInUsers" should {
 
-    "have StaffMovement Role" in {
+    "have StaffMovements Role" in {
 
-      val roleName = Roles.parse("staff-movement:edit")
+      val roleName = Roles.parse("staff-movements:edit")
 
       val loggedInUser = LoggedInUser("test", "testId", "test@drt.com", Set(roleName).flatten)
 
@@ -17,7 +17,7 @@ class LoggedInUserSpec extends WordSpec with MustMatchers {
       loggedInUser.hasRole(StaffMovementsEdit) mustBe true
     }
 
-    "not have StaffMovement Role if role name not exists" in {
+    "not have StaffMovements Role if role name not exists" in {
 
       val roleName = Roles.parse("unknown")
 
