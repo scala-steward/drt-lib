@@ -17,6 +17,17 @@ class LoggedInUserSpec extends WordSpec with MustMatchers {
       loggedInUser.hasRole(StaffMovementsEdit) mustBe true
     }
 
+    "have StaffMovementsExport Role" in {
+
+      val roleName = Roles.parse("staff-movements:export")
+
+      val loggedInUser = LoggedInUser("test", "testId", "test@drt.com", Set(roleName).flatten)
+
+      roleName mustBe Some(StaffMovementsExport)
+
+      loggedInUser.hasRole(StaffMovementsExport) mustBe true
+    }
+
     "not have StaffMovements Role if role name not exists" in {
 
       val roleName = Roles.parse("unknown")

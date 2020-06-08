@@ -49,6 +49,7 @@ object Roles {
   val availableRoles: Set[Role] = Set(
     FixedPointsEdit,
     StaffMovementsEdit,
+    StaffMovementsExport,
     StaffEdit,
     ApiView,
     ManageUsers,
@@ -80,6 +81,10 @@ case object StaffEdit extends Role {
 
 case object StaffMovementsEdit extends Role {
   override val name: String = "staff-movements:edit"
+}
+
+case object StaffMovementsExport extends Role {
+  override val name: String = "staff-movements:export"
 }
 
 case object TerminalDashboard extends Role {
