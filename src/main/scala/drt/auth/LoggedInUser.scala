@@ -65,7 +65,8 @@ object Roles {
     PortFeedUpload,
     ViewConfig,
     TerminalDashboard,
-    ArrivalSource
+    ArrivalSource,
+    ArrivalSimulationUpload
   ) ++ portRoles
 
   def parse(roleName: String): Option[Role] = availableRoles.find(role => role.name == roleName)
@@ -209,4 +210,8 @@ case object PortOperatorStaff extends Role {
 
 case object PortFeedUpload extends Role {
   override val name: String = "port-feed-upload"
+}
+
+case object ArrivalSimulationUpload extends Role {
+  override val name: String = "arrival-simulation-upload"
 }
