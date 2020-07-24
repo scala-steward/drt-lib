@@ -39,7 +39,8 @@ object Roles {
     ViewConfig,
     TerminalDashboard,
     ArrivalSource,
-    ArrivalSimulationUpload
+    ArrivalSimulationUpload,
+    Debug
   ) ++ portRoles
 
   def parse(roleName: String): Option[Role] = availableRoles.find(role => role.name == roleName)
