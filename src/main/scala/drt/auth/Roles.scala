@@ -40,6 +40,7 @@ object Roles {
     TerminalDashboard,
     ArrivalSource,
     ArrivalSimulationUpload,
+    EnhancedApiView,
     Debug
   ) ++ portRoles
 

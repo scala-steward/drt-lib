@@ -160,6 +160,10 @@ case object ArrivalSimulationUpload extends Role {
   override val name: String = "arrival-simulation-upload"
 }
 
+case object EnhancedApiView extends Role {
+  override val name: String = "enhanced-api-view"
+}
+
 case object Debug extends Role {
   override val name: String = "debug"
 }
