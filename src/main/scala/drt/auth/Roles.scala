@@ -41,7 +41,8 @@ object Roles {
     ArrivalSource,
     ArrivalSimulationUpload,
     EnhancedApiView,
-    Debug
+    Debug,
+    FaqView
   ) ++ portRoles
 
   def parse(roleName: String): Option[Role] = availableRoles.find(role => role.name == roleName)

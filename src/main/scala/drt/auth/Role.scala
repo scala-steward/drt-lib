@@ -167,3 +167,7 @@ case object EnhancedApiView extends Role {
 case object Debug extends Role {
   override val name: String = "debug"
 }
+
+case object FaqView extends Role {
+  override val name: String = "faq:view"
+}

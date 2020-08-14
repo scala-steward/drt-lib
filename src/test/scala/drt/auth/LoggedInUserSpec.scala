@@ -54,6 +54,17 @@ class LoggedInUserSpec extends WordSpec with MustMatchers {
       loggedInUser.hasRole(StaffEdit) mustBe true
 
     }
+
+    "have faq view Role" in {
+
+      val roleName = Roles.parse("faq:view")
+
+      val loggedInUser = LoggedInUser("test", "testId", "test@drt.com", Set(roleName).flatten)
+
+      roleName mustBe Some(FaqView)
+
+      loggedInUser.hasRole(FaqView) mustBe true
+    }
   }
 }
 
