@@ -1,5 +1,6 @@
-package drt.auth
+package uk.gov.homeoffice.drt.auth
 
+import uk.gov.homeoffice.drt.auth.Roles.Role
 import upickle.default.{macroRW, ReadWriter => RW}
 
 case class LoggedInUser(userName: String, id: String, email: String, roles: Set[Role]) {

@@ -1,6 +1,7 @@
-package drt.auth
+package uk.gov.homeoffice.drt.auth
 
 import org.scalatest.{MustMatchers, WordSpec}
+import uk.gov.homeoffice.drt.auth.Roles.{ArrivalSimulationUpload, FaqView, StaffEdit, StaffMovementsEdit, StaffMovementsExport}
 
 class LoggedInUserSpec extends WordSpec with MustMatchers {
 
