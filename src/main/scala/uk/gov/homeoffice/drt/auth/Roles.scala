@@ -85,12 +85,12 @@ object Roles {
 
   sealed trait PortAccess extends Role
 
-  case object Test extends PortAccess {
-    override val name: String = "test"
+  case object TEST extends PortAccess {
+    override val name: String = "TEST"
   }
 
-  case object Test2 extends PortAccess {
-    override val name: String = "test2"
+  case object TEST2 extends PortAccess {
+    override val name: String = "TEST2"
   }
 
   case object BHX extends PortAccess {
