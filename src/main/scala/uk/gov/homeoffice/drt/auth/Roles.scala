@@ -30,8 +30,9 @@ object Roles {
     TerminalDashboard,
     ArrivalSource,
     ArrivalSimulationUpload,
+    EnhancedApiView,
     FaqView,
-    Debug) ++ portRoles
+    Debug) ++ portRoles ++ Set(TEST, TEST2)
 
   def parse(roleName: String): Option[Role] = availableRoles.find(role => role.name.toLowerCase == roleName.toLowerCase)
 
