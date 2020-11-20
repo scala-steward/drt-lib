@@ -79,19 +79,19 @@ object Roles {
     override val name: String = "api:view-port-arrivals"
   }
 
-  case object TestAccess extends Role {
-    override val name: String = "test"
-  }
-
-  case object Test2Access extends Role {
-    override val name: String = "test2"
-  }
-
   case object ManageUsers extends Role {
     override val name: String = "manage-users"
   }
 
   sealed trait PortAccess extends Role
+
+  case object Test extends PortAccess {
+    override val name: String = "test"
+  }
+
+  case object Test2 extends PortAccess {
+    override val name: String = "test2"
+  }
 
   case object BHX extends PortAccess {
     override val name: String = "BHX"
