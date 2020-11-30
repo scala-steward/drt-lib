@@ -15,10 +15,22 @@ class UrlsSpec extends Specification {
     "When I ask for the port" >> {
       "I should get LHR" >> {
         val lhrUrl = "https://lhr." + rootDomain + "/"
-
         val portCode = urls.portCodeFromUrl(lhrUrl)
 
         val expected = Option("LHR")
+
+        portCode === expected
+      }
+    }
+  }
+
+  "Given a url without a port" >> {
+    "When I ask for the port" >> {
+      "I should get None" >> {
+        val lhrUrl = "https://" + rootDomain + "/"
+        val portCode = urls.portCodeFromUrl(lhrUrl)
+
+        val expected = None
 
         portCode === expected
       }
