@@ -1,6 +1,6 @@
 import Dependencies._
 
-lazy val scala = "2.12.12"
+lazy val scala = "2.12.10"
 
 ThisBuild / scalaVersion := scala
 ThisBuild / organization := "uk.gov.homeoffice"
