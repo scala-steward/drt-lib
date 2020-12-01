@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.auth
 
 import org.scalatest.{MustMatchers, WordSpec}
-import uk.gov.homeoffice.drt.auth.Roles.{ArrivalSimulationUpload, FaqView, StaffEdit, StaffMovementsEdit, StaffMovementsExport}
+import uk.gov.homeoffice.drt.auth.Roles._
 
 class LoggedInUserSpec extends WordSpec with MustMatchers {
 
@@ -40,7 +40,7 @@ class LoggedInUserSpec extends WordSpec with MustMatchers {
       loggedInUser.hasRole(StaffMovementsExport) mustBe true
     }
 
-    "not have StaffMovements Role if role name not exists" in {
+    "not have StaffMovements Role if role name doesn't exist" in {
 
       val roleName = Roles.parse("unknown")
 
@@ -65,6 +65,27 @@ class LoggedInUserSpec extends WordSpec with MustMatchers {
       roleName mustBe Some(FaqView)
 
       loggedInUser.hasRole(FaqView) mustBe true
+    }
+
+    "provide list of port access roles" in {
+      val user = LoggedInUser("", "", "", Set(LHR, STN, StaffMovementsExport))
+      val portRoles = user.portRoles
+
+      portRoles mustEqual Set(LHR, STN)
+    }
+
+    "return false for a non-accessible port" in {
+      val user = LoggedInUser("", "", "", Set(LHR, STN, StaffMovementsExport))
+      val isAccessible = user.canAccessPort(BHX.toString)
+
+      isAccessible mustEqual false
+    }
+
+    "return true for an accessible port" in {
+      val user = LoggedInUser("", "", "", Set(LHR, STN, StaffMovementsExport))
+      val isAccessible = user.canAccessPort(LHR.toString)
+
+      isAccessible mustEqual true
     }
   }
 }

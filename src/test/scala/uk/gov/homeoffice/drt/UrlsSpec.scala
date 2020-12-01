@@ -1,11 +1,8 @@
 package uk.gov.homeoffice.drt
 
-import com.typesafe.config.{Config, ConfigFactory}
 import org.specs2.mutable.Specification
 
 class UrlsSpec extends Specification {
-  val config: Config = ConfigFactory.load
-
   val useHttps: Boolean = true
   val rootDomain: String = "some-domain.com"
 
