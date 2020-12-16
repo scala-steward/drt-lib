@@ -1,8 +1,8 @@
 package uk.gov.homeoffice.drt.auth
 
 
-import ujson.Js.Value
-import upickle.Js
+import ujson.Value
+
 import upickle.default.{readwriter, _}
 
 
@@ -42,7 +42,7 @@ object Roles {
 
   object Role {
     implicit val paxTypeReaderWriter: ReadWriter[Role] =
-      readwriter[Js.Value].bimap[Role](
+      readwriter[Value].bimap[Role](
         r => r.name,
         (s: Value) => Roles.parse(s.str).getOrElse(NoOpRole)
       )
