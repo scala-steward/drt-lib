@@ -32,6 +32,7 @@ object Roles {
     ArrivalSimulationUpload,
     EnhancedApiView,
     FaqView,
+    RedListFeature,
     Debug) ++ portRoles ++ Set(TEST, TEST2)
 
   def parse(roleName: String): Option[Role] = availableRoles.find(role => role.name.toLowerCase == roleName.toLowerCase)
@@ -207,5 +208,11 @@ object Roles {
   case object Debug extends Role {
     override val name: String = "debug"
   }
+
+  case object RedListFeature extends Role {
+    override val name: String = "red-list-feature"
+  }
+
+
 
 }
