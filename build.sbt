@@ -5,7 +5,7 @@ lazy val scala = "2.12.10"
 ThisBuild / scalaVersion := scala
 ThisBuild / organization := "uk.gov.homeoffice"
 ThisBuild / organizationName := "drt"
-ThisBuild / version := sys.env.getOrElse("DRONE_BUILD_NUMBER", sys.env.getOrElse("BUILD_ID", "DEV"))
+ThisBuild / version := "v" + sys.env.getOrElse("DRONE_BUILD_NUMBER", sys.env.getOrElse("BUILD_ID", "DEV"))
 
 val artifactory = "https://artifactory.digital.homeoffice.gov.uk/"
 
