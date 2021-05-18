@@ -25,6 +25,7 @@ object Roles {
     ForecastView,
     BorderForceStaff,
     PortOperatorStaff,
+    CedatStaff,
     PortFeedUpload,
     ViewConfig,
     TerminalDashboard,
@@ -213,6 +214,8 @@ object Roles {
     override val name: String = "red-list-feature"
   }
 
-
+  case object CedatStaff extends Role {
+    override val name: String = "cedat-staff"
+  }
 
 }
