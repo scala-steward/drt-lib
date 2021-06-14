@@ -7,7 +7,7 @@ import upickle.default.{readwriter, _}
 
 
 object Roles {
-  val portRoles: Set[Role] = Set(BHX, BRS, EDI, EMA, LGW, GLA, LCY, BFS, LPL, NCL, LHR, LTN, MAN, STN)
+  val portRoles: Set[Role] = Set(BFS, BHD, BHX, BRS, EDI, EMA, GLA, LCY, LGW, LHR, LPL, LTN, MAN, NCL, STN)
 
   val availableRoles: Set[Role] = Set(
     FixedPointsEdit,
@@ -96,6 +96,14 @@ object Roles {
     override val name: String = "TEST2"
   }
 
+  case object BFS extends PortAccess {
+    override val name: String = "BFS"
+  }
+
+  case object BHD extends PortAccess {
+    override val name: String = "BHD"
+  }
+
   case object BHX extends PortAccess {
     override val name: String = "BHX"
   }
@@ -112,10 +120,6 @@ object Roles {
     override val name: String = "EMA"
   }
 
-  case object LGW extends PortAccess {
-    override val name: String = "LGW"
-  }
-
   case object GLA extends PortAccess {
     override val name: String = "GLA"
   }
@@ -124,20 +128,16 @@ object Roles {
     override val name: String = "LCY"
   }
 
-  case object BFS extends PortAccess {
-    override val name: String = "BFS"
-  }
-
-  case object LPL extends PortAccess {
-    override val name: String = "LPL"
-  }
-
-  case object NCL extends PortAccess {
-    override val name: String = "NCL"
+  case object LGW extends PortAccess {
+    override val name: String = "LGW"
   }
 
   case object LHR extends PortAccess {
     override val name: String = "LHR"
+  }
+
+  case object LPL extends PortAccess {
+    override val name: String = "LPL"
   }
 
   case object LTN extends PortAccess {
@@ -146,6 +146,10 @@ object Roles {
 
   case object MAN extends PortAccess {
     override val name: String = "MAN"
+  }
+
+  case object NCL extends PortAccess {
+    override val name: String = "NCL"
   }
 
   case object STN extends PortAccess {
