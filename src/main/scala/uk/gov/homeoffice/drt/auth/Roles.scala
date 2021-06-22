@@ -2,7 +2,7 @@ package uk.gov.homeoffice.drt.auth
 
 
 import ujson.Value
-
+import uk.gov.homeoffice.drt.auth.Roles.NeboUpload
 import upickle.default.{readwriter, _}
 
 
@@ -34,6 +34,7 @@ object Roles {
     EnhancedApiView,
     FaqView,
     RedListFeature,
+    NeboUpload,
     Debug) ++ portRoles ++ Set(TEST, TEST2)
 
   def parse(roleName: String): Option[Role] = availableRoles.find(role => role.name.toLowerCase == roleName.toLowerCase)
@@ -220,6 +221,10 @@ object Roles {
 
   case object CedatStaff extends Role {
     override val name: String = "cedat-staff"
+  }
+
+  case object NeboUpload extends Role {
+    override val name: String = "nebo:upload"
   }
 
 }
