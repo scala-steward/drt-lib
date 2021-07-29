@@ -153,6 +153,10 @@ object Roles {
     override val name: String = "NCL"
   }
 
+  case object PIK extends PortAccess {
+    override val name: String = "PIK"
+  }
+
   case object STN extends PortAccess {
     override val name: String = "STN"
   }
