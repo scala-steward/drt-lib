@@ -22,6 +22,7 @@ object Roles {
     FixedPointsView,
     DesksAndQueuesView,
     ArrivalsAndSplitsView,
+    RedListAdmin,
     ForecastView,
     BorderForceStaff,
     PortOperatorStaff,
@@ -183,6 +184,10 @@ object Roles {
 
   case object ArrivalsAndSplitsView extends Role {
     override val name: String = "arrivals-and-splits:view"
+  }
+
+  case object RedListsEdit extends Role {
+    override val name: String = "red-lists:edit"
   }
 
   case object ForecastView extends Role {
