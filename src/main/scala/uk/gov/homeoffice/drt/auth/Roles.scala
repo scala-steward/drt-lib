@@ -2,7 +2,6 @@ package uk.gov.homeoffice.drt.auth
 
 
 import ujson.Value
-import uk.gov.homeoffice.drt.auth.Roles.NeboUpload
 import upickle.default.{readwriter, _}
 
 
@@ -22,6 +21,7 @@ object Roles {
     FixedPointsView,
     DesksAndQueuesView,
     ArrivalsAndSplitsView,
+    RedListsEdit,
     ForecastView,
     BorderForceStaff,
     PortOperatorStaff,
@@ -183,6 +183,10 @@ object Roles {
 
   case object ArrivalsAndSplitsView extends Role {
     override val name: String = "arrivals-and-splits:view"
+  }
+
+  case object RedListsEdit extends Role {
+    override val name: String = "red-lists:edit"
   }
 
   case object ForecastView extends Role {
