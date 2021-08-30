@@ -2,7 +2,6 @@ package uk.gov.homeoffice.drt.auth
 
 
 import ujson.Value
-import uk.gov.homeoffice.drt.auth.Roles.NeboUpload
 import upickle.default.{readwriter, _}
 
 
@@ -22,7 +21,7 @@ object Roles {
     FixedPointsView,
     DesksAndQueuesView,
     ArrivalsAndSplitsView,
-    RedListAdmin,
+    RedListsEdit,
     ForecastView,
     BorderForceStaff,
     PortOperatorStaff,
