@@ -24,11 +24,11 @@ object Ports {
     "UHF", "ULL", "UNT", "UPV",
     "WEM", "WEX", "WFD", "WHS", "WIC", "WOB", "WRY", "WTN", "WXF",
     "YEO"
-  ).map(PortCode)
+  ).map(PortCode(_))
 
   val cta: Seq[PortCode] = Seq(
     "ORK", "CFN", "DUB", "WST", "GWY", "KIR", "NOC", "SNN", "SXL", "WAT", "GCI", "JER", "ACI", "IOM"
-  ).map(PortCode)
+  ).map(PortCode(_))
 
   def isDomestic(port: PortCode): Boolean = domestic.contains(port)
 

@@ -8,6 +8,8 @@ import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, Split
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
 
+import scala.collection.immutable.SortedMap
+
 object Brs extends AirportConfigLike {
 
   import AirportConfigDefaults._

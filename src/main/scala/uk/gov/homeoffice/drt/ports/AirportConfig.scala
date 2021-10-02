@@ -5,6 +5,7 @@ import uk.gov.homeoffice.drt.ports.QueueStatusProviders.QueueStatusProvider
 import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitRatios
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
+import upickle.default._
 
 import scala.collection.immutable.SortedMap
 
@@ -22,6 +23,10 @@ case class PortCode(iata: String) extends Ordered[PortCode] {
   lazy val isDomestic: Boolean = Ports.isDomestic(this)
   lazy val isCta: Boolean = Ports.isCta(this)
   lazy val isDomesticOrCta: Boolean = Ports.isDomesticOrCta(this)
+}
+
+object PortCode {
+  implicit val rw: ReadWriter[PortCode] = macroRW
 }
 
 case class AirportConfig(portCode: PortCode,
@@ -103,4 +108,23 @@ case class AirportConfig(portCode: PortCode,
   def nonTransferQueues(terminalName: Terminal): Seq[Queue] = queuesByTerminal(terminalName).collect {
     case queue if queue != Queues.Transfer => queue
   }
+}
+
+object AirportConfig {
+  implicit val rwQueues: ReadWriter[SortedMap[Terminal, Seq[Queue]]] = readwriter[Map[Terminal, Seq[Queue]]].bimap[SortedMap[Terminal, Seq[Queue]]](
+    sm => Map[Terminal, Seq[Queue]]() ++ sm,
+    m => SortedMap[Terminal, Seq[Queue]]() ++ m
+  )
+
+  implicit val rw: ReadWriter[AirportConfig] = macroRW
+
+  def desksByTerminalDefault(minMaxDesksByTerminalQueue: Map[Terminal, Map[Queue, (List[Int], List[Int])]])
+                            (terminal: Terminal): List[Int] = minMaxDesksByTerminalQueue.getOrElse(terminal, Map())
+    .filterKeys(_ != EGate)
+    .map { case (_, (_, max)) => max }
+    .reduce[List[Int]] {
+      case (max1, max2) => max1.zip(max2).map { case (m1, m2) => m1 + m2 }
+    }
+
+  val defaultQueueStatusProvider: (Terminal, Queue, Long) => QueueStatus = (_, _, _) => Open
 }
