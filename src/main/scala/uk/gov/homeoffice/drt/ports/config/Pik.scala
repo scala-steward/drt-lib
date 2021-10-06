@@ -56,6 +56,7 @@ object Pik extends AirportConfigLike {
       )),
     flexedQueues = Set(),
     desksByTerminal = Map(T1 -> 5),
-    feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, LiveFeedSource, AclFeedSource)
+    feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, LiveFeedSource, AclFeedSource) ,
+    feedSourceMonitorExemptions = Seq(AclFeedSource)
   )
 }
