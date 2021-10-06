@@ -12,6 +12,6 @@ object Dependencies {
     "com.lihaoyi" %% "upickle" % uPickle,
     "com.lihaoyi" %% "autowire" % autowire,
     "io.suzaku" %% "boopickle" % booPickle,
-    "org.specs2" %% "specs2-core" % specs2 % Test
+    "org.specs2" %% "specs2-core" % specs2 % Test,
   )
 }
