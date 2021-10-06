@@ -18,8 +18,6 @@ lazy val root = project.in(file(".")).
     libraryDependencies ++= libDeps
   )
 
-import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
-
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
   .in(file("."))
