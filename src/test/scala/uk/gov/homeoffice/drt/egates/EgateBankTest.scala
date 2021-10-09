@@ -3,18 +3,7 @@ package uk.gov.homeoffice.drt.egates
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
-case class EgateBank(gates: IndexedSeq[Boolean])
 
-case class EgateBanksUpdate(effectiveFrom: Long, banks: IndexedSeq[EgateBank])
-
-case class EgateBanksUpdates(updates: List[EgateBanksUpdate]) {
-  def applyForDate(atDate: Long, banks: IndexedSeq[EgateBank]): IndexedSeq[EgateBank] = {
-    updates.sortBy(_.effectiveFrom).reverse.find(_.effectiveFrom < atDate) match {
-      case Some(EgateBanksUpdate(effectiveFrom, update)) => update
-      case None => banks
-    }
-  }
-}
 //case class EgateBankIntraDayUpdate(startMinute: Int, durationMinutes: Int)
 //case class RecurringWeekly(startDate: Long, endDate: Long, daysOfWeek: Set[Int])
 
