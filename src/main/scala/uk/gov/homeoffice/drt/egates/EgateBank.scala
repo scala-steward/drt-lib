@@ -1,8 +1,18 @@
 package uk.gov.homeoffice.drt.egates
 
+import upickle.default.{ReadWriter, macroRW}
+
 case class EgateBank(gates: IndexedSeq[Boolean])
 
+object EgateBank {
+  implicit val rw: ReadWriter[EgateBank] = macroRW
+}
+
 case class EgateBanksUpdate(effectiveFrom: Long, banks: IndexedSeq[EgateBank])
+
+object EgateBanksUpdate {
+  implicit val rw: ReadWriter[EgateBanksUpdate] = macroRW
+}
 
 case class EgateBanksUpdates(updates: List[EgateBanksUpdate]) {
   def applyForDate(atDate: Long, banks: IndexedSeq[EgateBank]): IndexedSeq[EgateBank] = {
@@ -11,6 +21,15 @@ case class EgateBanksUpdates(updates: List[EgateBanksUpdate]) {
       case None => banks
     }
   }
-}
 
-case class SetEgateBanksUpdate(originalDate: Long, update: EgateBanksUpdate)
+  def update(setEgateBanksUpdate: SetEgateBanksUpdate): EgateBanksUpdates = {
+    val updated: List[EgateBanksUpdate] = updates
+      .filter { update =>
+        update.effectiveFrom != setEgateBanksUpdate.originalDate
+      } :+ setEgateBanksUpdate.egateBanksUpdate
+
+    copy(updates = updated)
+  }
+
+  def remove(effectiveFrom: Long): EgateBanksUpdates = copy(updates = updates.filter(_.effectiveFrom != effectiveFrom))
+}
