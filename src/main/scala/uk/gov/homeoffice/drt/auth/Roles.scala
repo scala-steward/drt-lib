@@ -189,6 +189,10 @@ object Roles {
     override val name: String = "red-lists:edit"
   }
 
+  case object EgateBanksEdit extends Role {
+    override val name: String = "egate-banks:edit"
+  }
+
   case object ForecastView extends Role {
     override val name: String = "forecast:view"
   }

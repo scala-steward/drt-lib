@@ -33,3 +33,9 @@ case class EgateBanksUpdates(updates: List[EgateBanksUpdate]) {
 
   def remove(effectiveFrom: Long): EgateBanksUpdates = copy(updates = updates.filter(_.effectiveFrom != effectiveFrom))
 }
+
+object EgateBanksUpdates {
+  val empty: EgateBanksUpdates = EgateBanksUpdates(List())
+
+  implicit val rw: ReadWriter[EgateBanksUpdates] = macroRW
+}
