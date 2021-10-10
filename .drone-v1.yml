@@ -14,6 +14,10 @@ steps:
     commands:
       - /root/entrypoint.sh
       - sbt compile
+    environment:
+      ARTIFACTORY_PASSWORD:
+        from_secret: ARTIFACTORY_PASSWORD
+      ARTIFACTORY_USERNAME: drt_optimiser_drone
     when:
       event:
         - push
