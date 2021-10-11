@@ -13,10 +13,10 @@ steps:
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     resources:
       requests:
-        cpu: "500m"
+        cpu: 500
         memory: "500MiB"
       limits:
-        cpu: "500m"
+        cpu: 500
         memory: "500MiB"
     commands:
       - /root/entrypoint.sh
