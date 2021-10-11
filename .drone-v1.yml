@@ -11,13 +11,6 @@ steps:
   - name: Build
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
-    resources:
-      requests:
-        cpu: 2000
-        memory: "2GiB"
-      limits:
-        cpu: 2000
-        memory: "2GiB"
     commands:
       - /root/entrypoint.sh
       - sbt compile
@@ -32,13 +25,6 @@ steps:
   - name: Test
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
-    resources:
-      requests:
-        cpu: 2000
-        memory: "2GiB"
-      limits:
-        cpu: 2000
-        memory: "2GiB"
     commands:
       - /root/entrypoint.sh
       - sbt --error test
@@ -55,13 +41,6 @@ steps:
   - name: Publish
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
-    resources:
-      requests:
-        cpu: 2000
-        memory: "2GiB"
-      limits:
-        cpu: 2000
-        memory: "2GiB"
     commands:
       - /root/entrypoint.sh
       - sbt clean +publish
