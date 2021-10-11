@@ -13,10 +13,10 @@ steps:
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     resources:
       requests:
-        cpu: 500
+        cpu: 1000
         memory: "1GiB"
       limits:
-        cpu: 500
+        cpu: 1000
         memory: "1GiB"
     commands:
       - /root/entrypoint.sh
@@ -32,6 +32,13 @@ steps:
   - name: Test
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
+    resources:
+      requests:
+        cpu: 1000
+        memory: "1GiB"
+      limits:
+        cpu: 1000
+        memory: "1GiB"
     commands:
       - /root/entrypoint.sh
       - sbt --error test
@@ -48,6 +55,13 @@ steps:
   - name: Publish
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
+    resources:
+      requests:
+        cpu: 1000
+        memory: "1GiB"
+      limits:
+        cpu: 1000
+        memory: "1GiB"
     commands:
       - /root/entrypoint.sh
       - sbt clean +publish
