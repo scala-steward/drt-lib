@@ -14,10 +14,10 @@ steps:
     resources:
       requests:
         cpu: 500
-        memory: "500MiB"
+        memory: "1GiB"
       limits:
         cpu: 500
-        memory: "500MiB"
+        memory: "1GiB"
     commands:
       - /root/entrypoint.sh
       - sbt compile
