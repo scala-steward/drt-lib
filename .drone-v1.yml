@@ -10,7 +10,7 @@ platform:
 resources:
   requests:
     cpu: 2000
-    memory: 2000MiB
+    memory: 4000MiB
 
 steps:
   - name: Build
@@ -21,8 +21,8 @@ steps:
       - sbt compile
     resources:
       limits:
-        cpu: 1000
-        memory: 1000MiB
+        cpu: 2000
+        memory: 3000MiB
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
@@ -39,8 +39,8 @@ steps:
       - sbt --error test
     resources:
       limits:
-        cpu: 1000
-        memory: 1000MiB
+        cpu: 2000
+        memory: 3000MiB
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
@@ -59,8 +59,8 @@ steps:
       - sbt clean +publish
     resources:
       limits:
-        cpu: 1000
-        memory: 1000MiB
+        cpu: 2000
+        memory: 3000MiB
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
