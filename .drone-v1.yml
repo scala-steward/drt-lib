@@ -13,11 +13,11 @@ steps:
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     resources:
       requests:
-        cpu: 1000
-        memory: "1GiB"
+        cpu: 2000
+        memory: "2GiB"
       limits:
-        cpu: 1000
-        memory: "1GiB"
+        cpu: 2000
+        memory: "2GiB"
     commands:
       - /root/entrypoint.sh
       - sbt compile
@@ -34,11 +34,11 @@ steps:
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     resources:
       requests:
-        cpu: 1000
-        memory: "1GiB"
+        cpu: 2000
+        memory: "2GiB"
       limits:
-        cpu: 1000
-        memory: "1GiB"
+        cpu: 2000
+        memory: "2GiB"
     commands:
       - /root/entrypoint.sh
       - sbt --error test
@@ -57,11 +57,11 @@ steps:
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     resources:
       requests:
-        cpu: 1000
-        memory: "1GiB"
+        cpu: 2000
+        memory: "2GiB"
       limits:
-        cpu: 1000
-        memory: "1GiB"
+        cpu: 2000
+        memory: "2GiB"
     commands:
       - /root/entrypoint.sh
       - sbt clean +publish
