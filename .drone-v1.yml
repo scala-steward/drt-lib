@@ -11,6 +11,13 @@ steps:
   - name: Build
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "500MiB"
+      limits:
+        cpu: "500m"
+        memory: "500MiB"
     commands:
       - /root/entrypoint.sh
       - sbt compile
