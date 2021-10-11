@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.ports.config
 
-import uk.gov.homeoffice.drt.auth.Roles.BFS
+import uk.gov.homeoffice.drt.auth.Roles.BHD
 import uk.gov.homeoffice.drt.ports.PaxTypes._
 import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
 import uk.gov.homeoffice.drt.ports.Queues._
@@ -42,7 +42,7 @@ object Bhd extends AirportConfigLike {
       Queues.NonEeaDesk -> (List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), List(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4))
     )),
     eGateBankSizes = Map(),
-    role = BFS,
+    role = BHD,
     terminalPaxTypeQueueAllocation = Map(
       T1 -> (defaultQueueRatios + (
         EeaMachineReadable -> List(EeaDesk -> 1.0),
