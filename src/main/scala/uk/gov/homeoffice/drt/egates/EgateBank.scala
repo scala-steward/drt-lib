@@ -7,6 +7,10 @@ case class EgateBank(gates: IndexedSeq[Boolean])
 
 object EgateBank {
   implicit val rw: ReadWriter[EgateBank] = macroRW
+
+  def fromAirportConfig(banks: Iterable[Int]): IndexedSeq[EgateBank] = {
+    banks.to[IndexedSeq].map { size => EgateBank(IndexedSeq.fill(size)(true)) }
+  }
 }
 
 case class EgateBanksUpdate(effectiveFrom: Long, banks: IndexedSeq[EgateBank])
@@ -51,4 +55,10 @@ case class PortEgateBanksUpdates(updatesByTerminal: Map[Terminal, EgateBanksUpda
     val updatedTerminal = updatesByTerminal.getOrElse(delete.terminal, EgateBanksUpdates.empty).remove(delete.millis)
     copy(updatesByTerminal.updated(delete.terminal, updatedTerminal))
   }
+
+  def size: Int = updatesByTerminal.map(_._2.updates.length).sum
+}
+
+object PortEgateBanksUpdates {
+  implicit val rw: ReadWriter[PortEgateBanksUpdates] = macroRW
 }
