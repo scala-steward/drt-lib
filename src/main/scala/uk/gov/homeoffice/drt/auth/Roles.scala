@@ -22,6 +22,7 @@ object Roles {
     DesksAndQueuesView,
     ArrivalsAndSplitsView,
     RedListsEdit,
+    EgateBanksEdit,
     ForecastView,
     BorderForceStaff,
     PortOperatorStaff,

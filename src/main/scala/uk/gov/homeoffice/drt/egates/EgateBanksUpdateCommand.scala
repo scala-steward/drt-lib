@@ -1,13 +1,14 @@
 package uk.gov.homeoffice.drt.egates
 
+import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import upickle.default.{ReadWriter, macroRW}
 
 sealed trait EgateBanksUpdateCommand
 
-case class SetEgateBanksUpdate(originalDate: Long, egateBanksUpdate: EgateBanksUpdate) extends EgateBanksUpdateCommand
+case class SetEgateBanksUpdate(terminal: Terminal, originalDate: Long, egateBanksUpdate: EgateBanksUpdate) extends EgateBanksUpdateCommand
 
 object SetEgateBanksUpdate {
   implicit val rw: ReadWriter[SetEgateBanksUpdate] = macroRW
 }
 
-case class DeleteEgateBanksUpdates(millis: Long) extends EgateBanksUpdateCommand
+case class DeleteEgateBanksUpdates(terminal: Terminal, millis: Long) extends EgateBanksUpdateCommand
