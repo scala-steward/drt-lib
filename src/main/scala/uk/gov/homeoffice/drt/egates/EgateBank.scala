@@ -23,16 +23,11 @@ object EgateBanksUpdate {
 }
 
 case class EgateBanksUpdates(updates: List[EgateBanksUpdate]) {
-  val log: Logger = LoggerFactory.getLogger(getClass)
-
   private def updatesForDate(atDate: Long): Option[EgateBanksUpdate] =
     updates.sortBy(_.effectiveFrom).reverse.find(_.effectiveFrom < atDate)
 
   def forPeriod(millis: NumericRange[Long]): IndexedSeq[Seq[EgateBank]] = {
     val applicableUpdates = updatesForDate(millis.min) ++ updates.filter(u => millis.min <= u.effectiveFrom && u.effectiveFrom <= millis.max)
-    if (applicableUpdates.isEmpty) {
-      log.warn(s"No applicable updates for period ${millis.min} -> ${millis.max}")
-    }
     applicableUpdates.toSeq
       .sortBy(_.effectiveFrom)
       .reverse
