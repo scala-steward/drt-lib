@@ -3,6 +3,8 @@ package uk.gov.homeoffice.drt.egates
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import upickle.default.{ReadWriter, macroRW}
 
+import scala.collection.immutable.NumericRange
+
 case class EgateBank(gates: IndexedSeq[Boolean])
 
 object EgateBank {
@@ -21,10 +23,39 @@ object EgateBanksUpdate {
 
 case class EgateBanksUpdates(updates: List[EgateBanksUpdate]) {
   def applyForDate(atDate: Long, banks: IndexedSeq[EgateBank]): IndexedSeq[EgateBank] = {
-    updates.sortBy(_.effectiveFrom).reverse.find(_.effectiveFrom < atDate) match {
+    updatesForDate(atDate) match {
       case Some(EgateBanksUpdate(_, update)) => update
       case None => banks
     }
+  }
+
+  private def updatesForDate(atDate: Long): Option[EgateBanksUpdate] =
+    updates.sortBy(_.effectiveFrom).reverse.find(_.effectiveFrom < atDate)
+
+  def forPeriod(millis: NumericRange[Long]): IndexedSeq[Seq[EgateBank]] = {
+    (updatesForDate(millis.min) ++ updates.filter(u => millis.min <= u.effectiveFrom && u.effectiveFrom <= millis.max)).toSeq
+      .sortBy(_.effectiveFrom)
+      .reverse
+      .foldLeft(List[(NumericRange[Long], Seq[EgateBank])]()) {
+        case (acc, updates) =>
+          acc.map(_._1).sortBy(_.min).headOption match {
+            case None => List((startMillis(millis, updates) to millis.max, updates.banks))
+            case Some(upToMillis) =>
+              val banksForPeriod = (startMillis(millis, updates) until upToMillis.min, updates.banks)
+              banksForPeriod :: acc
+          }
+      }
+      .flatMap {
+        case (range, banks) => range.map(m => (m, banks))
+      }
+      .sortBy(_._1)
+      .map(_._2)
+      .toIndexedSeq
+  }
+
+  private def startMillis(millis: NumericRange[Long], updates: EgateBanksUpdate) = {
+    val from = if (updates.effectiveFrom < millis.min) millis.min else updates.effectiveFrom
+    from
   }
 
   def update(setEgateBanksUpdate: SetEgateBanksUpdate): EgateBanksUpdates = {

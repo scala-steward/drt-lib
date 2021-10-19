@@ -5,7 +5,12 @@ import upickle.default.{ReadWriter, macroRW}
 
 sealed trait EgateBanksUpdateCommand
 
-case class SetEgateBanksUpdate(terminal: Terminal, originalDate: Long, egateBanksUpdate: EgateBanksUpdate) extends EgateBanksUpdateCommand
+case class SetEgateBanksUpdate(terminal: Terminal, originalDate: Long, egateBanksUpdate: EgateBanksUpdate) extends EgateBanksUpdateCommand {
+  lazy val firstMinuteAffected: Long =
+    if (egateBanksUpdate.effectiveFrom < originalDate)
+      egateBanksUpdate.effectiveFrom
+    else originalDate
+}
 
 object SetEgateBanksUpdate {
   implicit val rw: ReadWriter[SetEgateBanksUpdate] = macroRW
