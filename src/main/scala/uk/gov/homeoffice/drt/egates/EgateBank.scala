@@ -1,5 +1,6 @@
 package uk.gov.homeoffice.drt.egates
 
+import com.sun.org.slf4j.internal.{Logger, LoggerFactory}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import upickle.default.{ReadWriter, macroRW}
 
@@ -22,18 +23,17 @@ object EgateBanksUpdate {
 }
 
 case class EgateBanksUpdates(updates: List[EgateBanksUpdate]) {
-  def applyForDate(atDate: Long, banks: IndexedSeq[EgateBank]): IndexedSeq[EgateBank] = {
-    updatesForDate(atDate) match {
-      case Some(EgateBanksUpdate(_, update)) => update
-      case None => banks
-    }
-  }
+  val log: Logger = LoggerFactory.getLogger(getClass)
 
   private def updatesForDate(atDate: Long): Option[EgateBanksUpdate] =
     updates.sortBy(_.effectiveFrom).reverse.find(_.effectiveFrom < atDate)
 
   def forPeriod(millis: NumericRange[Long]): IndexedSeq[Seq[EgateBank]] = {
-    (updatesForDate(millis.min) ++ updates.filter(u => millis.min <= u.effectiveFrom && u.effectiveFrom <= millis.max)).toSeq
+    val applicableUpdates = updatesForDate(millis.min) ++ updates.filter(u => millis.min <= u.effectiveFrom && u.effectiveFrom <= millis.max)
+    if (applicableUpdates.isEmpty) {
+      log.warn(s"No applicable updates for period ${millis.min} -> ${millis.max}")
+    }
+    applicableUpdates.toSeq
       .sortBy(_.effectiveFrom)
       .reverse
       .foldLeft(List[(NumericRange[Long], Seq[EgateBank])]()) {
