@@ -26,31 +26,37 @@ case class EgateBanksUpdates(updates: List[EgateBanksUpdate]) {
     updates.sortBy(_.effectiveFrom).reverse.find(_.effectiveFrom < atDate)
 
   def forPeriod(millis: NumericRange[Long]): IndexedSeq[Seq[EgateBank]] = {
-    val applicableUpdates = updatesForDate(millis.min) ++ updates.filter(u => millis.min <= u.effectiveFrom && u.effectiveFrom <= millis.max)
-    applicableUpdates.toSeq
-      .sortBy(_.effectiveFrom)
-      .reverse
-      .foldLeft(List[(NumericRange[Long], Seq[EgateBank])]()) {
-        case (acc, updates) =>
-          acc.map(_._1).sortBy(_.min).headOption match {
-            case None => List((startMillis(millis, updates) to millis.max, updates.banks))
-            case Some(upToMillis) =>
-              val banksForPeriod = (startMillis(millis, updates) until upToMillis.min, updates.banks)
-              banksForPeriod :: acc
+    updatesForDate(millis.min) ++ updates.filter(u => millis.min <= u.effectiveFrom && u.effectiveFrom <= millis.max) match {
+      case noUpdates if noUpdates.isEmpty =>
+        IndexedSeq.fill(millis.length)(Seq())
+
+      case applicableUpdates =>
+        applicableUpdates.toSeq
+          .sortBy(_.effectiveFrom)
+          .reverse
+          .foldLeft(List[(NumericRange[Long], Seq[EgateBank])]()) {
+            case (acc, updates) =>
+              acc.map(_._1).sortBy(_.min).headOption match {
+                case None =>
+                  val range = startMillis(millis, updates) to millis.max by millis.step
+                  List((range, updates.banks))
+                case Some(upToMillis) =>
+                  val range = startMillis(millis, updates) until upToMillis.min by millis.step
+                  val banksForPeriod = (range, updates.banks)
+                  banksForPeriod :: acc
+              }
           }
-      }
-      .flatMap {
-        case (range, banks) => range.map(m => (m, banks))
-      }
-      .sortBy(_._1)
-      .map(_._2)
-      .toIndexedSeq
+          .flatMap {
+            case (range, banks) => range.map(m => (m, banks))
+          }
+          .sortBy(_._1)
+          .map(_._2)
+          .toIndexedSeq
+    }
   }
 
-  private def startMillis(millis: NumericRange[Long], updates: EgateBanksUpdate) = {
-    val from = if (updates.effectiveFrom < millis.min) millis.min else updates.effectiveFrom
-    from
-  }
+  private def startMillis(millis: NumericRange[Long], updates: EgateBanksUpdate): Long =
+    if (updates.effectiveFrom < millis.min) millis.min else updates.effectiveFrom
 
   def update(setEgateBanksUpdate: SetEgateBanksUpdate): EgateBanksUpdates = {
     val updated: List[EgateBanksUpdate] = updates
