@@ -27,23 +27,23 @@ class EgateBankTest extends AnyWordSpec with Matchers {
     "reflect the most recent update at a given time" in {
       val updates = EgateBanksUpdates(List(updateAt10))
 
-      val banksAt11 = updates.applyForDate(11L, banks)
+      val banksAt11 = updates.forPeriod(11L to 11L)
 
-      banksAt11 should ===(updateAt10.banks)
+      banksAt11 should ===(Iterable(updateAt10.banks))
     }
-    "remain the same given no previous updates" in {
+    "be empty given no previous updates" in {
       val updates = EgateBanksUpdates(List(updateAt10))
 
-      val banksAt9 = updates.applyForDate(9L, banks)
+      val banksAt9 = updates.forPeriod(9L to 9L)
 
-      banksAt9 should ===(banks)
+      banksAt9 should ===(Iterable())
     }
     "only reflect the most recent update, and not upcoming updates" in {
       val updates = EgateBanksUpdates(List(updateAt10, updateAt20))
 
-      val banksAt15 = updates.applyForDate(15L, banks)
+      val banksAt15 = updates.forPeriod(15L to 15L)
 
-      banksAt15 should ===(updateAt10.banks)
+      banksAt15 should ===(Iterable(updateAt10.banks))
     }
   }
 }
