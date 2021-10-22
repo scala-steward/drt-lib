@@ -4,9 +4,6 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 
 
-//case class EgateBankIntraDayUpdate(startMinute: Int, durationMinutes: Int)
-//case class RecurringWeekly(startDate: Long, endDate: Long, daysOfWeek: Set[Int])
-
 class EgateBankTest extends AnyWordSpec with Matchers {
   val banks = IndexedSeq(
     EgateBank(IndexedSeq(true, true, true, true, true)),
