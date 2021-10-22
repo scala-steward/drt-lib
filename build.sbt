@@ -1,6 +1,6 @@
 import Dependencies._
 
-lazy val scala = "2.12.10"
+lazy val scala = "2.12.15"
 
 ThisBuild / scalaVersion := scala
 ThisBuild / organization := "uk.gov.homeoffice"
@@ -17,8 +17,6 @@ lazy val root = project.in(file(".")).
     publishLocal := {},
     libraryDependencies ++= libDeps
   )
-
-import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)

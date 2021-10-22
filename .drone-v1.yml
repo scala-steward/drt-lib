@@ -7,11 +7,6 @@ platform:
   os: linux
   arch: amd64
 
-resources:
-  requests:
-    cpu: 2000
-    memory: 4000MiB
-
 steps:
   - name: Build
     pull: if-not-exists
@@ -19,10 +14,6 @@ steps:
     commands:
       - /root/entrypoint.sh
       - sbt compile
-    resources:
-      limits:
-        cpu: 2000
-        memory: 3000MiB
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
@@ -37,10 +28,6 @@ steps:
     commands:
       - /root/entrypoint.sh
       - sbt --error test
-    resources:
-      limits:
-        cpu: 2000
-        memory: 3000MiB
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
@@ -57,10 +44,6 @@ steps:
     commands:
       - /root/entrypoint.sh
       - sbt clean +publish
-    resources:
-      limits:
-        cpu: 2000
-        memory: 3000MiB
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD

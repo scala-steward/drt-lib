@@ -22,6 +22,7 @@ object Roles {
     DesksAndQueuesView,
     ArrivalsAndSplitsView,
     RedListsEdit,
+    EgateBanksEdit,
     ForecastView,
     BorderForceStaff,
     PortOperatorStaff,
@@ -187,6 +188,10 @@ object Roles {
 
   case object RedListsEdit extends Role {
     override val name: String = "red-lists:edit"
+  }
+
+  case object EgateBanksEdit extends Role {
+    override val name: String = "egate-banks:edit"
   }
 
   case object ForecastView extends Role {

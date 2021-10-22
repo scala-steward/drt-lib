@@ -1,9 +1,10 @@
 package uk.gov.homeoffice.drt.auth
 
-import org.scalatest.{MustMatchers, WordSpec}
+import org.scalatest.matchers.must.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.homeoffice.drt.auth.Roles._
 
-class LoggedInUserSpec extends WordSpec with MustMatchers {
+class LoggedInUserSpec extends AnyWordSpec with Matchers {
 
   "LoggedInUsers" should {
 
