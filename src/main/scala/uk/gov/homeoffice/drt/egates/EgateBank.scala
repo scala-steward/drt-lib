@@ -5,7 +5,17 @@ import upickle.default.{ReadWriter, macroRW}
 
 import scala.collection.immutable.NumericRange
 
-case class EgateBank(gates: IndexedSeq[Boolean])
+sealed trait WorkloadProcessor {
+  val maxCapacity: Int
+}
+
+case object Desk extends WorkloadProcessor {
+  override val maxCapacity: Int = 1
+}
+
+case class EgateBank(gates: IndexedSeq[Boolean]) extends WorkloadProcessor {
+  override val maxCapacity: Int = gates.count(_ == true)
+}
 
 object EgateBank {
   implicit val rw: ReadWriter[EgateBank] = macroRW
