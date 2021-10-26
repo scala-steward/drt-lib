@@ -42,5 +42,11 @@ class EgateBankTest extends AnyWordSpec with Matchers {
 
       banksAt15 should ===(Iterable(updateAt10.banks))
     }
+    "have capacity if it contains at least one open gate" in {
+      EgateBank(IndexedSeq(true, false)).hasCapacity should ===(true)
+    }
+    "not have capacity if it contains no open gate" in {
+      EgateBank(IndexedSeq(false, false)).hasCapacity should ===(false)
+    }
   }
 }
