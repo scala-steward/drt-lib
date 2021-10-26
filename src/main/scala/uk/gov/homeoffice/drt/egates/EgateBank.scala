@@ -15,7 +15,6 @@ case object Desk extends WorkloadProcessor {
 
 case class EgateBank(gates: IndexedSeq[Boolean]) extends WorkloadProcessor {
   override val maxCapacity: Int = gates.count(_ == true)
-  def hasCapacity: Boolean = gates.contains(true)
 }
 
 object EgateBank {
