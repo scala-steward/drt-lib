@@ -7,14 +7,23 @@ import scala.collection.immutable.NumericRange
 
 sealed trait WorkloadProcessor {
   val maxCapacity: Int
+  val openCount: Int
+  val isClosed: Boolean
+  val isFullyOpen: Boolean
 }
 
 case object Desk extends WorkloadProcessor {
   override val maxCapacity: Int = 1
+  override val openCount: Int = 1
+  override val isClosed = false
+  override val isFullyOpen: Boolean = true
 }
 
 case class EgateBank(gates: IndexedSeq[Boolean]) extends WorkloadProcessor {
-  override val maxCapacity: Int = gates.count(_ == true)
+  override lazy val maxCapacity: Int = gates.size
+  override lazy val openCount: Int = gates.count(identity)
+  override lazy val isClosed: Boolean = openCount == 0
+  override lazy val isFullyOpen: Boolean = openCount == maxCapacity
 }
 
 object EgateBank {
