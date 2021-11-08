@@ -32,11 +32,16 @@ object Huy extends AirportConfigLike {
     eGateBankSizes = Map(),
     role = HUY,
     terminalPaxTypeQueueAllocation = Map(
-      T1 -> (defaultQueueRatios + (
-        EeaMachineReadable -> List(EeaDesk -> 1.0),
-        B5JPlusNational -> List(Queues.EeaDesk -> 1.0)
-      ))),
-    feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, AclFeedSource),
+      T1 -> Map(
+        EeaMachineReadable -> List(Queues.EeaDesk -> 1.0),
+        EeaBelowEGateAge -> List(Queues.EeaDesk -> 1.0),
+        EeaNonMachineReadable -> List(Queues.EeaDesk -> 1.0),
+        NonVisaNational -> List(Queues.NonEeaDesk -> 1.0),
+        VisaNational -> List(Queues.NonEeaDesk -> 1.0),
+        B5JPlusNational -> List(Queues.EeaDesk -> 1.0),
+        B5JPlusNationalBelowEGateAge -> List(Queues.EeaDesk -> 1.0)
+      )),
+    feedSources = Seq(ApiFeedSource, LiveFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),
     desksByTerminal = Map(T1 -> 3)
   )
