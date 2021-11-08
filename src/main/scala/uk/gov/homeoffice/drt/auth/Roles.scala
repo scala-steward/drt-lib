@@ -6,37 +6,37 @@ import upickle.default.{readwriter, _}
 
 
 object Roles {
-  val portRoles: Set[Role] = Set(BFS, BHD, BHX, BRS, EDI, EMA, GLA, LBA, LCY, LGW, LHR, LPL, LTN, MAN, NCL, PIK, STN)
+  val portRoles: Set[Role] = Set(BFS, BHD, BHX, BRS, DSA, EDI, EMA, GLA, HUY, LBA, LCY, LGW, LHR, LPL, LTN, MAN, NCL, PIK, STN)
 
   val availableRoles: Set[Role] = Set(
+    ApiView,
+    ApiViewPortCsv,
+    ArrivalsAndSplitsView,
+    ArrivalSimulationUpload,
+    ArrivalSource,
+    BorderForceStaff,
+    CedatStaff,
+    CreateAlerts,
+    Debug,
+    DesksAndQueuesView,
+    EgateBanksEdit,
+    EnhancedApiView,
+    FaqView,
     FixedPointsEdit,
+    FixedPointsView,
+    ForecastView,
+    ManageUsers,
+    NeboUpload,
+    PortFeedUpload,
+    PortOperatorStaff,
+    RedListFeature,
+    RedListsEdit,
     StaffMovementsEdit,
     StaffMovementsExport,
     StaffEdit,
-    ApiView,
-    ManageUsers,
-    CreateAlerts,
-    ApiViewPortCsv,
-    FixedPointsEdit,
-    FixedPointsView,
-    DesksAndQueuesView,
-    ArrivalsAndSplitsView,
-    RedListsEdit,
-    EgateBanksEdit,
-    ForecastView,
-    BorderForceStaff,
-    PortOperatorStaff,
-    CedatStaff,
-    PortFeedUpload,
-    ViewConfig,
     TerminalDashboard,
-    ArrivalSource,
-    ArrivalSimulationUpload,
-    EnhancedApiView,
-    FaqView,
-    RedListFeature,
-    NeboUpload,
-    Debug) ++ portRoles ++ Set(TEST, TEST2)
+    ViewConfig,
+  ) ++ portRoles ++ Set(TEST, TEST2)
 
   def parse(roleName: String): Option[Role] = availableRoles.find(role => role.name.toLowerCase == roleName.toLowerCase)
 
@@ -114,6 +114,10 @@ object Roles {
     override val name: String = "BRS"
   }
 
+  case object DSA extends PortAccess {
+    override val name: String = "DSA"
+  }
+
   case object EDI extends PortAccess {
     override val name: String = "EDI"
   }
@@ -124,6 +128,14 @@ object Roles {
 
   case object GLA extends PortAccess {
     override val name: String = "GLA"
+  }
+
+  case object HUY extends PortAccess {
+    override val name: String = "HUY"
+  }
+
+  case object LBA extends PortAccess {
+    override val name: String = "LBA"
   }
 
   case object LCY extends PortAccess {
@@ -160,10 +172,6 @@ object Roles {
 
   case object STN extends PortAccess {
     override val name: String = "STN"
-  }
-
-  case object LBA extends PortAccess {
-    override val name: String = "LBA"
   }
 
   case object CreateAlerts extends Role {
@@ -243,5 +251,4 @@ object Roles {
   case object NeboUpload extends Role {
     override val name: String = "nebo:upload"
   }
-
 }
