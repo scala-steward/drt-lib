@@ -2,7 +2,9 @@ package uk.gov.homeoffice.drt.ports.config
 
 import uk.gov.homeoffice.drt.auth.Roles.LBA
 import uk.gov.homeoffice.drt.ports.PaxTypes._
+import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues.{eeaMachineReadableToDesk, eeaNonMachineReadableToDesk, nonVisaNationalToDesk, visaNationalToDesk}
 import uk.gov.homeoffice.drt.ports.Queues._
+import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
 
@@ -22,7 +24,13 @@ object Lba extends AirportConfigLike {
       Queues.NonEeaDesk -> 45
     ),
     defaultWalkTimeMillis = Map(T1 -> 600000L),
-    terminalPaxSplits = List(T1).map(t => (t, defaultPaxSplits)).toMap,
+    terminalPaxSplits = Map(T1 -> SplitRatios(
+      SplitSources.TerminalAverage,
+      SplitRatio(eeaMachineReadableToDesk, 0.99 * 0.2),
+      SplitRatio(eeaNonMachineReadableToDesk, 0),
+      SplitRatio(visaNationalToDesk, 0.0),
+      SplitRatio(nonVisaNationalToDesk, 0.01)
+    )),
     terminalProcessingTimes = Map(T1 -> defaultProcessingTimes),
     minMaxDesksByTerminalQueue24Hrs = Map(T1 -> Map(
       Queues.EeaDesk -> (List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), List(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4)),
