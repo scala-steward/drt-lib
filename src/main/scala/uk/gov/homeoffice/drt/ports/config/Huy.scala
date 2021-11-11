@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.ports.config
 
-import uk.gov.homeoffice.drt.auth.Roles.{HUY, LBA}
+import uk.gov.homeoffice.drt.auth.Roles.HUY
 import uk.gov.homeoffice.drt.ports.PaxTypes._
 import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues.{eeaMachineReadableToDesk, eeaNonMachineReadableToDesk, nonVisaNationalToDesk, visaNationalToDesk}
 import uk.gov.homeoffice.drt.ports.Queues._
