@@ -123,6 +123,4 @@ object AirportConfig {
     .reduce[List[Int]] {
       case (max1, max2) => max1.zip(max2).map { case (m1, m2) => m1 + m2 }
     }
-
-  val defaultQueueStatusProvider: (Terminal, Queue, Long) => QueueStatus = (_, _, _) => Open
 }
