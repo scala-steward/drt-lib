@@ -19,7 +19,7 @@ object Queues {
     val fallbacks: PartialFunction[(Queue, PaxType), Seq[Queue]] = {
       case (EGate, _: EeaPaxType) => Seq(EeaDesk, QueueDesk, NonEeaDesk)
       case (EGate, _: NonEeaPaxType) => Seq(NonEeaDesk, QueueDesk, EeaDesk)
-      case (EeaDesk, _: PaxType) => Seq(EeaDesk, QueueDesk)
+      case (EeaDesk, _: PaxType) => Seq(NonEeaDesk, QueueDesk)
       case (NonEeaDesk, _: PaxType) => Seq(EeaDesk, QueueDesk)
       case (_, _) => Seq()
     }

@@ -1,7 +1,6 @@
 package uk.gov.homeoffice.drt.ports
 
 import uk.gov.homeoffice.drt.auth.Roles.Role
-import uk.gov.homeoffice.drt.ports.QueueStatusProviders.QueueStatusProvider
 import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitRatios
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
@@ -40,7 +39,6 @@ case class AirportConfig(portCode: PortCode,
                          terminalPaxSplits: Map[Terminal, SplitRatios],
                          terminalProcessingTimes: Map[Terminal, Map[PaxTypeAndQueue, Double]],
                          minMaxDesksByTerminalQueue24Hrs: Map[Terminal, Map[Queue, (List[Int], List[Int])]],
-                         queueStatusProvider: QueueStatusProvider = QueueStatusProviders.QueuesAlwaysOpen,
                          fixedPointExamples: Seq[String] = Seq(),
                          hasActualDeskStats: Boolean = false,
                          eGateBankSizes: Map[Terminal, Iterable[Int]],
@@ -125,6 +123,4 @@ object AirportConfig {
     .reduce[List[Int]] {
       case (max1, max2) => max1.zip(max2).map { case (m1, m2) => m1 + m2 }
     }
-
-  val defaultQueueStatusProvider: (Terminal, Queue, Long) => QueueStatus = (_, _, _) => Open
 }
