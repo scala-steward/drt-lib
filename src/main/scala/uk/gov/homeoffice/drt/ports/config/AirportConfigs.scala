@@ -3,7 +3,7 @@ package uk.gov.homeoffice.drt.ports.config
 import uk.gov.homeoffice.drt.ports.{AirportConfig, AirportConfigLike, PortCode}
 
 object AirportConfigs {
-  val allPorts: List[AirportConfigLike] = List(Abz ,Bfs, Bhd, Bhx, Brs, Cwl, Dsa, Edi, Ema, Gla, Huy, Inv, Lba, Lcy, Lgw, Lhr, Lpl, Ltn, Man, Ncl, Pik, Stn)
+  val allPorts: List[AirportConfigLike] = List(Abz, Bfs, Bhd, Bhx, Brs, Cwl, Dsa, Edi, Ema, Gla, Huy, Inv, Lba, Lcy, Lgw, Lhr, Lpl, Ltn, Man, Ncl, Pik, Sou, Stn)
 
   val allPortConfigs: List[AirportConfig] = allPorts.map(_.config)
 
