@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.ports.config
 
-import uk.gov.homeoffice.drt.auth.Roles.PIK
+import uk.gov.homeoffice.drt.auth.Roles.{NQY, PIK}
 import uk.gov.homeoffice.drt.ports.PaxTypes._
 import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
 import uk.gov.homeoffice.drt.ports.Queues.{EeaDesk, NonEeaDesk}
@@ -10,10 +10,10 @@ import uk.gov.homeoffice.drt.ports._
 
 import scala.collection.immutable.SortedMap
 
-object Pik extends AirportConfigLike {
+object Nqy extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
-    portCode = PortCode("PIK"),
+    portCode = PortCode("NQY"),
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.QueueDesk)
     ),
@@ -24,7 +24,7 @@ object Pik extends AirportConfigLike {
     slaByQueue = Map(
       Queues.QueueDesk -> 20,
     ),
-    defaultWalkTimeMillis = Map(T1 -> 780000L),
+    defaultWalkTimeMillis = Map(T1 -> 30000L),
     terminalPaxSplits = Map(T1 -> SplitRatios(
       SplitSources.TerminalAverage,
       SplitRatio(eeaMachineReadableToDesk, 0.99 * 0.2),
@@ -40,11 +40,11 @@ object Pik extends AirportConfigLike {
     )),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(
-        Queues.QueueDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5))
+        Queues.QueueDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2))
       )
     ),
     eGateBankSizes = Map(T1 -> Iterable()),
-    role = PIK,
+    role = NQY,
     terminalPaxTypeQueueAllocation = Map(
       T1 -> Map(
         EeaMachineReadable -> List(Queues.QueueDesk -> 1.0),
@@ -56,7 +56,7 @@ object Pik extends AirportConfigLike {
         B5JPlusNationalBelowEGateAge -> List(Queues.QueueDesk -> 1.0)
       )),
     flexedQueues = Set(),
-    desksByTerminal = Map(T1 -> 5),
+    desksByTerminal = Map(T1 -> 2),
     feedSources = Seq(ApiFeedSource, LiveFeedSource)
   )
 }
