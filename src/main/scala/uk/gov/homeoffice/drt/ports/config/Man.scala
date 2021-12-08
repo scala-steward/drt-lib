@@ -31,7 +31,19 @@ object Man extends AirportConfigLike {
       SplitRatio(visaNationalToDesk, 0.05),
       SplitRatio(nonVisaNationalToDesk, 0.05)
     ))).toMap,
-    terminalProcessingTimes = Map(T1 -> defaultProcessingTimes, T2 -> defaultProcessingTimes, T3 -> defaultProcessingTimes),
+    terminalProcessingTimes = Map(T1 -> Map(
+      eeaMachineReadableToDesk -> 20d / 60,
+      eeaMachineReadableToEGate -> 43d / 60,
+      eeaNonMachineReadableToDesk -> 50d / 60,
+      visaNationalToDesk -> 90d / 60,
+      nonVisaNationalToDesk -> 78d / 60
+    ), T2 -> Map(
+      eeaMachineReadableToDesk -> 20d / 60,
+      eeaMachineReadableToEGate -> 50d / 60,
+      eeaNonMachineReadableToDesk -> 50d / 60,
+      visaNationalToDesk -> 90d / 60,
+      nonVisaNationalToDesk -> 78d / 60
+    ), T3 -> defaultProcessingTimes),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(
         Queues.EGate -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2)),

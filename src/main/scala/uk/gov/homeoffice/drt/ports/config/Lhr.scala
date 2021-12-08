@@ -60,10 +60,37 @@ object Lhr extends AirportConfigLike {
       SplitRatio(nonVisaNationalToFastTrack, 0)
     ))).toMap,
     terminalProcessingTimes = Map(
-      T2 -> lhrDefaultTerminalProcessingTimes,
-      T3 -> lhrDefaultTerminalProcessingTimes,
+      T2 -> Map(
+        eeaMachineReadableToDesk -> 25d / 60,
+        eeaMachineReadableToEGate -> 42d / 60,
+        eeaNonMachineReadableToDesk -> 55d / 60,
+        visaNationalToDesk -> 96d / 60,
+        nonVisaNationalToDesk -> 78d / 60,
+        nonVisaNationalToFastTrack -> 78d / 60,
+        visaNationalToFastTrack -> 78d / 60,
+        transitToTransfer -> 0d
+      ),
+      T3 -> Map(
+        eeaMachineReadableToDesk -> 25d / 60,
+        eeaMachineReadableToEGate -> 43d / 60,
+        eeaNonMachineReadableToDesk -> 55d / 60,
+        visaNationalToDesk -> 96d / 60,
+        nonVisaNationalToDesk -> 78d / 60,
+        nonVisaNationalToFastTrack -> 78d / 60,
+        visaNationalToFastTrack -> 78d / 60,
+        transitToTransfer -> 0d
+      ),
       T4 -> lhrDefaultTerminalProcessingTimes,
-      T5 -> lhrDefaultTerminalProcessingTimes
+      T5 -> Map(
+        eeaMachineReadableToDesk -> 25d / 60,
+        eeaMachineReadableToEGate -> 46d / 60,
+        eeaNonMachineReadableToDesk -> 55d / 60,
+        visaNationalToDesk -> 96d / 60,
+        nonVisaNationalToDesk -> 78d / 60,
+        nonVisaNationalToFastTrack -> 78d / 60,
+        visaNationalToFastTrack -> 78d / 60,
+        transitToTransfer -> 0d
+      )
     ),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T2 -> Map(

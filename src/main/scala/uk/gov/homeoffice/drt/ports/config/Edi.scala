@@ -32,7 +32,7 @@ object Edi extends AirportConfigLike {
       ),
       A2 -> Map(
         eeaMachineReadableToDesk -> 16d / 60,
-        eeaMachineReadableToEGate -> 25d / 60,
+        eeaMachineReadableToEGate -> 46d / 60,
         eeaNonMachineReadableToDesk -> 50d / 60,
         visaNationalToDesk -> 75d / 60,
         nonVisaNationalToDesk -> 64d / 60

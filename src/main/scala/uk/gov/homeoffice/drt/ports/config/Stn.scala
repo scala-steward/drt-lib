@@ -33,7 +33,7 @@ object Stn extends AirportConfigLike {
     )),
     terminalProcessingTimes = Map(T1 -> Map(
       eeaMachineReadableToDesk -> 20d / 60,
-      eeaMachineReadableToEGate -> 35d / 60,
+      eeaMachineReadableToEGate -> 47d / 60,
       eeaNonMachineReadableToDesk -> 50d / 60,
       visaNationalToDesk -> 90d / 60,
       nonVisaNationalToDesk -> 78d / 60
