@@ -60,7 +60,8 @@ case class AirportConfig(portCode: PortCode,
                          feedSourceMonitorExemptions: Seq[FeedSource] = Seq(),
                          desksByTerminal: Map[Terminal, Int],
                          queuePriority: List[Queue] = List(EeaDesk, NonEeaDesk, QueueDesk, FastTrack, EGate),
-                         assumedAdultsPerChild: Double = 1.0
+                         assumedAdultsPerChild: Double = 1.0,
+                         useTimePredictions: Boolean = false,
                         ) {
   def assertValid(): Unit = {
     queuesByTerminal.values.flatten.toSet
