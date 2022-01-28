@@ -1,5 +1,6 @@
 package uk.gov.homeoffice.drt.arrivals
 
+import uk.gov.homeoffice.drt.arrivals.SplitStyle.PaxNumbers
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSource
 import uk.gov.homeoffice.drt.ports.{ApiPaxTypeAndQueueCount, Queues}
 import upickle.default.{ReadWriter, macroRW}

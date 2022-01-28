@@ -22,12 +22,12 @@ object SplitStyle {
       feedSource => feedSource.toString,
       (s: Value) => apply(s.str)
     )
+
+  case object PaxNumbers extends SplitStyle
+
+  case object Percentage extends SplitStyle
+
+  case object Ratio extends SplitStyle
+
+  case object UndefinedSplitStyle extends SplitStyle
 }
-
-case object PaxNumbers extends SplitStyle
-
-case object Percentage extends SplitStyle
-
-case object Ratio extends SplitStyle
-
-case object UndefinedSplitStyle extends SplitStyle
