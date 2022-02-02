@@ -21,6 +21,7 @@ case class Arrival(Operator: Option[Operator],
                    FlightCodeSuffix: Option[FlightCodeSuffix],
                    Status: ArrivalStatus,
                    Estimated: Option[Long],
+                   PredictedTouchdown: Option[Long],
                    Actual: Option[Long],
                    EstimatedChox: Option[Long],
                    ActualChox: Option[Long],
@@ -110,17 +111,18 @@ case class Arrival(Operator: Option[Operator],
     case _ => 0
   }
 
-  def bestArrivalTime(timeToChox: Long): Long =
-    (ActualChox, EstimatedChox, Actual, Estimated, Scheduled) match {
-      case (Some(actChox), _, _, _, _) => actChox
-      case (_, Some(estChox), _, _, _) => estChox
-      case (_, _, Some(touchdown), _, _) => touchdown + timeToChox
-      case (_, _, _, Some(estimated), _) => estimated + timeToChox
-      case (_, _, _, _, scheduled) => scheduled + timeToChox
+  def bestArrivalTime(timeToChox: Long, considerPredictions: Boolean): Long =
+    (ActualChox, EstimatedChox, Actual, Estimated, PredictedTouchdown, Scheduled) match {
+      case (Some(actChox), _, _, _, _, _) => actChox
+      case (_, Some(estChox), _, _, _, _) => estChox
+      case (_, _, Some(touchdown), _, _, _) => touchdown + timeToChox
+      case (_, _, _, Some(estimated), _, _) => estimated + timeToChox
+      case (_, _, _, _, Some(predictedTd), _) if considerPredictions => predictedTd + timeToChox
+      case (_, _, _, _, _, scheduled) => scheduled + timeToChox
     }
 
-  def walkTime(timeToChox: Long, firstPaxOff: Long): Option[Long] =
-    PcpTime.map(pcpTime => pcpTime - (bestArrivalTime(timeToChox) + firstPaxOff))
+  def walkTime(timeToChox: Long, firstPaxOff: Long, considerPredictions: Boolean): Option[Long] =
+    PcpTime.map(pcpTime => pcpTime - (bestArrivalTime(timeToChox, considerPredictions) + firstPaxOff))
 
   def minutesOfPaxArrivals: Int = {
     val totalPax = bestPcpPaxEstimate
@@ -194,6 +196,7 @@ object Arrival {
   def apply(Operator: Option[Operator],
             Status: ArrivalStatus,
             Estimated: Option[Long],
+            PredictedTouchdown: Option[Long],
             Actual: Option[Long],
             EstimatedChox: Option[Long],
             ActualChox: Option[Long],
@@ -234,6 +237,7 @@ object Arrival {
       FlightCodeSuffix = maybeSuffix,
       Status = Status,
       Estimated = Estimated,
+      PredictedTouchdown = PredictedTouchdown,
       Actual = Actual,
       EstimatedChox = EstimatedChox,
       ActualChox = ActualChox,
