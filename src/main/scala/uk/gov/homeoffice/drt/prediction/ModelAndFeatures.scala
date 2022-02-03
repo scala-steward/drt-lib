@@ -17,6 +17,6 @@ object ModelAndFeatures {
             improvementPct: Double,
             sDateProvider: Long => SDateLike,
            ): ModelAndFeatures = targetName match {
-    case TouchdownModelAndFeatures.targetName => TouchdownModelAndFeatures(model, features, examplesTrainedOn, improvementPct, sDateProvider)
+    case TouchdownModelAndFeatures.targetName => TouchdownModelAndFeatures(model, features, examplesTrainedOn, improvementPct)
   }
 }
