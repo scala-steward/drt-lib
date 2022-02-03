@@ -10,7 +10,7 @@ object Feature {
   case class OneToMany(columnNames: List[String], featurePrefix: String) extends Feature
 }
 
-case class Features(features: List[Feature], oneToManyValues: IndexedSeq[String]) {
+case class FeaturesWithOneToManyValues(features: List[Feature], oneToManyValues: IndexedSeq[String]) {
   def oneToManyFeatures: Seq[OneToMany] = features.collect {
     case otm: OneToMany => otm
   }
