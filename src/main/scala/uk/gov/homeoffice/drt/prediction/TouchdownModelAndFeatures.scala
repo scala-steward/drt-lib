@@ -7,8 +7,8 @@ object TouchdownModelAndFeatures {
   val targetName: String = "touchdown"
 }
 
-case class TouchdownModelAndFeatures(model: RegressionModel, features: Features, examplesTrainedOn: Int, improvementPct: Double, sDateProvider: Long => SDateLike) extends ModelAndFeatures {
-  def maybePrediction(arrival: Arrival): Option[Long] = {
+case class TouchdownModelAndFeatures(model: RegressionModel, features: FeaturesWithOneToManyValues, examplesTrainedOn: Int, improvementPct: Double) extends ModelAndFeatures {
+  def maybePrediction(arrival: Arrival, modelAndFeatures: TouchdownModelAndFeatures)(implicit sDateProvider: Long => SDateLike): Option[Long] = {
     val dow = s"dow_${sDateProvider(arrival.Scheduled).getDayOfWeek()}"
     val partOfDay = s"pod_${sDateProvider(arrival.Scheduled).getHours() / 12}"
     val dowIdx = features.oneToManyValues.indexOf(dow)
