@@ -1,7 +1,5 @@
 package uk.gov.homeoffice.drt.prediction
 
-import uk.gov.homeoffice.drt.time.SDateLike
-
 trait ModelAndFeatures {
   val model: RegressionModel
   val features: Features
@@ -15,7 +13,6 @@ object ModelAndFeatures {
             targetName: String,
             examplesTrainedOn: Int,
             improvementPct: Double,
-            sDateProvider: Long => SDateLike,
            ): ModelAndFeatures = targetName match {
     case TouchdownModelAndFeatures.targetName => TouchdownModelAndFeatures(model, features, examplesTrainedOn, improvementPct)
   }
