@@ -8,7 +8,7 @@ object TouchdownModelAndFeatures {
 }
 
 case class TouchdownModelAndFeatures(model: RegressionModel, features: FeaturesWithOneToManyValues, examplesTrainedOn: Int, improvementPct: Double) extends ModelAndFeatures {
-  def maybePrediction(arrival: Arrival, modelAndFeatures: TouchdownModelAndFeatures)(implicit sDateProvider: Long => SDateLike): Option[Long] = {
+  def maybePrediction(arrival: Arrival)(implicit sDateProvider: Long => SDateLike): Option[Long] = {
     val dow = s"dow_${sDateProvider(arrival.Scheduled).getDayOfWeek()}"
     val partOfDay = s"pod_${sDateProvider(arrival.Scheduled).getHours() / 12}"
     val dowIdx = features.oneToManyValues.indexOf(dow)
