@@ -6,7 +6,7 @@ import upickle.default.{readwriter, _}
 
 
 object Roles {
-  val portRoles: Set[Role] = Set(ABZ, BFS, BHD, BHX, BRS, BOH, CWL, DSA, EDI, EMA, EXT, GLA, HUY, INV, LBA, LCY, LGW, LHR, LPL, LTN, MAN, MME, NCL, NQY, PIK, SOU, STN)
+  val portRoles: Set[Role] = Set(ABZ, BFS, BHD, BHX, BRS, BOH, CWL, DSA, EDI, EMA, EXT, GLA, HUY, INV, LBA, LCY, LGW, LHR, LPL, LTN, MAN, MME, NCL, NQY, NWI, PIK, SOU, STN)
 
   val availableRoles: Set[Role] = Set(
     ApiView,
@@ -192,6 +192,10 @@ object Roles {
 
   case object NQY extends PortAccess {
     override val name: String = "NQY"
+  }
+
+  case object NWI extends PortAccess {
+    override val name: String = "NWI"
   }
 
   case object PIK extends PortAccess {
