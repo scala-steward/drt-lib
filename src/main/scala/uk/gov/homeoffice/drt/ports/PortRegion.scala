@@ -8,6 +8,8 @@ sealed trait PortRegion {
 object PortRegion {
   val regions = Set(North, South, Central, Heathrow)
 
+  val ports: Set[PortCode] = regions.flatMap(_.ports)
+
   object North extends PortRegion {
     override val name: String = "North"
     override val ports: Set[PortCode] =
