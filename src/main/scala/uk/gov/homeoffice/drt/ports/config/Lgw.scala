@@ -37,7 +37,7 @@ object Lgw extends AirportConfigLike {
     terminalProcessingTimes = Map(
       N -> Map(
         eeaMachineReadableToDesk -> 23d / 60,
-        eeaMachineReadableToEGate -> 49d / 60,
+        eeaMachineReadableToEGate -> 47d / 60,
         eeaNonMachineReadableToDesk -> 55d / 60,
         visaNationalToDesk -> 92d / 60,
         nonVisaNationalToDesk -> 77d / 60

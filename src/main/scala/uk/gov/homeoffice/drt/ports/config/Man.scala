@@ -33,13 +33,13 @@ object Man extends AirportConfigLike {
     ))).toMap,
     terminalProcessingTimes = Map(T1 -> Map(
       eeaMachineReadableToDesk -> 20d / 60,
-      eeaMachineReadableToEGate -> 43d / 60,
+      eeaMachineReadableToEGate -> 44d / 60,
       eeaNonMachineReadableToDesk -> 50d / 60,
       visaNationalToDesk -> 90d / 60,
       nonVisaNationalToDesk -> 78d / 60
     ), T2 -> Map(
       eeaMachineReadableToDesk -> 20d / 60,
-      eeaMachineReadableToEGate -> 50d / 60,
+      eeaMachineReadableToEGate -> 51d / 60,
       eeaNonMachineReadableToDesk -> 50d / 60,
       visaNationalToDesk -> 90d / 60,
       nonVisaNationalToDesk -> 78d / 60

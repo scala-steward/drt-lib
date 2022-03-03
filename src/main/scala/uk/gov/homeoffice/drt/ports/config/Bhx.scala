@@ -40,7 +40,7 @@ object Bhx extends AirportConfigLike {
       )),
     terminalProcessingTimes = Map(T1 -> Map(
       eeaMachineReadableToDesk -> 16d / 60,
-      eeaMachineReadableToEGate -> 46d / 60,
+      eeaMachineReadableToEGate -> 48d / 60,
       eeaNonMachineReadableToDesk -> 50d / 60,
       visaNationalToDesk -> 93d / 60,
       nonVisaNationalToDesk -> 83d / 60

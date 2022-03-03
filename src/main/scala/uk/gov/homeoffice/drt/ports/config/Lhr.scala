@@ -62,7 +62,7 @@ object Lhr extends AirportConfigLike {
     terminalProcessingTimes = Map(
       T2 -> Map(
         eeaMachineReadableToDesk -> 25d / 60,
-        eeaMachineReadableToEGate -> 42d / 60,
+        eeaMachineReadableToEGate -> 44d / 60,
         eeaNonMachineReadableToDesk -> 55d / 60,
         visaNationalToDesk -> 96d / 60,
         nonVisaNationalToDesk -> 78d / 60,
@@ -72,7 +72,7 @@ object Lhr extends AirportConfigLike {
       ),
       T3 -> Map(
         eeaMachineReadableToDesk -> 25d / 60,
-        eeaMachineReadableToEGate -> 43d / 60,
+        eeaMachineReadableToEGate -> 44d / 60,
         eeaNonMachineReadableToDesk -> 55d / 60,
         visaNationalToDesk -> 96d / 60,
         nonVisaNationalToDesk -> 78d / 60,
@@ -83,7 +83,7 @@ object Lhr extends AirportConfigLike {
       T4 -> lhrDefaultTerminalProcessingTimes,
       T5 -> Map(
         eeaMachineReadableToDesk -> 25d / 60,
-        eeaMachineReadableToEGate -> 46d / 60,
+        eeaMachineReadableToEGate -> 47d / 60,
         eeaNonMachineReadableToDesk -> 55d / 60,
         visaNationalToDesk -> 96d / 60,
         nonVisaNationalToDesk -> 78d / 60,
