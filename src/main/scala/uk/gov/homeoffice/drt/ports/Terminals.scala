@@ -32,6 +32,7 @@ object Terminals {
       case "4i" => T4
       case "5i" => T5
       case "ter" => T1
+      case "1" => T1
       case "n" => N
       case "s" => S
       case "mt" => T1
