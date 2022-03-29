@@ -15,7 +15,7 @@ object ArrivalGenerator {
                origin: PortCode = PortCode(""),
                operator: Option[Operator] = None,
                status: ArrivalStatus = ArrivalStatus(""),
-               predDt: Long = 0L,
+               predDt: Option[Prediction[Long]] = None,
                est: Long = 0L,
                act: Long = 0L,
                estChox: Long = 0L,
@@ -32,7 +32,7 @@ object ArrivalGenerator {
     Arrival(
       Operator = operator,
       Status = status,
-      PredictedTouchdown = Option(predDt),
+      PredictedTouchdown = predDt,
       Estimated = if (est != 0L) Option(est) else None,
       Actual = if (act != 0L) Option(act) else None,
       EstimatedChox = if (estChox != 0L) Option(estChox) else None,

@@ -15,13 +15,20 @@ trait WithUnique[I] {
   def unique: I
 }
 
+case class Prediction[A](updatedAt: Long, value: A)
+
+object Prediction {
+  implicit val predictionLong: ReadWriter[Prediction[Long]] = macroRW
+  implicit val predictionInt: ReadWriter[Prediction[Int]] = macroRW
+}
+
 case class Arrival(Operator: Option[Operator],
                    CarrierCode: CarrierCode,
                    VoyageNumber: VoyageNumber,
                    FlightCodeSuffix: Option[FlightCodeSuffix],
                    Status: ArrivalStatus,
                    Estimated: Option[Long],
-                   PredictedTouchdown: Option[Long],
+                   PredictedTouchdown: Option[Prediction[Long]],
                    Actual: Option[Long],
                    EstimatedChox: Option[Long],
                    ActualChox: Option[Long],
@@ -117,7 +124,7 @@ case class Arrival(Operator: Option[Operator],
       case (_, Some(estChox), _, _, _, _) => estChox
       case (_, _, Some(touchdown), _, _, _) => touchdown + timeToChox
       case (_, _, _, Some(estimated), _, _) => estimated + timeToChox
-      case (_, _, _, _, Some(predictedTd), _) if considerPredictions => predictedTd + timeToChox
+      case (_, _, _, _, Some(Prediction(_, predictedTd)), _) if considerPredictions => predictedTd + timeToChox
       case (_, _, _, _, _, scheduled) => scheduled + timeToChox
     }
 
@@ -196,7 +203,7 @@ object Arrival {
   def apply(Operator: Option[Operator],
             Status: ArrivalStatus,
             Estimated: Option[Long],
-            PredictedTouchdown: Option[Long],
+            PredictedTouchdown: Option[Prediction[Long]],
             Actual: Option[Long],
             EstimatedChox: Option[Long],
             ActualChox: Option[Long],
