@@ -28,10 +28,10 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
   jvmSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release"),
     PB.targets in Compile := Seq(
-      scalapb.gen() -> (sourceManaged in Compile).value
+      scalapb.gen() -> (sourceManaged in Compile).value / "protobuf"
     ),
     PB.protoSources in Compile := Seq(file("src/main/protobuf")),
-    PB.deleteTargetDirectory := false,
+    PB.deleteTargetDirectory := false
   ).
   jsSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
