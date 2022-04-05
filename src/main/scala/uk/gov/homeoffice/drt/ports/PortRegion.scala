@@ -23,7 +23,7 @@ object PortRegion {
 
   object South extends PortRegion {
     override val name: String = "South"
-    override val ports: Set[PortCode] = Set("BOH", "BRS", "CWL", "EXT", "LGW", "NQY", "SOU").map(PortCode(_))
+    override val ports: Set[PortCode] = Set("BOH", "BRS", "CWL", "EXT", "LGW", "NQY", "SEN", "SOU").map(PortCode(_))
   }
 
   object Heathrow extends PortRegion {
