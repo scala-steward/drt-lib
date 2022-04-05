@@ -38,17 +38,3 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
 
 lazy val crossJVM = cross.jvm
 lazy val crossJS = cross.js
-
-lazy val client = (project in file("client"))
-  .enablePlugins(ScalaJSPlugin)
-  .settings(
-    name := "client"
-//    scalaJSUseMainModuleInitializer := true
-  )
-  .dependsOn(crossJS)
-
-lazy val server = (project in file("server"))
-  .settings(
-    name := "server"
-  )
-  .dependsOn(crossJVM)
