@@ -23,7 +23,11 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .in(file("."))
   .settings(
     name := "drt-lib",
-    libraryDependencies ++= libDeps
+    libraryDependencies ++= libDeps,
+
+    Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
+    Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
+    PB.deleteTargetDirectory := false
   ).
   jvmSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
@@ -38,18 +42,13 @@ lazy val crossJS = cross.js
 lazy val client = (project in file("client"))
   .enablePlugins(ScalaJSPlugin)
   .settings(
-    name := "client",
-    scalaJSUseMainModuleInitializer := true
+    name := "client"
+//    scalaJSUseMainModuleInitializer := true
   )
   .dependsOn(crossJS)
 
 lazy val server = (project in file("server"))
   .settings(
-    name := "server",
-    Compile / PB.targets := Seq(
-      scalapb.gen() -> (Compile / sourceManaged).value
-    ),
-    Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
-    PB.deleteTargetDirectory := false
+    name := "server"
   )
   .dependsOn(crossJVM)
