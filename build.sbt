@@ -15,7 +15,11 @@ lazy val root = project.in(file(".")).
     name := "drt-lib",
     publish := {},
     publishLocal := {},
-    libraryDependencies ++= libDeps
+    libraryDependencies ++= libDeps,
+    Compile / PB.targets := Seq(
+      scalapb.gen() -> (Compile / sourceManaged).value / "protobuf"
+    ),
+    PB.deleteTargetDirectory := false
   )
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
@@ -26,12 +30,7 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= libDeps
   ).
   jvmSettings(
-    publishTo := Some("release" at artifactory + "artifactory/libs-release"),
-    PB.targets in Compile := Seq(
-      scalapb.gen() -> (sourceManaged in Compile).value / "protobuf"
-    ),
-    PB.protoSources in Compile := Seq(file("src/main/protobuf")),
-    PB.deleteTargetDirectory := false
+    publishTo := Some("release" at artifactory + "artifactory/libs-release")
   ).
   jsSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
