@@ -17,7 +17,7 @@ lazy val root = project.in(file(".")).
     publishLocal := {},
     libraryDependencies ++= libDeps,
     Compile / PB.targets := Seq(
-      scalapb.gen() -> (Compile / sourceManaged).value / "protobuf"
+      scalapb.gen() -> (Compile / sourceDirectory).value / "scala"
     ),
     PB.deleteTargetDirectory := false
   )

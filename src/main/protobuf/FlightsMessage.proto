@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package server.protobuf.messages;
+package uk.gov.homeoffice.drt.protobuf.messages;
 
 import "Prediction.proto";
 
