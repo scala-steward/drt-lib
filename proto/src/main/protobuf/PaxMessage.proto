@@ -1,6 +1,6 @@
 syntax = "proto2";
 
-package server.protobuf.messages;
+package uk.gov.homeoffice.drt.protobuf.messages;
 
 message PaxCountMessage {
     optional int64 pointInTime = 1;

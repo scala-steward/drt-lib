@@ -26,7 +26,9 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= libDeps
   ).
   jvmSettings(
-    publishTo := Some("release" at artifactory + "artifactory/libs-release")
+    publishTo := Some("release" at artifactory + "artifactory/libs-release"),
+    Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
+    Compile / PB.protoSources := Seq(file("proto/src/main/protobuf"))
   ).
   jsSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
