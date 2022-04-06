@@ -24,13 +24,12 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "drt-lib",
     libraryDependencies ++= libDeps,
-
+  ).
+  jvmSettings(
+    publishTo := Some("release" at artifactory + "artifactory/libs-release"),
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
     Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
     PB.deleteTargetDirectory := false
-  ).
-  jvmSettings(
-    publishTo := Some("release" at artifactory + "artifactory/libs-release")
   ).
   jsSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
