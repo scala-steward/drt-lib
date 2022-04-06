@@ -12,6 +12,7 @@ object Dependencies {
     "com.lihaoyi" %% "upickle" % uPickle,
     "com.lihaoyi" %% "autowire" % autowire,
     "io.suzaku" %% "boopickle" % booPickle,
+    "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf",
     "org.specs2" %% "specs2-core" % specs2 % Test,
   )
 }
