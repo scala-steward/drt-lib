@@ -5,7 +5,6 @@ target
 .~*
 .#*
 *.DS_Store
-src/main/scala/uk/gov/homeoffice/drt/protobuf/
 
 # sbt specific
 .sbtopts
