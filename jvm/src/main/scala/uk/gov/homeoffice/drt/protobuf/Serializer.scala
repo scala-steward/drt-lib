@@ -1,4 +1,4 @@
-package uk.gov.homeoffice.drt.serialisation
+package uk.gov.homeoffice.drt.protobuf
 
 import akka.serialization.SerializerWithStringManifest
 import scalapb.GeneratedMessage
@@ -18,7 +18,7 @@ import uk.gov.homeoffice.drt.protobuf.messages.StaffMovementMessages.{RemoveStaf
 import uk.gov.homeoffice.drt.protobuf.messages.TerminalQueuesSummary.TerminalQueuesSummaryMessage
 import uk.gov.homeoffice.drt.protobuf.messages.VoyageManifest.{VoyageManifestLatestFileNameMessage, VoyageManifestMessage, VoyageManifestStateSnapshotMessage, VoyageManifestsMessage}
 
-class ProtoBufSerializer extends SerializerWithStringManifest {
+class Serializer extends SerializerWithStringManifest {
   override def identifier: Int = 9001
 
   override def manifest(targetObject: AnyRef): String = targetObject.getClass.getName

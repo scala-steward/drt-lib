@@ -21,7 +21,7 @@ lazy val root = project.in(file(".")).
     publish := {},
     publishLocal := {},
     libraryDependencies ++= libDeps,
-    crossScalaVersions := Nil
+    crossScalaVersions := Nil,
   )
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
@@ -31,13 +31,13 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= libDeps
   ).
   jvmSettings(
-    publishTo := Some("release" at artifactory + "artifactory/libs-release"),
-    Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
-    Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
+    crossScalaVersions := supportedScalaVersions,
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-actor" % "2.6.17"
     ),
-    crossScalaVersions := supportedScalaVersions
+    Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
+    Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
+    publishTo := Some("release" at artifactory + "artifactory/libs-release")
   ).
   jsSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release"),
