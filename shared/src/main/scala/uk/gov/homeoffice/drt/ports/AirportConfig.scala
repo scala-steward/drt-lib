@@ -82,13 +82,13 @@ case class AirportConfig(portCode: PortCode,
     }
   }
 
-  def minDesksByTerminalAndQueue24Hrs: Map[Terminal, Map[Queue, IndexedSeq[Int]]] = minMaxDesksByTerminalQueue24Hrs.mapValues(_.mapValues(_._1.toIndexedSeq))
+  def minDesksByTerminalAndQueue24Hrs: Map[Terminal, Map[Queue, IndexedSeq[Int]]] = minMaxDesksByTerminalQueue24Hrs.mapValues(_.mapValues(_._1.toIndexedSeq).view.toMap).view.toMap
 
-  def maxDesksByTerminalAndQueue24Hrs: Map[Terminal, Map[Queue, IndexedSeq[Int]]] = minMaxDesksByTerminalQueue24Hrs.mapValues(_.mapValues(_._2.toIndexedSeq))
+  def maxDesksByTerminalAndQueue24Hrs: Map[Terminal, Map[Queue, IndexedSeq[Int]]] = minMaxDesksByTerminalQueue24Hrs.mapValues(_.mapValues(_._2.toIndexedSeq).view.toMap).view.toMap
 
-  def minDesksForTerminal24Hrs(tn: Terminal): Map[Queue, IndexedSeq[Int]] = minMaxDesksByTerminalQueue24Hrs.getOrElse(tn, Map()).mapValues(_._1.toIndexedSeq)
+  def minDesksForTerminal24Hrs(tn: Terminal): Map[Queue, IndexedSeq[Int]] = minMaxDesksByTerminalQueue24Hrs.getOrElse(tn, Map()).mapValues(_._1.toIndexedSeq).view.toMap.view.toMap
 
-  def maxDesksForTerminal24Hrs(tn: Terminal): Map[Queue, IndexedSeq[Int]] = minMaxDesksByTerminalQueue24Hrs.getOrElse(tn, Map()).mapValues(_._2.toIndexedSeq)
+  def maxDesksForTerminal24Hrs(tn: Terminal): Map[Queue, IndexedSeq[Int]] = minMaxDesksByTerminalQueue24Hrs.getOrElse(tn, Map()).mapValues(_._2.toIndexedSeq).view.toMap.view.toMap
 
   val terminals: Iterable[Terminal] = queuesByTerminal.keys
 

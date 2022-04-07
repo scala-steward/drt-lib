@@ -30,7 +30,7 @@ object EgateBank {
   implicit val rw: ReadWriter[EgateBank] = macroRW
 
   def fromAirportConfig(banks: Iterable[Int]): IndexedSeq[EgateBank] = {
-    banks.to[IndexedSeq].map { size => EgateBank(IndexedSeq.fill(size)(true)) }
+    banks.map { size => EgateBank(IndexedSeq.fill(size)(true)) }.toIndexedSeq
   }
 }
 

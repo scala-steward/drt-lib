@@ -15,7 +15,7 @@ object RedListUpdate {
 case class RedListUpdates(updates: Map[Long, RedListUpdate]) {
   lazy val isEmpty: Boolean = updates.isEmpty
 
-  def remove(effectiveFrom: Long): RedListUpdates = copy(updates = updates.filterKeys(_ != effectiveFrom))
+  def remove(effectiveFrom: Long): RedListUpdates = copy(updates = updates.filterKeys(_ != effectiveFrom).view.toMap)
 
   def update(setRedListUpdate: SetRedListUpdate): RedListUpdates =
     copy(updates = updates
