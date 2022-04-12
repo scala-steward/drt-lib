@@ -44,6 +44,7 @@ object Ltn extends AirportConfigLike {
       )
     ),
     eGateBankSizes = Map(T1 -> Iterable(10, 5)),
+    hasEstChox = false,
     role = LTN,
     terminalPaxTypeQueueAllocation = Map(
       T1 -> (defaultQueueRatios + (EeaMachineReadable -> List(
