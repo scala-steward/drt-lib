@@ -19,6 +19,7 @@ object ApiFlightWithSplits {
 
 case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpdated: Option[Long] = None)
   extends WithUnique[UniqueArrival]
+    with Updatable[ApiFlightWithSplits]
     with WithLastUpdated {
 
   def totalPaxFromApi: Option[Int] = splits.collectFirst {
@@ -84,4 +85,7 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
   def hasPcpPaxIn(start: SDateLike, end: SDateLike): Boolean = apiFlight.hasPcpDuring(start, end)
 
   override val unique: UniqueArrival = apiFlight.unique
+
+  override def update(incoming: ApiFlightWithSplits): ApiFlightWithSplits =
+    incoming.copy(apiFlight = apiFlight.update(incoming.apiFlight))
 }
