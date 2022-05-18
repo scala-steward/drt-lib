@@ -19,6 +19,10 @@ object Mme extends AirportConfigLike {
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.QueueDesk)
     ),
+    divertedQueues = Map(
+      Queues.NonEeaDesk -> Queues.QueueDesk,
+      Queues.EeaDesk -> Queues.QueueDesk
+    ),
     slaByQueue = Map(
       Queues.QueueDesk -> 20
     ),
@@ -43,13 +47,8 @@ object Mme extends AirportConfigLike {
     role = MME,
     terminalPaxTypeQueueAllocation = Map(
       T1 -> (defaultQueueRatios + (
-        EeaMachineReadable -> List(Queues.QueueDesk -> 1.0),
-        EeaBelowEGateAge -> List(Queues.QueueDesk -> 1.0),
-        EeaNonMachineReadable -> List(Queues.QueueDesk -> 1.0),
-        NonVisaNational -> List(Queues.QueueDesk -> 1.0),
-        VisaNational -> List(Queues.QueueDesk -> 1.0),
-        B5JPlusNational -> List(Queues.QueueDesk -> 1.0),
-        B5JPlusNationalBelowEGateAge -> List(Queues.QueueDesk -> 1.0)
+        EeaMachineReadable -> List(Queues.EeaDesk -> 1.0),
+        B5JPlusNational -> List(Queues.EeaDesk -> 1.0),
       ))),
     feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, AclFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),

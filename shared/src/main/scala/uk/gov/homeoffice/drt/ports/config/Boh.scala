@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.ports.config
 
-import uk.gov.homeoffice.drt.auth.Roles.{BOH, SOU}
+import uk.gov.homeoffice.drt.auth.Roles.BOH
 import uk.gov.homeoffice.drt.ports.PaxTypes._
 import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
 import uk.gov.homeoffice.drt.ports.Queues.{EeaDesk, NonEeaDesk}
@@ -18,6 +18,10 @@ object Boh extends AirportConfigLike {
     portCode = PortCode("BOH"),
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.QueueDesk)
+    ),
+    divertedQueues = Map(
+      Queues.NonEeaDesk -> Queues.QueueDesk,
+      Queues.EeaDesk -> Queues.QueueDesk
     ),
     slaByQueue = Map(
       Queues.QueueDesk -> 20
@@ -43,13 +47,8 @@ object Boh extends AirportConfigLike {
     role = BOH,
     terminalPaxTypeQueueAllocation = Map(
       T1 -> (defaultQueueRatios + (
-        EeaMachineReadable -> List(Queues.QueueDesk -> 1.0),
-        EeaBelowEGateAge -> List(Queues.QueueDesk -> 1.0),
-        EeaNonMachineReadable -> List(Queues.QueueDesk -> 1.0),
-        NonVisaNational -> List(Queues.QueueDesk -> 1.0),
-        VisaNational -> List(Queues.QueueDesk -> 1.0),
-        B5JPlusNational -> List(Queues.QueueDesk -> 1.0),
-        B5JPlusNationalBelowEGateAge -> List(Queues.QueueDesk -> 1.0)
+        EeaMachineReadable -> List(Queues.EeaDesk -> 1.0),
+        B5JPlusNational -> List(Queues.EeaDesk -> 1.0),
       ))),
     feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, AclFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),

@@ -18,6 +18,10 @@ object Sou extends AirportConfigLike {
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.QueueDesk)
     ),
+    divertedQueues = Map(
+      Queues.NonEeaDesk -> Queues.QueueDesk,
+      Queues.EeaDesk -> Queues.QueueDesk
+    ),
     slaByQueue = Map(
       Queues.QueueDesk -> 20
     ),
@@ -35,20 +39,16 @@ object Sou extends AirportConfigLike {
       visaNationalToDesk -> 90d / 60,
       nonVisaNationalToDesk -> 78d / 60
     )),
-    minMaxDesksByTerminalQueue24Hrs = Map(T1 -> Map(
-      Queues.QueueDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4)),
-    )),
+    minMaxDesksByTerminalQueue24Hrs = Map(
+      T1 -> Map(
+        Queues.QueueDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4)),
+      )),
     eGateBankSizes = Map(),
     role = SOU,
     terminalPaxTypeQueueAllocation = Map(
       T1 -> (defaultQueueRatios + (
-        EeaMachineReadable -> List(Queues.QueueDesk -> 1.0),
-        EeaBelowEGateAge -> List(Queues.QueueDesk -> 1.0),
-        EeaNonMachineReadable -> List(Queues.QueueDesk -> 1.0),
-        NonVisaNational -> List(Queues.QueueDesk -> 1.0),
-        VisaNational -> List(Queues.QueueDesk -> 1.0),
-        B5JPlusNational -> List(Queues.QueueDesk -> 1.0),
-        B5JPlusNationalBelowEGateAge -> List(Queues.QueueDesk -> 1.0)
+        EeaMachineReadable -> List(Queues.EeaDesk -> 1.0),
+        B5JPlusNational -> List(Queues.EeaDesk -> 1.0),
       ))),
     feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, AclFeedSource),
     flexedQueues = Set(),
