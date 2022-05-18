@@ -46,13 +46,8 @@ object Pik extends AirportConfigLike {
     role = PIK,
     terminalPaxTypeQueueAllocation = Map(
       T1 -> Map(
-        EeaMachineReadable -> List(Queues.QueueDesk -> 1.0),
-        EeaBelowEGateAge -> List(Queues.QueueDesk -> 1.0),
-        EeaNonMachineReadable -> List(Queues.QueueDesk -> 1.0),
-        NonVisaNational -> List(Queues.QueueDesk -> 1.0),
-        VisaNational -> List(Queues.QueueDesk -> 1.0),
-        B5JPlusNational -> List(Queues.QueueDesk -> 1.0),
-        B5JPlusNationalBelowEGateAge -> List(Queues.QueueDesk -> 1.0)
+        EeaMachineReadable -> List(Queues.EeaDesk -> 1.0),
+        B5JPlusNational -> List(Queues.EeaDesk -> 1.0),
       )),
     flexedQueues = Set(),
     desksByTerminal = Map(T1 -> 5),
