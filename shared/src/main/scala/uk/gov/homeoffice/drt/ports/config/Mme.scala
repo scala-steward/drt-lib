@@ -1,7 +1,6 @@
 package uk.gov.homeoffice.drt.ports.config
 
-import uk.gov.homeoffice.drt.auth.Roles.{EXT, MME}
-import uk.gov.homeoffice.drt.ports.PaxTypes._
+import uk.gov.homeoffice.drt.auth.Roles.MME
 import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
 import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
@@ -45,11 +44,7 @@ object Mme extends AirportConfigLike {
     )),
     eGateBankSizes = Map(),
     role = MME,
-    terminalPaxTypeQueueAllocation = Map(
-      T1 -> (defaultQueueRatios + (
-        EeaMachineReadable -> List(Queues.EeaDesk -> 1.0),
-        B5JPlusNational -> List(Queues.EeaDesk -> 1.0),
-      ))),
+    terminalPaxTypeQueueAllocation = Map(T1 -> defaultQueueRatiosWithoutEgates),
     feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, AclFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),
     desksByTerminal = Map(T1 -> 2)

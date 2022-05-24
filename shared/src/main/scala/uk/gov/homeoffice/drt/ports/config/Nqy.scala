@@ -1,11 +1,11 @@
 package uk.gov.homeoffice.drt.ports.config
 
 import uk.gov.homeoffice.drt.auth.Roles.NQY
-import uk.gov.homeoffice.drt.ports.PaxTypes._
 import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.ports.config.AirportConfigDefaults.defaultQueueRatiosWithoutEgates
 
 import scala.collection.immutable.SortedMap
 
@@ -44,11 +44,7 @@ object Nqy extends AirportConfigLike {
     ),
     eGateBankSizes = Map(T1 -> Iterable()),
     role = NQY,
-    terminalPaxTypeQueueAllocation = Map(
-      T1 -> Map(
-        EeaMachineReadable -> List(Queues.EeaDesk -> 1.0),
-        B5JPlusNational -> List(Queues.EeaDesk -> 1.0),
-      )),
+    terminalPaxTypeQueueAllocation = Map(T1 -> defaultQueueRatiosWithoutEgates),
     flexedQueues = Set(),
     desksByTerminal = Map(T1 -> 2),
     feedSources = Seq(ApiFeedSource, LiveFeedSource)

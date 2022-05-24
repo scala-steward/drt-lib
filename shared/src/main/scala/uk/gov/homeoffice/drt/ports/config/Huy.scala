@@ -1,7 +1,6 @@
 package uk.gov.homeoffice.drt.ports.config
 
 import uk.gov.homeoffice.drt.auth.Roles.HUY
-import uk.gov.homeoffice.drt.ports.PaxTypes._
 import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues.{eeaMachineReadableToDesk, eeaNonMachineReadableToDesk, nonVisaNationalToDesk, visaNationalToDesk}
 import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
@@ -39,16 +38,7 @@ object Huy extends AirportConfigLike {
     )),
     eGateBankSizes = Map(),
     role = HUY,
-    terminalPaxTypeQueueAllocation = Map(
-      T1 -> Map(
-        EeaMachineReadable -> List(Queues.EeaDesk -> 1.0),
-        EeaBelowEGateAge -> List(Queues.EeaDesk -> 1.0),
-        EeaNonMachineReadable -> List(Queues.EeaDesk -> 1.0),
-        NonVisaNational -> List(Queues.NonEeaDesk -> 1.0),
-        VisaNational -> List(Queues.NonEeaDesk -> 1.0),
-        B5JPlusNational -> List(Queues.EeaDesk -> 1.0),
-        B5JPlusNationalBelowEGateAge -> List(Queues.EeaDesk -> 1.0)
-      )),
+    terminalPaxTypeQueueAllocation = Map(T1 -> defaultQueueRatiosWithoutEgates),
     feedSources = Seq(ApiFeedSource, LiveFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),
     desksByTerminal = Map(T1 -> 3)

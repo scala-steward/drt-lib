@@ -32,6 +32,11 @@ object AirportConfigDefaults {
     B5JPlusNationalBelowEGateAge -> List(Queues.EeaDesk -> 1)
   )
 
+  val defaultQueueRatiosWithoutEgates: Map[PaxType, Seq[(Queue, Double)]] = defaultQueueRatios + (
+    EeaMachineReadable -> List(EeaDesk -> 1.0),
+    B5JPlusNational -> List(EeaDesk -> 1.0),
+  )
+
   val defaultProcessingTimes: Map[PaxTypeAndQueue, Double] = Map(
     eeaMachineReadableToDesk -> 20d / 60,
     eeaMachineReadableToEGate -> 35d / 60,
