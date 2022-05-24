@@ -1,7 +1,6 @@
 package uk.gov.homeoffice.drt.ports.config
 
-import uk.gov.homeoffice.drt.auth.Roles.{BHD, EXT}
-import uk.gov.homeoffice.drt.ports.PaxTypes._
+import uk.gov.homeoffice.drt.auth.Roles.EXT
 import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
 import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
