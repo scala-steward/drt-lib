@@ -45,11 +45,7 @@ object Sou extends AirportConfigLike {
       )),
     eGateBankSizes = Map(),
     role = SOU,
-    terminalPaxTypeQueueAllocation = Map(
-      T1 -> (defaultQueueRatios + (
-        EeaMachineReadable -> List(Queues.EeaDesk -> 1.0),
-        B5JPlusNational -> List(Queues.EeaDesk -> 1.0),
-      ))),
+    terminalPaxTypeQueueAllocation = Map(T1 -> defaultQueueRatiosWithoutEgates),
     feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, AclFeedSource),
     flexedQueues = Set(),
     desksByTerminal = Map(T1 -> 4)

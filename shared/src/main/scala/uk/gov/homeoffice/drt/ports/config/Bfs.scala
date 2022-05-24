@@ -7,7 +7,7 @@ import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
-import uk.gov.homeoffice.drt.ports.config.AirportConfigDefaults.defaultQueueRatios
+import uk.gov.homeoffice.drt.ports.config.AirportConfigDefaults.{defaultQueueRatios, defaultQueueRatiosWithoutEgates}
 
 import scala.collection.immutable.SortedMap
 
@@ -47,11 +47,7 @@ object Bfs extends AirportConfigLike {
     ),
     eGateBankSizes = Map(),
     role = BFS,
-    terminalPaxTypeQueueAllocation = Map(
-      T1 -> (defaultQueueRatios + (
-        EeaMachineReadable -> List(EeaDesk -> 1.0),
-        B5JPlusNational -> List(Queues.EeaDesk -> 1.0)
-      ))),
+    terminalPaxTypeQueueAllocation = Map(T1 -> defaultQueueRatiosWithoutEgates),
     feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, AclFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),
     desksByTerminal = Map(T1 -> 8)

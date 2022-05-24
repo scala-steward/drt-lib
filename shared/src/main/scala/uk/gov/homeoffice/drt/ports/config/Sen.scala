@@ -39,16 +39,7 @@ object Sen extends AirportConfigLike {
     )),
     eGateBankSizes = Map(),
     role = SEN,
-    terminalPaxTypeQueueAllocation = Map(
-      T1 -> Map(
-        EeaMachineReadable -> List(Queues.EeaDesk -> 1.0),
-        EeaBelowEGateAge -> List(Queues.EeaDesk -> 1.0),
-        EeaNonMachineReadable -> List(Queues.EeaDesk -> 1.0),
-        NonVisaNational -> List(Queues.NonEeaDesk -> 1.0),
-        VisaNational -> List(Queues.NonEeaDesk -> 1.0),
-        B5JPlusNational -> List(Queues.EeaDesk -> 1.0),
-        B5JPlusNationalBelowEGateAge -> List(Queues.EeaDesk -> 1.0)
-      )),
+    terminalPaxTypeQueueAllocation = Map(T1 -> defaultQueueRatiosWithoutEgates),
     feedSources = Seq(ApiFeedSource, LiveFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),
     desksByTerminal = Map(T1 -> 6)
