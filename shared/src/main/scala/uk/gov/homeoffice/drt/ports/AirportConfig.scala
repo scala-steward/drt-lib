@@ -51,7 +51,6 @@ case class AirportConfig(portCode: PortCode,
                          outOfHoursContactPhone: Option[String] = None,
                          nationalityBasedProcTimes: Map[String, Double] = ProcessingTimes.nationalityProcessingTimes,
                          role: Role,
-                         cloneOfPortCode: Option[PortCode] = None,
                          terminalPaxTypeQueueAllocation: Map[Terminal, Map[PaxType, Seq[(Queue, Double)]]],
                          hasTransfer: Boolean = false,
                          maybeCiriumEstThresholdHours: Option[Int] = None,
@@ -62,6 +61,7 @@ case class AirportConfig(portCode: PortCode,
                          queuePriority: List[Queue] = List(EeaDesk, NonEeaDesk, QueueDesk, FastTrack, EGate),
                          assumedAdultsPerChild: Double = 1.0,
                          useTimePredictions: Boolean = false,
+                         noLivePortFeed: Boolean = false,
                         ) {
   def assertValid(): Unit = {
     queuesByTerminal.values.flatten.toSet
@@ -101,8 +101,6 @@ case class AirportConfig(portCode: PortCode,
     q =>
       terminalSplitQueueTypes.getOrElse(terminal, Set()).contains(q)
   }
-
-  def feedPortCode: PortCode = cloneOfPortCode.getOrElse(portCode)
 
   def nonTransferQueues(terminalName: Terminal): Seq[Queue] = queuesByTerminal(terminalName).collect {
     case queue if queue != Queues.Transfer => queue

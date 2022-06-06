@@ -42,32 +42,6 @@ class AirportConfigsSpec extends Specification {
       }
     }
 
-    "A cloned Airport config should return the portcode of the port it is cloned from when calling feedPortCode" in {
-      import uk.gov.homeoffice.drt.ports.config.AirportConfigDefaults._
-
-      val clonedConfig = AirportConfig(
-        portCode = PortCode("LHR_Clone"),
-        cloneOfPortCode = Option(PortCode("LHR")),
-        queuesByTerminal = SortedMap(),
-        slaByQueue = Map(),
-        timeToChoxMillis = 0L,
-        firstPaxOffMillis = 0L,
-        defaultWalkTimeMillis = Map(),
-        terminalPaxSplits = Map(),
-        terminalProcessingTimes = Map(),
-        minMaxDesksByTerminalQueue24Hrs = Map(),
-        eGateBankSizes = Map(),
-        role = LHR,
-        terminalPaxTypeQueueAllocation = Map(T1 -> defaultQueueRatios),
-        desksByTerminal = Map[Terminal, Int](),
-        feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, LiveFeedSource, AclFeedSource)
-        )
-
-      val result = clonedConfig.feedPortCode
-      val expected = PortCode("LHR")
-      result === expected
-    }
-
     "All configurations should be valid with no missing queues or terminals" in {
       AirportConfigs.allPortConfigs.foreach(_.assertValid())
 
