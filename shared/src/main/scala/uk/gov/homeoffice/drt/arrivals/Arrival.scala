@@ -1,7 +1,9 @@
 package uk.gov.homeoffice.drt.arrivals
 
+import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSource
+import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.{ApiSplitsWithHistoricalEGateAndFTPercentages, Historical}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.ports.{FeedSource, LiveFeedSource, PortCode}
+import uk.gov.homeoffice.drt.ports._
 import uk.gov.homeoffice.drt.time.MilliTimes.oneMinuteMillis
 import uk.gov.homeoffice.drt.time.{MilliTimes, SDateLike}
 import upickle.default.{ReadWriter, macroRW}
@@ -25,6 +27,8 @@ object Prediction {
   implicit val predictionLong: ReadWriter[Prediction[Long]] = macroRW
   implicit val predictionInt: ReadWriter[Prediction[Int]] = macroRW
 }
+
+case class TotalPaxSource(pax: Int, feedSource: FeedSource, splitSource: Option[SplitSource])
 
 case class Arrival(Operator: Option[Operator],
                    CarrierCode: CarrierCode,
@@ -53,9 +57,9 @@ case class Arrival(Operator: Option[Operator],
                    ApiPax: Option[Int],
                    ScheduledDeparture: Option[Long],
                    RedListPax: Option[Int],
+                   TotalPax: Set[TotalPaxSource]
                   )
-  extends WithUnique[UniqueArrival]
-    with Updatable[Arrival] {
+  extends WithUnique[UniqueArrival] with Updatable[Arrival] {
   lazy val differenceFromScheduled: Option[FiniteDuration] = Actual.map(a => (a - Scheduled).milliseconds)
 
   val paxOffPerMinute = 20
@@ -116,12 +120,26 @@ case class Arrival(Operator: Option[Operator],
     (minutesToDisembark * oneMinuteInMillis).toLong
   }
 
-  val bestPcpPaxEstimate: Int = (ApiPax, ActPax, TranPax, MaxPax) match {
-    case (Some(apiPax), _, _, _) if !FeedSources.contains(LiveFeedSource) => apiPax
-    case (_, Some(actPax), Some(tranPax), _) if (actPax - tranPax) >= 0 => actPax - tranPax
-    case (_, Some(actPax), None, _) => actPax
-    case (Some(apiPax), _, _, _) => apiPax
-    case _ => 0
+  val bestPcpPaxEstimate: TotalPaxSource = {
+    val matchedTotalPax = TotalPax match {
+      case totalPax if totalPax.exists(tp => tp.feedSource == ScenarioSimulationSource && tp.pax > 0) =>
+        totalPax.find(tp => tp.feedSource == ScenarioSimulationSource)
+      case totalPax if totalPax.exists(tp => tp.feedSource == LiveFeedSource && tp.pax > 0) =>
+        totalPax.find(tp => tp.feedSource == LiveFeedSource && tp.pax > 0)
+      case totalPax if totalPax.exists(tp => tp.feedSource == ApiFeedSource && tp.splitSource.contains(ApiSplitsWithHistoricalEGateAndFTPercentages) && tp.pax > 0) =>
+        totalPax.find(tp => tp.feedSource == ApiFeedSource && tp.splitSource.contains(ApiSplitsWithHistoricalEGateAndFTPercentages))
+      case totalPax if totalPax.exists(tp => tp.feedSource == ForecastFeedSource && tp.pax > 0) =>
+        totalPax.find(tp => tp.feedSource == ForecastFeedSource && tp.pax > 0)
+      case totalPax if totalPax.exists(tp => tp.feedSource == ApiFeedSource && tp.splitSource.contains(Historical) && tp.pax > 0) =>
+        totalPax.find(tp => tp.feedSource == ApiFeedSource && tp.splitSource.contains(Historical) && tp.pax > 0)
+      case totalPax if totalPax.exists(tp => tp.feedSource == ApiFeedSource && tp.pax > 0) =>
+        totalPax.find(tp => tp.feedSource == ApiFeedSource && tp.pax > 0)
+      case totalPax if totalPax.exists(tp => tp.feedSource == AclFeedSource && tp.pax > 0) =>
+        totalPax.find(tp => tp.feedSource == AclFeedSource)
+      case totalPax =>
+        totalPax.find(tp => tp.feedSource == UnknownFeedSource)
+    }
+    matchedTotalPax.getOrElse(TotalPaxSource(0, UnknownFeedSource, None))
   }
 
   def bestArrivalTime(timeToChox: Long, considerPredictions: Boolean): Long =
@@ -139,18 +157,20 @@ case class Arrival(Operator: Option[Operator],
 
   def minutesOfPaxArrivals: Int = {
     val totalPax = bestPcpPaxEstimate
-    if (totalPax <= 0) 0
-    else (totalPax.toDouble / paxOffPerMinute).ceil.toInt - 1
+    if (totalPax.pax <= 0) 0
+    else (totalPax.pax.toDouble / paxOffPerMinute).ceil.toInt - 1
   }
 
   lazy val pcpRange: NumericRange[Long] = {
     val pcpStart = MilliTimes.timeToNearestMinute(PcpTime.getOrElse(0L))
+
     val pcpEnd = pcpStart + oneMinuteMillis * minutesOfPaxArrivals
+
     pcpStart to pcpEnd by oneMinuteMillis
   }
 
   def paxDeparturesByMinute(departRate: Int): Iterable[(Long, Int)] = {
-    val totalPax = bestPcpPaxEstimate
+    val totalPax = bestPcpPaxEstimate.pax
     val maybeRemainingPax = totalPax % departRate match {
       case 0 => None
       case someLeftovers => Option(someLeftovers)
@@ -173,7 +193,7 @@ case class Arrival(Operator: Option[Operator],
       BaggageReclaimId = if (incoming.BaggageReclaimId.exists(_.nonEmpty)) incoming.BaggageReclaimId else this.BaggageReclaimId,
       Stand = if (incoming.Stand.exists(_.nonEmpty)) incoming.Stand else this.Stand,
       Gate = if (incoming.Gate.exists(_.nonEmpty)) incoming.Gate else this.Gate,
-      RedListPax = if (incoming.RedListPax.nonEmpty) incoming.RedListPax else this.RedListPax,
+      RedListPax = if (incoming.RedListPax.nonEmpty) incoming.RedListPax else this.RedListPax
     )
 }
 
@@ -213,6 +233,7 @@ object Arrival {
   implicit val operatorRw: ReadWriter[Operator] = macroRW
   implicit val portCodeRw: ReadWriter[PortCode] = macroRW
   implicit val arrivalRw: ReadWriter[Arrival] = macroRW
+  implicit val totalPaxSourceRw: ReadWriter[TotalPaxSource] = macroRW
 
   def apply(Operator: Option[Operator],
             Status: ArrivalStatus,
@@ -240,6 +261,7 @@ object Arrival {
             ApiPax: Option[Int] = None,
             ScheduledDeparture: Option[Long] = None,
             RedListPax: Option[Int] = None,
+            TotalPax: Set[TotalPaxSource] = Set.empty
            ): Arrival = {
     val (carrierCode: CarrierCode, voyageNumber: VoyageNumber, maybeSuffix: Option[FlightCodeSuffix]) = {
       val bestCode = (rawIATA, rawICAO) match {
@@ -279,6 +301,7 @@ object Arrival {
       ApiPax = ApiPax,
       ScheduledDeparture = ScheduledDeparture,
       RedListPax = RedListPax,
+      TotalPax = TotalPax
     )
   }
 }

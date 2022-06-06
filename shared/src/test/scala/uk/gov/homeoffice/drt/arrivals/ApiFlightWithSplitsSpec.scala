@@ -7,40 +7,40 @@ import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitSource, SplitSources}
 import uk.gov.homeoffice.drt.ports._
 import uk.gov.homeoffice.drt.splits.ApiSplitsToSplitRatio
 
-
 class ApiFlightWithSplitsSpec extends Specification {
   "A flight with splits" should {
     "have valid Api when api splits pax count is within the 5% Threshold of LiveSourceFeed pax count" in {
       "and there are no transfer pax" in {
-        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 41, 0, Set(LiveFeedSource))
+        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 41, 0, Set(LiveFeedSource),
+          Set(TotalPaxSource(40, LiveFeedSource, None)))
         val apiSplits = flightWithSplits.splits.find(_.source == SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages).get
         flightWithSplits.isWithinThreshold(apiSplits) mustEqual true
         flightWithSplits.hasValidApi mustEqual true
       }
 
       "and there are transfer pax only in the port feed data" in {
-        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 20, 21, 0, Set(LiveFeedSource))
+        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 20, 21, 0, Set(LiveFeedSource), Set(TotalPaxSource(40, LiveFeedSource, None)))
         val apiSplits = flightWithSplits.splits.find(_.source == SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages).get
         flightWithSplits.isWithinThreshold(apiSplits) mustEqual true
         flightWithSplits.hasValidApi mustEqual true
       }
 
       "and there are transfer pax only in the API data" in {
-        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 41, 20, Set(LiveFeedSource))
+        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 41, 20, Set(LiveFeedSource), Set(TotalPaxSource(40, LiveFeedSource, None)))
         val apiSplits = flightWithSplits.splits.find(_.source == SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages).get
         flightWithSplits.isWithinThreshold(apiSplits) mustEqual true
         flightWithSplits.hasValidApi mustEqual true
       }
 
       "and there are transfer pax both in the API data and in the port feed" in {
-        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 20, 21, 20, Set(LiveFeedSource))
+        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 20, 21, 20, Set(LiveFeedSource), Set(TotalPaxSource(40, LiveFeedSource, None)))
         val apiSplits = flightWithSplits.splits.find(s => s.source == SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages).get
         flightWithSplits.isWithinThreshold(apiSplits) mustEqual true
         flightWithSplits.hasValidApi mustEqual true
       }
 
       "or there is a ScenarioSimulationSource" in {
-        val flightWithSplits = flightWithPaxAndApiSplits(Option(20), 0, 41, 0, Set(LiveFeedSource, ScenarioSimulationSource))
+        val flightWithSplits = flightWithPaxAndApiSplits(Option(20), 0, 41, 0, Set(LiveFeedSource, ScenarioSimulationSource), Set())
 
         flightWithSplits.hasValidApi mustEqual true
       }
@@ -48,28 +48,28 @@ class ApiFlightWithSplitsSpec extends Specification {
 
     "not have valid Api when api splits pax count outside the 5% Threshold of LiveSourceFeed pax count" in {
       "and there are no transfer pax" in {
-        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 45, 0, Set(LiveFeedSource))
+        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 45, 0, Set(LiveFeedSource), Set(TotalPaxSource(40, LiveFeedSource, None)))
         val apiSplits = flightWithSplits.splits.find(_.source == SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages).get
         flightWithSplits.isWithinThreshold(apiSplits) mustEqual false
         flightWithSplits.hasValidApi mustEqual false
       }
 
       "and there are transfer pax only in the port feed data" in {
-        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 20, 24, 0, Set(LiveFeedSource))
+        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 20, 24, 0, Set(LiveFeedSource), Set(TotalPaxSource(40, LiveFeedSource, None)))
         val apiSplits = flightWithSplits.splits.find(_.source == SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages).get
         flightWithSplits.isWithinThreshold(apiSplits) mustEqual false
         flightWithSplits.hasValidApi mustEqual false
       }
 
       "and there are transfer pax only in the API data" in {
-        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 21, 25, Set(LiveFeedSource))
+        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 21, 25, Set(LiveFeedSource), Set(TotalPaxSource(40, LiveFeedSource, None)))
         val apiSplits = flightWithSplits.splits.find(_.source == SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages).get
         flightWithSplits.isWithinThreshold(apiSplits) mustEqual false
         flightWithSplits.hasValidApi mustEqual false
       }
 
       "and there are transfer pax both in the API data and in the port feed" in {
-        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 20, 25, 25, Set(LiveFeedSource))
+        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 20, 25, 25, Set(LiveFeedSource), Set(TotalPaxSource(40, LiveFeedSource, None)))
         val apiSplits = flightWithSplits.splits.find(s => s.source == SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages).get
         flightWithSplits.isWithinThreshold(apiSplits) mustEqual false
         flightWithSplits.hasValidApi mustEqual false
@@ -83,43 +83,43 @@ class ApiFlightWithSplitsSpec extends Specification {
 
     "have valid Api splits when flight is has no LiveFeedSource" in {
       "and pax count differences are within the threshold" in {
-        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 40, 0, Set())
+        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 40, 0, Set(), Set())
         flightWithSplits.hasValidApi mustEqual true
       }
       "and pax count differences are outside the threshold" in {
-        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 100, 0, Set())
+        val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 100, 0, Set(), Set())
         flightWithSplits.hasValidApi mustEqual true
       }
     }
 
     "when there no actual pax number in liveFeed" in {
       "and api splits has pax number and hasValidApi is true" in {
-        val flightWithSplits = flightWithPaxAndApiSplits(None, 0, 100, 0, Set(LiveFeedSource))
+        val flightWithSplits = flightWithPaxAndApiSplits(None, 0, 100, 0, Set(LiveFeedSource), Set(TotalPaxSource(40, LiveFeedSource, None)))
         flightWithSplits.hasValidApi mustEqual true
-        flightWithSplits.pcpPaxEstimate mustEqual 100
+        flightWithSplits.pcpPaxEstimate.pax mustEqual 100
         val paxPerQueue: Option[Map[Queues.Queue, Int]] = ApiSplitsToSplitRatio.paxPerQueueUsingBestSplitsAsRatio(flightWithSplits)
         paxPerQueue must beSome(collection.Map(Queues.NonEeaDesk -> 100))
       }
     }
 
     "give a pax count from splits when it has API splits" in {
-      val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 45, 0, Set())
-      flightWithSplits.totalPaxFromApiExcludingTransfer mustEqual Option(45)
+      val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 45, 0, Set(), Set())
+      flightWithSplits.totalPaxFromApiExcludingTransfer.map(_.pax) mustEqual Option(45)
     }
 
     "give a pax count from splits when it has API splits which does not include transfer pax" in {
-      val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 45, 20, Set())
-      flightWithSplits.totalPaxFromApiExcludingTransfer mustEqual Option(45)
+      val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 45, 20, Set(), Set())
+      flightWithSplits.totalPaxFromApiExcludingTransfer.map(_.pax) mustEqual Option(45)
     }
 
     "give a pax count from splits when it has API splits even when it is outside the trusted threshold" in {
-      val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 150, 0, Set(LiveFeedSource))
-      flightWithSplits.totalPaxFromApiExcludingTransfer mustEqual Option(150)
+      val flightWithSplits = flightWithPaxAndApiSplits(Option(40), 0, 150, 0, Set(LiveFeedSource), Set())
+      flightWithSplits.totalPaxFromApiExcludingTransfer.map(_.pax) mustEqual Option(150)
     }
 
     "give no pax count from splits it has no API splits" in {
       val flightWithSplits = flightWithPaxAndHistoricSplits(Option(40), 0, 45, 20, Set())
-      flightWithSplits.totalPaxFromApiExcludingTransfer must beNone
+      flightWithSplits.totalPaxFromApiExcludingTransfer.map(_.pax) must beNone
     }
 
     "give None for totalPaxFromApiExcludingTransfer when it doesn't have live API splits" in {
@@ -133,8 +133,8 @@ class ApiFlightWithSplitsSpec extends Specification {
     }
   }
 
-  private def flightWithPaxAndApiSplits(actPax: Option[Int], transferPax: Int, splitsDirect: Int, splitsTransfer: Int, sources: Set[FeedSource]): ApiFlightWithSplits = {
-    val flight: Arrival = ArrivalGenerator.arrival(actPax = actPax, tranPax = Option(transferPax), feedSources = sources)
+  private def flightWithPaxAndApiSplits(actPax: Option[Int], transferPax: Int, splitsDirect: Int, splitsTransfer: Int, sources: Set[FeedSource], totalPax: Set[TotalPaxSource]): ApiFlightWithSplits = {
+    val flight: Arrival = ArrivalGenerator.arrival(actPax = actPax, tranPax = Option(transferPax), feedSources = sources, totalPax = totalPax)
 
     ApiFlightWithSplits(flight, Set(splitsForPax(directPax = splitsDirect, transferPax = splitsTransfer, ApiSplitsWithHistoricalEGateAndFTPercentages)))
   }
