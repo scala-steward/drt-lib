@@ -1,7 +1,5 @@
 package uk.gov.homeoffice.drt.arrivals
 
-import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSource
-import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.{ApiSplitsWithHistoricalEGateAndFTPercentages, Historical}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.ports._
 import uk.gov.homeoffice.drt.time.MilliTimes.oneMinuteMillis
@@ -28,7 +26,7 @@ object Prediction {
   implicit val predictionInt: ReadWriter[Prediction[Int]] = macroRW
 }
 
-case class TotalPaxSource(pax: Int, feedSource: FeedSource, splitSource: Option[SplitSource])
+case class TotalPaxSource(pax: Option[Int], feedSource: FeedSource)
 
 case class Arrival(Operator: Option[Operator],
                    CarrierCode: CarrierCode,
@@ -122,24 +120,31 @@ case class Arrival(Operator: Option[Operator],
 
   val bestPcpPaxEstimate: TotalPaxSource = {
     val matchedTotalPax = TotalPax match {
-      case totalPax if totalPax.exists(tp => tp.feedSource == ScenarioSimulationSource && tp.pax > 0) =>
-        totalPax.find(tp => tp.feedSource == ScenarioSimulationSource)
-      case totalPax if totalPax.exists(tp => tp.feedSource == LiveFeedSource && tp.pax > 0) =>
-        totalPax.find(tp => tp.feedSource == LiveFeedSource && tp.pax > 0)
-      case totalPax if totalPax.exists(tp => tp.feedSource == ApiFeedSource && tp.splitSource.contains(ApiSplitsWithHistoricalEGateAndFTPercentages) && tp.pax > 0) =>
-        totalPax.find(tp => tp.feedSource == ApiFeedSource && tp.splitSource.contains(ApiSplitsWithHistoricalEGateAndFTPercentages))
-      case totalPax if totalPax.exists(tp => tp.feedSource == ForecastFeedSource && tp.pax > 0) =>
-        totalPax.find(tp => tp.feedSource == ForecastFeedSource && tp.pax > 0)
-      case totalPax if totalPax.exists(tp => tp.feedSource == ApiFeedSource && tp.splitSource.contains(Historical) && tp.pax > 0) =>
-        totalPax.find(tp => tp.feedSource == ApiFeedSource && tp.splitSource.contains(Historical) && tp.pax > 0)
-      case totalPax if totalPax.exists(tp => tp.feedSource == ApiFeedSource && tp.pax > 0) =>
-        totalPax.find(tp => tp.feedSource == ApiFeedSource && tp.pax > 0)
-      case totalPax if totalPax.exists(tp => tp.feedSource == AclFeedSource && tp.pax > 0) =>
-        totalPax.find(tp => tp.feedSource == AclFeedSource)
+      case totalPax if totalPax.exists(tp => tp.feedSource == ScenarioSimulationSource && tp.pax.isDefined) =>
+        excludeTransferPax(totalPax.find(tp => tp.feedSource == ScenarioSimulationSource))
+      case totalPax if totalPax.exists(tp => tp.feedSource == LiveFeedSource && tp.pax.isDefined) =>
+        excludeTransferPax(totalPax.find(tp => tp.feedSource == LiveFeedSource && tp.pax.isDefined))
+      case totalPax if totalPax.exists(tp => tp.feedSource == ApiFeedSource && tp.pax.isDefined) =>
+        totalPax.find(tp => tp.feedSource == ApiFeedSource && tp.pax.isDefined)
+      case totalPax if totalPax.exists(tp => tp.feedSource == ForecastFeedSource && tp.pax.isDefined) =>
+        excludeTransferPax(totalPax.find(tp => tp.feedSource == ForecastFeedSource && tp.pax.isDefined))
+      case totalPax if totalPax.exists(tp => tp.feedSource == HistoricApiFeedSource && tp.pax.isDefined) =>
+        totalPax.find(tp => tp.feedSource == HistoricApiFeedSource && tp.pax.isDefined)
+      case totalPax if totalPax.exists(tp => tp.feedSource == AclFeedSource && tp.pax.isDefined) =>
+        excludeTransferPax(totalPax.find(tp => tp.feedSource == AclFeedSource))
       case totalPax =>
         totalPax.find(tp => tp.feedSource == UnknownFeedSource)
     }
-    matchedTotalPax.getOrElse(TotalPaxSource(0, UnknownFeedSource, None))
+    matchedTotalPax.getOrElse(TotalPaxSource(None, UnknownFeedSource))
+  }
+
+  def excludeTransferPax(totalPaxSource: Option[TotalPaxSource]) = {
+    val excludeTransPax = totalPaxSource.flatMap(_.pax.map(_ - TranPax.getOrElse(0)))
+    if (excludeTransPax.exists(_ > 0)) {
+      totalPaxSource.map(tps => tps.copy(pax = excludeTransPax))
+    } else {
+      totalPaxSource.map(tps => tps.copy(pax = Some(0)))
+    }
   }
 
   def bestArrivalTime(timeToChox: Long, considerPredictions: Boolean): Long =
@@ -157,8 +162,8 @@ case class Arrival(Operator: Option[Operator],
 
   def minutesOfPaxArrivals: Int = {
     val totalPax = bestPcpPaxEstimate
-    if (totalPax.pax <= 0) 0
-    else (totalPax.pax.toDouble / paxOffPerMinute).ceil.toInt - 1
+    if (totalPax.pax.getOrElse(0) <= 0) 0
+    else (totalPax.pax.getOrElse(0).toDouble / paxOffPerMinute).ceil.toInt - 1
   }
 
   lazy val pcpRange: NumericRange[Long] = {
@@ -170,7 +175,7 @@ case class Arrival(Operator: Option[Operator],
   }
 
   def paxDeparturesByMinute(departRate: Int): Iterable[(Long, Int)] = {
-    val totalPax = bestPcpPaxEstimate.pax
+    val totalPax = bestPcpPaxEstimate.pax.getOrElse(0)
     val maybeRemainingPax = totalPax % departRate match {
       case 0 => None
       case someLeftovers => Option(someLeftovers)

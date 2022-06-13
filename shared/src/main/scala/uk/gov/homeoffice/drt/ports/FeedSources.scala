@@ -15,6 +15,17 @@ trait FeedSource {
   override val toString: String = getClass.getSimpleName.split("\\$").last
 }
 
+case object HistoricApiFeedSource extends FeedSource {
+  val name: String = "Historic API"
+
+  val maybeLastUpdateThreshold: Option[FiniteDuration] = None
+
+  val description: Boolean => String = isLiveFeedAvailable => if (isLiveFeedAvailable)
+    "Historic passenger nationality and age data when available."
+  else
+    "Historic passenger numbers and nationality data when available."
+}
+
 case object ApiFeedSource extends FeedSource {
   val name: String = "API"
 
@@ -78,7 +89,7 @@ case object UnknownFeedSource extends FeedSource {
 }
 
 object FeedSource {
-  def feedSources: Set[FeedSource] = Set(ApiFeedSource, AclFeedSource, ForecastFeedSource, LiveFeedSource, LiveBaseFeedSource, ScenarioSimulationSource)
+  def feedSources: Set[FeedSource] = Set(ApiFeedSource, AclFeedSource, ForecastFeedSource, HistoricApiFeedSource, LiveFeedSource, LiveBaseFeedSource, ScenarioSimulationSource)
 
   def apply(feedSource: String): Option[FeedSource] = feedSources.find(fs => fs.toString == feedSource)
 

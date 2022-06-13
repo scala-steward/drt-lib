@@ -36,7 +36,7 @@ message FlightMessage {
     optional int32 RedListPax = 26;
     optional int64 ScheduledDeparture = 27;
     optional PredictionLongMessage PredictedTouchdown = 29;
-    repeated TotalPaxSource TotalPax = 30;
+    repeated TotalPaxSourceMessage TotalPax = 30;
     optional int32 FlightID__OLD = 10;
     optional int32 LastKnownPax__OLD = 22;
     optional int64 PredictedTouchdown__OLD = 28;
@@ -72,8 +72,7 @@ message FeedStatusMessage {
     optional string message = 3;
 }
 
-message TotalPaxSource {
+message TotalPaxSourceMessage {
     optional int32 pax = 1;
     optional string feedSource = 2;
-    optional string splitSource = 3;
 }

@@ -2,7 +2,7 @@ package uk.gov.homeoffice.drt.arrivals
 
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages
-import uk.gov.homeoffice.drt.ports.{AclFeedSource, ApiFeedSource, ForecastFeedSource, LiveFeedSource, ScenarioSimulationSource, UnknownFeedSource}
+import uk.gov.homeoffice.drt.ports._
 import uk.gov.homeoffice.drt.time.SDateLike
 import upickle.default.{ReadWriter, macroRW}
 
@@ -24,12 +24,12 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
 
   def totalPaxFromApi: Option[TotalPaxSource] = splits.collectFirst {
     case splits if splits.source == ApiSplitsWithHistoricalEGateAndFTPercentages =>
-      TotalPaxSource(Math.round(splits.totalPax).toInt, ApiFeedSource, Option(ApiSplitsWithHistoricalEGateAndFTPercentages))
+      TotalPaxSource(Option(Math.round(splits.totalPax).toInt), ApiFeedSource)
   }
 
   def totalPaxFromApiExcludingTransfer: Option[TotalPaxSource] =
     splits.collectFirst { case splits if splits.source == ApiSplitsWithHistoricalEGateAndFTPercentages =>
-      TotalPaxSource(Math.round(splits.totalExcludingTransferPax).toInt, ApiFeedSource, Option(ApiSplitsWithHistoricalEGateAndFTPercentages))
+      TotalPaxSource(Option(Math.round(splits.totalExcludingTransferPax).toInt), ApiFeedSource)
     }
 
   def pcpPaxEstimate: TotalPaxSource =
@@ -48,11 +48,11 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
   def bestSource(actPax: Option[Int]): Option[TotalPaxSource] = {
     this.apiFlight.FeedSources match {
       case feedSource if feedSource.contains(LiveFeedSource) =>
-        Some(TotalPaxSource(actPax.getOrElse(0), LiveFeedSource, None))
+        Some(TotalPaxSource(actPax, LiveFeedSource))
       case feedSource if feedSource.contains(ForecastFeedSource) =>
-        Some(TotalPaxSource(actPax.getOrElse(0), ForecastFeedSource, None))
+        Some(TotalPaxSource(actPax, ForecastFeedSource))
       case feedSource if feedSource.contains(AclFeedSource) =>
-        Some(TotalPaxSource(actPax.getOrElse(0), AclFeedSource, None))
+        Some(TotalPaxSource(actPax, AclFeedSource))
       case _ =>
         None
     }
