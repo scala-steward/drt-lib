@@ -132,10 +132,25 @@ case class Arrival(Operator: Option[Operator],
         totalPax.find(tp => tp.feedSource == HistoricApiFeedSource && tp.pax.isDefined)
       case totalPax if totalPax.exists(tp => tp.feedSource == AclFeedSource && tp.pax.isDefined) =>
         excludeTransferPax(totalPax.find(tp => tp.feedSource == AclFeedSource))
+      case _ if fallBackToFeedSource(ActPax).isDefined =>
+        excludeTransferPax(fallBackToFeedSource(ActPax))
       case totalPax =>
         totalPax.find(tp => tp.feedSource == UnknownFeedSource)
     }
     matchedTotalPax.getOrElse(TotalPaxSource(None, UnknownFeedSource))
+  }
+
+  def fallBackToFeedSource(actPax: Option[Int]): Option[TotalPaxSource] = {
+    FeedSources match {
+      case feedSource if feedSource.contains(LiveFeedSource) =>
+        Some(TotalPaxSource(actPax, LiveFeedSource))
+      case feedSource if feedSource.contains(ForecastFeedSource) =>
+        Some(TotalPaxSource(actPax, ForecastFeedSource))
+      case feedSource if feedSource.contains(AclFeedSource) =>
+        Some(TotalPaxSource(actPax, AclFeedSource))
+      case _ =>
+        None
+    }
   }
 
   def excludeTransferPax(totalPaxSource: Option[TotalPaxSource]) = {

@@ -12,7 +12,7 @@ class ArrivalSpec extends Specification {
     val historicApiFeedTotalPaxSource = TotalPaxSource(Option(10), HistoricApiFeedSource)
     val aclFeedTotalPaxSource = TotalPaxSource(Option(10), AclFeedSource)
 
-    "Give LiveFeedSource as bestPcpPaxEstimate, When LiveFeedSource and ApiFeedSource with ApiSplitsWithHistoricalEGateAndFTPercentages is present in total pax" in {
+    "Give LiveFeedSource as bestPcpPaxEstimate, When LiveFeedSource and ApiFeedSource is present in total pax" in {
       val arrival = arrivalBase.copy(TotalPax = Set(liveFeedTotalPaxSource,
         apiFeedTotalPaxSource))
       arrival.bestPcpPaxEstimate mustEqual liveFeedTotalPaxSource
@@ -46,7 +46,7 @@ class ArrivalSpec extends Specification {
 
     "When totalPax" +
       " does not contain Live feed source" +
-      " bestPcpPaxEstimate gives apiFeed With ApiSplitsWithHistoricalEGateAndFTPercentages" in {
+      " bestPcpPaxEstimate gives apiFeedSource" in {
       val arrival = arrivalBase.copy(TotalPax = Set(
         portForecastFeedTotalPaxSource,
         apiFeedTotalPaxSource,
@@ -56,7 +56,7 @@ class ArrivalSpec extends Specification {
     }
 
     "When totalPax " +
-      " does not contain Live feed source and ApiFeed Source" +
+      " does not contain Live feed source and ApiFeedSource" +
       " bestPcpPaxEstimate gives port forecast feed" in {
       val arrival = arrivalBase.copy(TotalPax = Set(
         portForecastFeedTotalPaxSource,
@@ -66,7 +66,7 @@ class ArrivalSpec extends Specification {
     }
 
     "When totalPax" +
-      " does not contain Live feed source, ApiFeed Source and port forecast feed source" +
+      " does not contain Live feed source, ApiFeedSource and port forecast feed source" +
       " bestPcpPaxEstimate gives api with historic feed" in {
       val arrival = arrivalBase.copy(TotalPax = Set(
         historicApiFeedTotalPaxSource,
@@ -75,8 +75,8 @@ class ArrivalSpec extends Specification {
     }
 
     "When totalPax" +
-      " does not contain Live feed source, ApiFeed Source with ApiSplitsWithHistoricalEGateAndFTPercentages ," +
-      " ApiFeed Source with Historical, port forecast feed source and ApiFeed Source without splits" +
+      " does not contain Live feed source, ApiFeedSource ," +
+      " HistoricApiFeedSource , port forecast feed source and ApiFeed Source without splits" +
       " bestPcpPaxEstimate gives aclFeed " in {
       val arrival = arrivalBase.copy(TotalPax = Set(aclFeedTotalPaxSource))
       arrival.bestPcpPaxEstimate mustEqual aclFeedTotalPaxSource
@@ -88,6 +88,13 @@ class ArrivalSpec extends Specification {
       val arrival = arrivalBase.copy(TranPax = Option(100),
         TotalPax = Set(aclFeedTotalPaxSource.copy(pax = Option(250)), liveFeedTotalPaxSource.copy(pax = Option(50))))
       arrival.bestPcpPaxEstimate mustEqual liveFeedTotalPaxSource.copy(pax = Option(0))
+    }
+
+    "When totalPax" +
+      " does not contain any SourceData," +
+      " then bestPcpPaxEstimate fallback to FeedSource " in {
+      val arrival = arrivalBase.copy(ActPax = Option(10), TotalPax = Set(), FeedSources = Set(AclFeedSource))
+      arrival.bestPcpPaxEstimate mustEqual aclFeedTotalPaxSource
     }
   }
 }
