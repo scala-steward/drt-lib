@@ -24,18 +24,18 @@ object Edi extends AirportConfigLike {
     terminalPaxSplits = List(A1, A2).map(t => (t, defaultPaxSplits)).toMap,
     terminalProcessingTimes = Map(
       A1 -> Map(
-        eeaMachineReadableToDesk -> 16d / 60,
         eeaMachineReadableToEGate -> 25d / 60,
-        eeaNonMachineReadableToDesk -> 50d / 60,
-        visaNationalToDesk -> 75d / 60,
-        nonVisaNationalToDesk -> 64d / 60
+        eeaMachineReadableToDesk -> 31d / 60,
+        eeaNonMachineReadableToDesk -> 31d / 60,
+        visaNationalToDesk -> 113d / 60,
+        nonVisaNationalToDesk -> 76d / 60
       ),
       A2 -> Map(
-        eeaMachineReadableToDesk -> 16d / 60,
         eeaMachineReadableToEGate -> 47d / 60,
-        eeaNonMachineReadableToDesk -> 50d / 60,
-        visaNationalToDesk -> 75d / 60,
-        nonVisaNationalToDesk -> 64d / 60
+        eeaMachineReadableToDesk -> 34d / 60,
+        eeaNonMachineReadableToDesk -> 34d / 60,
+        visaNationalToDesk -> 122d / 60,
+        nonVisaNationalToDesk -> 89d / 60
       )),
     minMaxDesksByTerminalQueue24Hrs = Map(
       A1 -> Map(
