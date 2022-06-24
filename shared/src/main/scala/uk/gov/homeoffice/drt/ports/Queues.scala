@@ -8,7 +8,7 @@ object Queues {
   sealed trait QueueStatus
 
   object QueueStatus {
-    implicit val rw: ReadWriter[QueueStatus] = macroRW
+    implicit val rw: ReadWriter[QueueStatus] = ReadWriter.merge(macroRW[Open.type], macroRW[Closed.type])
   }
 
   case object Open extends QueueStatus
@@ -35,7 +35,15 @@ object Queues {
   }
 
   object Queue {
-    implicit val rw: ReadWriter[Queue] = macroRW
+    implicit val rw: ReadWriter[Queue] = ReadWriter.merge(
+      macroRW[InvalidQueue.type],
+      macroRW[EeaDesk.type],
+      macroRW[EGate.type],
+      macroRW[NonEeaDesk.type],
+      macroRW[FastTrack.type],
+      macroRW[Transfer.type],
+      macroRW[QueueDesk.type],
+    )
 
     def apply(queueName: String): Queue = queueName.toLowerCase match {
       case "eeadesk" => EeaDesk

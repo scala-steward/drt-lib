@@ -3,12 +3,12 @@ package uk.gov.homeoffice.drt.arrivals
 import uk.gov.homeoffice.drt.arrivals.EventTypes.{CI, DC, InvalidEventType}
 import uk.gov.homeoffice.drt.ports.ClassNameForToString
 import upickle.default
-import upickle.default.macroRW
+import upickle.default.{ReadWriter, macroRW}
 
 sealed trait EventType extends ClassNameForToString
 
 object EventType {
-  implicit val rw: default.ReadWriter[EventType] = macroRW
+  implicit val rw: default.ReadWriter[EventType] = ReadWriter.merge(macroRW[DC.type], macroRW[CI.type])
 
   def apply(eventType: String): EventType = eventType match {
     case "DC" => DC
@@ -19,9 +19,9 @@ object EventType {
 
 object EventTypes {
 
-  object DC extends EventType
+  case object DC extends EventType
 
-  object CI extends EventType
+  case object CI extends EventType
 
   object InvalidEventType extends EventType
 

@@ -13,7 +13,21 @@ object Terminals {
   }
 
   object Terminal {
-    implicit val rw: ReadWriter[Terminal] = macroRW
+    implicit val rw: ReadWriter[Terminal] = ReadWriter.merge(
+      macroRW[T1.type],
+      macroRW[T2.type],
+      macroRW[T3.type],
+      macroRW[T4.type],
+      macroRW[T5.type],
+      macroRW[A1.type],
+      macroRW[A2.type],
+      macroRW[ACLTER.type],
+      macroRW[N.type],
+      macroRW[S.type],
+      macroRW[MainApron.type],
+      macroRW[CTA.type],
+      macroRW[InvalidTerminal.type],
+    )
 
     def apply(terminalName: String): Terminal = terminalName.toLowerCase match {
       case "t1" => T1

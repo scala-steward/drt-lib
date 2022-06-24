@@ -10,7 +10,16 @@ object SplitRatiosNs {
   sealed trait SplitSource extends ClassNameForToString
 
   object SplitSource {
-    implicit val rw: ReadWriter[SplitSource] = macroRW
+    implicit val rw: ReadWriter[SplitSource] = ReadWriter.merge(
+      macroRW[AdvPaxInfo.type],
+      macroRW[ApiSplitsWithHistoricalEGateAndFTPercentages_Old.type],
+      macroRW[ApiSplitsWithHistoricalEGateAndFTPercentages.type],
+      macroRW[PredictedSplitsWithHistoricalEGateAndFTPercentages.type],
+      macroRW[ScenarioSimulationSplits.type],
+      macroRW[Historical.type],
+      macroRW[TerminalAverage.type],
+      macroRW[InvalidSource.type],
+    )
 
     def apply(splitSource: String): SplitSource = splitSource match {
       case "advPaxInfo" => AdvPaxInfo
