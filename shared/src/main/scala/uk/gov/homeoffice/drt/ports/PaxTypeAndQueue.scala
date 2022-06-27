@@ -55,7 +55,6 @@ object PaxTypesAndQueues {
     nonVisaNationalToDesk -> "Non EEA (Non Visa)",
     visaNationalToFastTrack -> "Fast Track (Visa)",
     nonVisaNationalToFastTrack -> "Fast Track (Non Visa)",
-    transitToTransfer -> "Transfer",
   )
 
   val inOrder = List(
@@ -73,7 +72,6 @@ object PaxTypesAndQueues {
     nonVisaNationalToDesk,
     visaNationalToFastTrack,
     nonVisaNationalToFastTrack,
-    transitToTransfer,
   )
 }
 

@@ -85,10 +85,10 @@ object Bhx extends AirportConfigLike {
     hasEstChox = false,
     role = BHX,
     terminalPaxTypeQueueAllocation = Map(
-      T1 -> (defaultQueueRatios + (EeaMachineReadable -> List(
-        EGate -> 0.7968,
-        EeaDesk -> (1.0 - 0.7968)
-      ))),
+      T1 -> (
+        defaultQueueRatios +
+          (EeaMachineReadable -> List(EGate -> 0.7968, EeaDesk -> (1.0 - 0.7968))),
+        ),
       T2 -> defaultQueueRatiosWithoutEgates
     ),
     feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, LiveFeedSource, ForecastFeedSource, AclFeedSource),

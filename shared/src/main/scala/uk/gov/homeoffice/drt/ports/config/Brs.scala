@@ -44,10 +44,10 @@ object Brs extends AirportConfigLike {
     eGateBankSizes = Map(T1 -> Iterable(5, 5)),
     role = BRS,
     terminalPaxTypeQueueAllocation = Map(
-      T1 -> (defaultQueueRatios + (EeaMachineReadable -> List(
-        EGate -> 0.7742,
-        EeaDesk -> (1.0 - 0.7742)
-      )))
+      T1 -> (
+        defaultQueueRatios +
+          (EeaMachineReadable -> List(EGate -> 0.7742, EeaDesk -> (1.0 - 0.7742))),
+        )
     ),
     feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, AclFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),

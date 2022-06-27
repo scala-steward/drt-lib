@@ -23,6 +23,8 @@ object AirportConfigDefaults {
   )
 
   val defaultQueueRatios: Map[PaxType, Seq[(Queue, Double)]] = Map(
+    GBRNational -> List(Queues.EGate -> 0.8, Queues.EeaDesk -> 0.2),
+    GBRNationalBelowEgateAge -> List(Queues.EeaDesk -> 1.0),
     EeaMachineReadable -> List(Queues.EGate -> 0.8, Queues.EeaDesk -> 0.2),
     EeaBelowEGateAge -> List(Queues.EeaDesk -> 1.0),
     EeaNonMachineReadable -> List(Queues.EeaDesk -> 1.0),
@@ -33,6 +35,7 @@ object AirportConfigDefaults {
   )
 
   val defaultQueueRatiosWithoutEgates: Map[PaxType, Seq[(Queue, Double)]] = defaultQueueRatios + (
+    GBRNational -> List(EeaDesk -> 1.0),
     EeaMachineReadable -> List(EeaDesk -> 1.0),
     B5JPlusNational -> List(EeaDesk -> 1.0),
   )
