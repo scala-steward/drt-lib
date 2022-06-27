@@ -44,8 +44,11 @@ object Bhx extends AirportConfigLike {
       eeaMachineReadableToDesk -> 36d / 60,
       eeaNonMachineReadableToDesk -> 36d / 60,
       eeaChildToDesk -> 36d / 60,
+      gbrNationalToDesk -> 26d / 60,
+      gbrNationalChildToDesk -> 26d / 60,
       b5jsskToEGate -> 48d / 60,
       eeaMachineReadableToEGate -> 48d / 60,
+      gbrNationalToEgate -> 48d / 60,
       visaNationalToDesk -> 96d / 60,
       nonVisaNationalToDesk -> 92d / 60
     ), T2 -> Map(
@@ -54,8 +57,11 @@ object Bhx extends AirportConfigLike {
       eeaMachineReadableToDesk -> 36d / 60,
       eeaNonMachineReadableToDesk -> 36d / 60,
       eeaChildToDesk -> 36d / 60,
+      gbrNationalToDesk -> 26d / 60,
+      gbrNationalChildToDesk -> 26d / 60,
       b5jsskToEGate -> 48d / 60,
       eeaMachineReadableToEGate -> 48d / 60,
+      gbrNationalToEgate -> 48d / 60,
       visaNationalToDesk -> 96d / 60,
       nonVisaNationalToDesk -> 92d / 60
     )),
