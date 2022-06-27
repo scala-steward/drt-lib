@@ -32,23 +32,35 @@ object Man extends AirportConfigLike {
       SplitRatio(nonVisaNationalToDesk, 0.05)
     ))).toMap,
     terminalProcessingTimes = Map(T1 -> Map(
-      eeaMachineReadableToEGate -> 44d / 60,
+      b5jsskToDesk -> 53d / 60,
+      b5jsskChildToDesk -> 53d / 60,
       eeaMachineReadableToDesk -> 38d / 60,
       eeaNonMachineReadableToDesk -> 38d / 60,
+      eeaChildToDesk -> 38d / 60,
+      b5jsskToEGate -> 38d / 60,
+      eeaMachineReadableToEGate -> 44d / 60,
       visaNationalToDesk -> 109d / 60,
-      nonVisaNationalToDesk -> 79d / 60
+      nonVisaNationalToDesk -> 79d / 60,
     ), T2 -> Map(
-      eeaMachineReadableToEGate -> 51d / 60,
+      b5jsskToDesk -> 57d / 60,
+      b5jsskChildToDesk -> 57d / 60,
       eeaMachineReadableToDesk -> 42d / 60,
       eeaNonMachineReadableToDesk -> 42d / 60,
+      eeaChildToDesk -> 42d / 60,
+      b5jsskToEGate -> 51d / 60,
+      eeaMachineReadableToEGate -> 51d / 60,
       visaNationalToDesk -> 105d / 60,
-      nonVisaNationalToDesk -> 92d / 60
+      nonVisaNationalToDesk -> 92d / 60,
     ), T3 -> Map(
-      eeaMachineReadableToEGate -> 44d / 60,
+      b5jsskToDesk -> 56d / 60,
+      b5jsskChildToDesk -> 56d / 60,
       eeaMachineReadableToDesk -> 38d / 60,
       eeaNonMachineReadableToDesk -> 38d / 60,
+      eeaChildToDesk -> 38d / 60,
+      b5jsskToEGate -> 44d / 60,
+      eeaMachineReadableToEGate -> 44d / 60,
       visaNationalToDesk -> 111d / 60,
-      nonVisaNationalToDesk -> 92d / 60
+      nonVisaNationalToDesk -> 92d / 60,
     )),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(

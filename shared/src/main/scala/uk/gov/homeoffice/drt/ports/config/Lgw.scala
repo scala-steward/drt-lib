@@ -36,18 +36,26 @@ object Lgw extends AirportConfigLike {
     ))).toMap,
     terminalProcessingTimes = Map(
       N -> Map(
-        eeaMachineReadableToEGate -> 47d / 60,
+        b5jsskToDesk -> 57d / 60,
+        b5jsskChildToDesk -> 57d / 60,
         eeaMachineReadableToDesk -> 39d / 60,
         eeaNonMachineReadableToDesk -> 39d / 60,
+        eeaChildToDesk -> 39d / 60,
+        b5jsskToEGate -> 47d / 60,
+        eeaMachineReadableToEGate -> 47d / 60,
         visaNationalToDesk -> 125d / 60,
         nonVisaNationalToDesk -> 110d / 60
       ),
       S -> Map(
-        eeaMachineReadableToEGate -> 30d / 60,
+        b5jsskToDesk -> 63d / 60,
+        b5jsskChildToDesk -> 63d / 60,
         eeaMachineReadableToDesk -> 40d / 60,
         eeaNonMachineReadableToDesk -> 40d / 60,
+        eeaChildToDesk -> 40d / 60,
+        b5jsskToEGate -> 47d / 60,
+        eeaMachineReadableToEGate -> 47d / 60,
         visaNationalToDesk -> 125d / 60,
-        nonVisaNationalToDesk -> 95d / 60
+        nonVisaNationalToDesk -> 110d / 60,
       )),
     minMaxDesksByTerminalQueue24Hrs = Map(
       N -> Map(

@@ -11,22 +11,6 @@ import uk.gov.homeoffice.drt.ports._
 import scala.collection.immutable.SortedMap
 
 object Lhr extends AirportConfigLike {
-
-  val standardProcessingTimes: Map[PaxTypeAndQueue, Double] = Map(
-    eeaMachineReadableToDesk -> 25d,
-    eeaMachineReadableToEGate -> 25d,
-    eeaNonMachineReadableToDesk -> 55d,
-    visaNationalToDesk -> 96d,
-    nonVisaNationalToDesk -> 78d,
-    nonVisaNationalToFastTrack -> 78d,
-    visaNationalToFastTrack -> 78d,
-    transitToTransfer -> 0d
-  )
-
-  val lhrDefaultTerminalProcessingTimes: Map[PaxTypeAndQueue, Double] = standardProcessingTimes.map {
-    case (ptq, time) => (ptq, time / 60)
-  }
-
   val lhrDefaultQueueRatios: Map[PaxType, Seq[(Queue, Double)]] = Map(
     EeaMachineReadable -> List(Queues.EGate -> 0.8, Queues.EeaDesk -> 0.2),
     EeaBelowEGateAge -> List(Queues.EeaDesk -> 1.0),
@@ -61,44 +45,60 @@ object Lhr extends AirportConfigLike {
     ))).toMap,
     terminalProcessingTimes = Map(
       T2 -> Map(
-        eeaMachineReadableToEGate -> 44d / 60,
+        b5jsskToDesk -> 55d / 60,
+        b5jsskChildToDesk -> 55d / 60,
         eeaMachineReadableToDesk -> 43d / 60,
         eeaNonMachineReadableToDesk -> 43d / 60,
+        eeaChildToDesk -> 43d / 60,
+        b5jsskToEGate -> 44d / 60,
+        eeaMachineReadableToEGate -> 44d / 60,
         visaNationalToDesk -> 111d / 60,
         nonVisaNationalToDesk -> 85d / 60,
-        nonVisaNationalToFastTrack -> 85d / 60,
         visaNationalToFastTrack -> 111d / 60,
-        transitToTransfer -> 0d
+        nonVisaNationalToFastTrack -> 85d / 60,
+        transitToTransfer -> 0d,
       ),
       T3 -> Map(
-        eeaMachineReadableToEGate -> 44d / 60,
+        b5jsskToDesk -> 52d / 60,
+        b5jsskChildToDesk -> 52d / 60,
         eeaMachineReadableToDesk -> 40d / 60,
         eeaNonMachineReadableToDesk -> 40d / 60,
+        eeaChildToDesk -> 40d / 60,
+        b5jsskToEGate -> 44d / 60,
+        eeaMachineReadableToEGate -> 44d / 60,
         visaNationalToDesk -> 108d / 60,
         nonVisaNationalToDesk -> 94d / 60,
-        nonVisaNationalToFastTrack -> 94d / 60,
         visaNationalToFastTrack -> 108d / 60,
-        transitToTransfer -> 0d
+        nonVisaNationalToFastTrack -> 94d / 60,
+        transitToTransfer -> 0d,
       ),
       T4 -> Map(
-        eeaMachineReadableToEGate -> 44d / 60,
+        b5jsskToDesk -> 55d / 60,
+        b5jsskChildToDesk -> 55d / 60,
         eeaMachineReadableToDesk -> 43d / 60,
         eeaNonMachineReadableToDesk -> 43d / 60,
+        eeaChildToDesk -> 43d / 60,
+        b5jsskToEGate -> 44d / 60,
+        eeaMachineReadableToEGate -> 44d / 60,
         visaNationalToDesk -> 111d / 60,
         nonVisaNationalToDesk -> 85d / 60,
-        nonVisaNationalToFastTrack -> 85d / 60,
         visaNationalToFastTrack -> 111d / 60,
-        transitToTransfer -> 0d
+        nonVisaNationalToFastTrack -> 85d / 60,
+        transitToTransfer -> 0d,
       ),
       T5 -> Map(
-        eeaMachineReadableToEGate -> 47d / 60,
+        b5jsskToDesk -> 55d / 60,
+        b5jsskChildToDesk -> 55d / 60,
         eeaMachineReadableToDesk -> 42d / 60,
         eeaNonMachineReadableToDesk -> 42d / 60,
+        eeaChildToDesk -> 42d / 60,
+        b5jsskToEGate -> 47d / 60,
+        eeaMachineReadableToEGate -> 47d / 60,
         visaNationalToDesk -> 115d / 60,
         nonVisaNationalToDesk -> 98d / 60,
-        nonVisaNationalToFastTrack -> 98d / 60,
         visaNationalToFastTrack -> 115d / 60,
-        transitToTransfer -> 0d
+        nonVisaNationalToFastTrack -> 98d / 60,
+        transitToTransfer -> 0d,
       )
     ),
     minMaxDesksByTerminalQueue24Hrs = Map(

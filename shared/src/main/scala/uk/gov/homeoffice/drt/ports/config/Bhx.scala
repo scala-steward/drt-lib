@@ -39,14 +39,23 @@ object Bhx extends AirportConfigLike {
         SplitRatio(nonVisaNationalToDesk, 0.04)
       )),
     terminalProcessingTimes = Map(T1 -> Map(
-      eeaMachineReadableToEGate -> 48d / 60,
+      b5jsskToDesk -> 54d / 60,
+      b5jsskChildToDesk -> 54d / 60,
       eeaMachineReadableToDesk -> 36d / 60,
       eeaNonMachineReadableToDesk -> 36d / 60,
+      eeaChildToDesk -> 36d / 60,
+      b5jsskToEGate -> 48d / 60,
+      eeaMachineReadableToEGate -> 48d / 60,
       visaNationalToDesk -> 96d / 60,
       nonVisaNationalToDesk -> 92d / 60
     ), T2 -> Map(
+      b5jsskToDesk -> 54d / 60,
+      b5jsskChildToDesk -> 54d / 60,
       eeaMachineReadableToDesk -> 36d / 60,
       eeaNonMachineReadableToDesk -> 36d / 60,
+      eeaChildToDesk -> 36d / 60,
+      b5jsskToEGate -> 48d / 60,
+      eeaMachineReadableToEGate -> 48d / 60,
       visaNationalToDesk -> 96d / 60,
       nonVisaNationalToDesk -> 92d / 60
     )),

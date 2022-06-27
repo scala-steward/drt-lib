@@ -30,13 +30,7 @@ object Lpl extends AirportConfigLike {
       SplitRatio(visaNationalToDesk, 0.0),
       SplitRatio(nonVisaNationalToDesk, 0.01)
     )),
-    terminalProcessingTimes = Map(T1 -> Map(
-      eeaMachineReadableToDesk -> 20d / 60,
-      eeaMachineReadableToEGate -> 30d / 60,
-      eeaNonMachineReadableToDesk -> 50d / 60,
-      visaNationalToDesk -> 100d / 60,
-      nonVisaNationalToDesk -> 80d / 60
-    )),
+    terminalProcessingTimes = Map(T1 -> defaultProcessingTimes),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(
         Queues.EeaDesk -> (List(2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2), List(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6)),

@@ -33,12 +33,7 @@ object Ext extends AirportConfigLike {
       SplitRatio(visaNationalToDesk, 0.01),
       SplitRatio(nonVisaNationalToDesk, 0.01)
     )),
-    terminalProcessingTimes = Map(T1 -> Map(
-      eeaMachineReadableToDesk -> 20d / 60,
-      eeaNonMachineReadableToDesk -> 50d / 60,
-      visaNationalToDesk -> 90d / 60,
-      nonVisaNationalToDesk -> 78d / 60
-    )),
+    terminalProcessingTimes = Map(T1 -> defaultProcessingTimes),
     minMaxDesksByTerminalQueue24Hrs = Map(T1 -> Map(
       Queues.QueueDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4)),
     )),

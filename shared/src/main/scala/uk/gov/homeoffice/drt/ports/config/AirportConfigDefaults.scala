@@ -38,10 +38,14 @@ object AirportConfigDefaults {
   )
 
   val defaultProcessingTimes: Map[PaxTypeAndQueue, Double] = Map(
-    eeaMachineReadableToDesk -> 20d / 60,
+    b5jsskToDesk -> 55d / 60,
+    b5jsskChildToDesk -> 55d / 60,
+    eeaChildToDesk -> 38d / 60,
+    eeaMachineReadableToDesk -> 38d / 60,
+    eeaNonMachineReadableToDesk -> 38d / 60,
+    b5jsskToEGate -> 35d / 60,
     eeaMachineReadableToEGate -> 35d / 60,
-    eeaNonMachineReadableToDesk -> 50d / 60,
-    visaNationalToDesk -> 90d / 60,
-    nonVisaNationalToDesk -> 78d / 60
+    visaNationalToDesk -> 109d / 60,
+    nonVisaNationalToDesk -> 87d / 60
   )
 }

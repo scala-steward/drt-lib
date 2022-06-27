@@ -30,11 +30,15 @@ object Ltn extends AirportConfigLike {
       SplitRatio(nonVisaNationalToDesk, 0.05)
     )),
     terminalProcessingTimes = Map(T1 -> Map(
-      eeaMachineReadableToEGate -> 47d / 60,
+      b5jsskToDesk -> 59d / 60,
+      b5jsskChildToDesk -> 59d / 60,
       eeaMachineReadableToDesk -> 37d / 60,
       eeaNonMachineReadableToDesk -> 37d / 60,
+      eeaChildToDesk -> 37d / 60,
+      b5jsskToEGate -> 47d / 60,
+      eeaMachineReadableToEGate -> 47d / 60,
       visaNationalToDesk -> 88d / 60,
-      nonVisaNationalToDesk -> 53d / 60
+      nonVisaNationalToDesk -> 53d / 60,
     )),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(

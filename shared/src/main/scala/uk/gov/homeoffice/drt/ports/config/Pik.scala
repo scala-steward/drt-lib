@@ -5,7 +5,7 @@ import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
-import uk.gov.homeoffice.drt.ports.config.AirportConfigDefaults.defaultQueueRatiosWithoutEgates
+import uk.gov.homeoffice.drt.ports.config.AirportConfigDefaults.{defaultProcessingTimes, defaultQueueRatiosWithoutEgates}
 
 import scala.collection.immutable.SortedMap
 
@@ -31,12 +31,7 @@ object Pik extends AirportConfigLike {
       SplitRatio(visaNationalToDesk, 0.0),
       SplitRatio(nonVisaNationalToDesk, 0.01)
     )),
-    terminalProcessingTimes = Map(T1 -> Map(
-      eeaMachineReadableToDesk -> 20d / 60,
-      eeaNonMachineReadableToDesk -> 50d / 60,
-      visaNationalToDesk -> 100d / 60,
-      nonVisaNationalToDesk -> 80d / 60
-    )),
+    terminalProcessingTimes = Map(T1 -> defaultProcessingTimes),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(
         Queues.QueueDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5))
