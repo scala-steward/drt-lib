@@ -3,6 +3,10 @@ package uk.gov.homeoffice.drt.arrivals
 import upickle.default.{ReadWriter, macroRW}
 import scala.util.{Failure, Success, Try}
 
+object VoyageNumberLike {
+  implicit val rw: ReadWriter[VoyageNumberLike] = ReadWriter.merge(VoyageNumber.rw, macroRW[InvalidVoyageNumber.type])
+}
+
 sealed trait VoyageNumberLike {
   def numeric: Int
 
@@ -27,7 +31,7 @@ case class VoyageNumber(numeric: Int) extends VoyageNumberLike with Ordered[Voya
   override def compare(that: VoyageNumber): Int = numeric.compare(that.numeric)
 }
 
-case class InvalidVoyageNumber(exception: Throwable) extends VoyageNumberLike {
+case object InvalidVoyageNumber extends VoyageNumberLike {
   override def toString: String = "invalid"
 
   override def toPaddedString: String = toString
@@ -40,6 +44,6 @@ case object VoyageNumber {
 
   def apply(string: String): VoyageNumberLike = Try(string.toInt) match {
     case Success(value) => VoyageNumber(value)
-    case Failure(exception) => InvalidVoyageNumber(exception)
+    case Failure(_) => InvalidVoyageNumber
   }
 }
