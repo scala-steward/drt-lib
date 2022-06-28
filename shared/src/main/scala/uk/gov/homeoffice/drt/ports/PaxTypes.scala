@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.ports
 
 import ujson.Value.Value
-import uk.gov.homeoffice.drt.ports.PaxTypes.{B5JPlusNational, B5JPlusNationalBelowEGateAge, EeaBelowEGateAge, EeaMachineReadable, EeaNonMachineReadable, NonVisaNational, Transit, UndefinedPaxType, VisaNational}
+import uk.gov.homeoffice.drt.ports.PaxTypes._
 import upickle.default._
 
 sealed trait PaxType {
@@ -10,12 +10,16 @@ sealed trait PaxType {
   def cleanName: String = getClass.getSimpleName.dropRight(1)
 }
 
+sealed trait GbrPaxType extends PaxType
+
 sealed trait EeaPaxType extends PaxType
 
 sealed trait NonEeaPaxType extends PaxType
 
 object PaxType {
   def apply(paxTypeString: String): PaxType = paxTypeString match {
+    case "GBRNational$" => GBRNational
+    case "GBRNationalBelowEgateAge$" => GBRNationalBelowEgateAge
     case "EeaMachineReadable$" => EeaMachineReadable
     case "EeaNonMachineReadable$" => EeaNonMachineReadable
     case "EeaBelowEGateAge$" => EeaBelowEGateAge
@@ -32,6 +36,9 @@ object PaxType {
 }
 
 object PaxTypes {
+  case object GBRNational extends GbrPaxType
+
+  case object GBRNationalBelowEgateAge extends GbrPaxType
 
   case object EeaMachineReadable extends EeaPaxType
 
@@ -52,6 +59,8 @@ object PaxTypes {
   case object UndefinedPaxType extends PaxType
 
   def displayName(pt: PaxType): String = pt match {
+    case GBRNational => "GBR National"
+    case GBRNationalBelowEgateAge => "GBR National Child"
     case EeaMachineReadable => "EEA Machine Readable"
     case EeaNonMachineReadable => "EEA Non-Machine Readable"
     case EeaBelowEGateAge => "EEA Child"

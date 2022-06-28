@@ -33,13 +33,7 @@ object Brs extends AirportConfigLike {
       SplitRatio(visaNationalToDesk, 0.0),
       SplitRatio(nonVisaNationalToDesk, 0.01)
     )),
-    terminalProcessingTimes = Map(T1 -> Map(
-      eeaMachineReadableToDesk -> 20d / 60,
-      eeaMachineReadableToEGate -> 30d / 60,
-      eeaNonMachineReadableToDesk -> 50d / 60,
-      visaNationalToDesk -> 100d / 60,
-      nonVisaNationalToDesk -> 80d / 60
-    )),
+    terminalProcessingTimes = Map(T1 -> defaultProcessingTimes),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(
         Queues.EGate -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)),
@@ -50,10 +44,10 @@ object Brs extends AirportConfigLike {
     eGateBankSizes = Map(T1 -> Iterable(5, 5)),
     role = BRS,
     terminalPaxTypeQueueAllocation = Map(
-      T1 -> (defaultQueueRatios + (EeaMachineReadable -> List(
-        EGate -> 0.7742,
-        EeaDesk -> (1.0 - 0.7742)
-      )))
+      T1 -> (
+        defaultQueueRatios +
+          (EeaMachineReadable -> List(EGate -> 0.7742, EeaDesk -> (1.0 - 0.7742))),
+        )
     ),
     feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, AclFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),

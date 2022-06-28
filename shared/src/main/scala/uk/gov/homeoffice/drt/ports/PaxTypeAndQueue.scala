@@ -6,6 +6,9 @@ import upickle.default._
 
 
 object PaxTypesAndQueues {
+  val gbrNationalToEgate: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.GBRNational, Queues.EGate)
+  val gbrNationalToDesk: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.GBRNational, Queues.EeaDesk)
+  val gbrNationalChildToDesk: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.GBRNationalBelowEgateAge, Queues.EeaDesk)
   val eeaMachineReadableToDesk: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.EeaMachineReadable, Queues.EeaDesk)
   val eeaChildToDesk: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.EeaBelowEGateAge, Queues.EeaDesk)
   val eeaMachineReadableToEGate: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.EeaMachineReadable, Queues.EGate)
@@ -16,17 +19,34 @@ object PaxTypesAndQueues {
   val visaNationalToDesk: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.VisaNational, Queues.NonEeaDesk)
   val nonVisaNationalToDesk: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.NonVisaNational, Queues.NonEeaDesk)
   val visaNationalToFastTrack: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.VisaNational, Queues.FastTrack)
-  val transitToTransfer: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.Transit, Queues.Transfer)
   val nonVisaNationalToFastTrack: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.NonVisaNational, Queues.FastTrack)
-  val undefinedToEea: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.UndefinedPaxType, Queues.EeaDesk)
-  val undefinedToNonEea: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.UndefinedPaxType, Queues.NonEeaDesk)
-  val undefinedToEgate: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.UndefinedPaxType, Queues.EGate)
-  val undefinedToFastTrack: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.UndefinedPaxType, Queues.FastTrack)
+  val transitToTransfer: PaxTypeAndQueue = PaxTypeAndQueue(PaxTypes.Transit, Queues.Transfer)
+
+  val allPaxTypeAndQueues = Set(
+    gbrNationalToEgate,
+    gbrNationalToDesk,
+    gbrNationalChildToDesk,
+    eeaMachineReadableToDesk,
+    eeaChildToDesk,
+    eeaMachineReadableToEGate,
+    eeaNonMachineReadableToDesk,
+    b5jsskToDesk,
+    b5jsskChildToDesk,
+    b5jsskToEGate,
+    visaNationalToDesk,
+    nonVisaNationalToDesk,
+    visaNationalToFastTrack,
+    nonVisaNationalToFastTrack,
+    transitToTransfer,
+  )
 
   def cedatDisplayName: Map[PaxTypeAndQueue, String] = Map(
-    eeaMachineReadableToEGate -> "eGates",
+    gbrNationalToEgate -> "GBR to eGates",
+    gbrNationalToDesk -> "GBR to Desk",
+    gbrNationalChildToDesk -> "GBR Child to Desk",
     eeaMachineReadableToDesk -> "EEA (Machine Readable)",
     eeaChildToDesk -> "EEA child to Desk",
+    eeaMachineReadableToEGate -> "eGates",
     eeaNonMachineReadableToDesk -> "EEA (Non Machine Readable)",
     b5jsskToDesk -> "B5JSSK to Desk",
     b5jsskChildToDesk -> "B5JSSK child to Desk",
@@ -35,15 +55,24 @@ object PaxTypesAndQueues {
     nonVisaNationalToDesk -> "Non EEA (Non Visa)",
     visaNationalToFastTrack -> "Fast Track (Visa)",
     nonVisaNationalToFastTrack -> "Fast Track (Non Visa)",
-    transitToTransfer -> "Transfer",
-    undefinedToEea -> "EEA (Undefined)",
-    undefinedToNonEea -> "Non EEA (Undefined)",
-    undefinedToEgate -> "eGates (Undefined)",
-    undefinedToEgate -> "eGates (Undefined)",
   )
 
   val inOrder = List(
-    eeaMachineReadableToEGate, eeaMachineReadableToDesk, eeaNonMachineReadableToDesk, visaNationalToDesk, nonVisaNationalToDesk, visaNationalToFastTrack, nonVisaNationalToFastTrack)
+    eeaMachineReadableToEGate,
+    eeaMachineReadableToDesk,
+    eeaNonMachineReadableToDesk,
+    eeaChildToDesk,
+    gbrNationalToEgate,
+    gbrNationalToDesk,
+    gbrNationalChildToDesk,
+    b5jsskToEGate,
+    b5jsskToDesk,
+    b5jsskChildToDesk,
+    visaNationalToDesk,
+    nonVisaNationalToDesk,
+    visaNationalToFastTrack,
+    nonVisaNationalToFastTrack,
+  )
 }
 
 case class PaxTypeAndQueue(passengerType: PaxType, queueType: Queue) {
