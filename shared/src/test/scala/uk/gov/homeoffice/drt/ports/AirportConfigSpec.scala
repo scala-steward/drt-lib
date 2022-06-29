@@ -20,10 +20,10 @@ class AirportConfigSpec extends Specification {
     splitOrder(Bhx, T2, List(Queues.EeaDesk, Queues.NonEeaDesk))
 
     "EMA config should give a list of queues pre-diversions" >> {
-      Ema.config.preDiversionQueuesByTerminal === Map(T1 -> Seq(EGate, NonEeaDesk, EeaDesk))
+      Ema.config.queuesByTerminalPreDiversion === Map(T1 -> Seq(EGate, NonEeaDesk, EeaDesk))
     }
     "STN config give a list of queues pre-diversions for ports with no diverted queues" should {
-      Stn.config.preDiversionQueuesByTerminal === Map(T1 -> Seq(EeaDesk, EGate, NonEeaDesk))
+      Stn.config.queuesByTerminalPreDiversion === Map(T1 -> Seq(EeaDesk, EGate, NonEeaDesk))
     }
   }
 

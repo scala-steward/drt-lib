@@ -63,7 +63,7 @@ case class AirportConfig(portCode: PortCode,
                          useTimePredictions: Boolean = false,
                          noLivePortFeed: Boolean = false,
                         ) {
-  def preDiversionQueuesByTerminal: Map[Terminal, Seq[Queue]] = queuesByTerminal
+  def queuesByTerminalPreDiversion: Map[Terminal, Seq[Queue]] = queuesByTerminal
     .mapValues { queues =>
       queues.filterNot(q => divertedQueues.values.toSet.contains(q)) ++ divertedQueues.keys
     }.view.toMap
