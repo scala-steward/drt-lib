@@ -12,6 +12,8 @@ import scala.collection.immutable.SortedMap
 
 object Lhr extends AirportConfigLike {
   val lhrDefaultQueueRatios: Map[PaxType, Seq[(Queue, Double)]] = Map(
+    GBRNational -> List(Queues.EGate -> 0.8, Queues.EeaDesk -> 0.2),
+    GBRNationalBelowEgateAge -> List(Queues.EeaDesk -> 1.0),
     EeaMachineReadable -> List(Queues.EGate -> 0.8, Queues.EeaDesk -> 0.2),
     EeaBelowEGateAge -> List(Queues.EeaDesk -> 1.0),
     EeaNonMachineReadable -> List(Queues.EeaDesk -> 1.0),

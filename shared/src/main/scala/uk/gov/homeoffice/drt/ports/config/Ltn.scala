@@ -21,14 +21,7 @@ object Ltn extends AirportConfigLike {
     ),
     slaByQueue = defaultSlas,
     defaultWalkTimeMillis = Map(T1 -> 300000L),
-    terminalPaxSplits = Map(T1 -> SplitRatios(
-      SplitSources.TerminalAverage,
-      SplitRatio(eeaMachineReadableToDesk, 0.02078),
-      SplitRatio(eeaMachineReadableToEGate, 0.07922),
-      SplitRatio(eeaNonMachineReadableToDesk, 0.1625),
-      SplitRatio(visaNationalToDesk, 0.05),
-      SplitRatio(nonVisaNationalToDesk, 0.05)
-    )),
+    terminalPaxSplits = Map(T1 -> defaultPaxSplits),
     terminalProcessingTimes = Map(T1 -> Map(
       b5jsskToDesk -> 59d / 60,
       b5jsskChildToDesk -> 59d / 60,

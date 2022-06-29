@@ -4,7 +4,7 @@ import uk.gov.homeoffice.drt.ports.PaxTypes._
 import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
 import uk.gov.homeoffice.drt.ports.Queues.{EGate, EeaDesk, NonEeaDesk, Queue}
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
-import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.ports.{PaxTypes, _}
 
 object AirportConfigDefaults {
   val defaultSlas: Map[Queue, Int] = Map(
@@ -15,9 +15,17 @@ object AirportConfigDefaults {
 
   val defaultPaxSplits: SplitRatios = SplitRatios(
     SplitSources.TerminalAverage,
-    SplitRatio(eeaMachineReadableToDesk, 0.1625),
-    SplitRatio(eeaMachineReadableToEGate, 0.4875),
-    SplitRatio(eeaNonMachineReadableToDesk, 0.1625),
+    SplitRatio(eeaMachineReadableToDesk, 0.175),
+    SplitRatio(eeaMachineReadableToEGate, 0.55),
+    SplitRatio(eeaNonMachineReadableToDesk, 0.175),
+    SplitRatio(visaNationalToDesk, 0.05),
+    SplitRatio(nonVisaNationalToDesk, 0.05)
+  )
+
+  val defaultPaxSplitsWithoutEgates: SplitRatios = SplitRatios(
+    SplitSources.TerminalAverage,
+    SplitRatio(eeaMachineReadableToDesk, 0.725),
+    SplitRatio(eeaNonMachineReadableToDesk, 0.175),
     SplitRatio(visaNationalToDesk, 0.05),
     SplitRatio(nonVisaNationalToDesk, 0.05)
   )
@@ -31,7 +39,8 @@ object AirportConfigDefaults {
     NonVisaNational -> List(Queues.NonEeaDesk -> 1.0),
     VisaNational -> List(Queues.NonEeaDesk -> 1.0),
     B5JPlusNational -> List(Queues.EGate -> 0.6, Queues.EeaDesk -> 0.4),
-    B5JPlusNationalBelowEGateAge -> List(Queues.EeaDesk -> 1)
+    B5JPlusNationalBelowEGateAge -> List(Queues.EeaDesk -> 1),
+    PaxTypes.Transit -> List(),
   )
 
   val defaultQueueRatiosWithoutEgates: Map[PaxType, Seq[(Queue, Double)]] = defaultQueueRatios ++ Map(

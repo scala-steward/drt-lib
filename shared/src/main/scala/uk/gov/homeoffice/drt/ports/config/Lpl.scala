@@ -23,13 +23,7 @@ object Lpl extends AirportConfigLike {
       Queues.NonEeaDesk -> 45
     ),
     defaultWalkTimeMillis = Map(T1 -> 600000L),
-    terminalPaxSplits = Map(T1 -> SplitRatios(
-      SplitSources.TerminalAverage,
-      SplitRatio(eeaMachineReadableToDesk, 0.98),
-      SplitRatio(eeaNonMachineReadableToDesk, 0),
-      SplitRatio(visaNationalToDesk, 0.0),
-      SplitRatio(nonVisaNationalToDesk, 0.01)
-    )),
+    terminalPaxSplits = Map(T1 -> defaultPaxSplitsWithoutEgates),
     terminalProcessingTimes = Map(T1 -> defaultProcessingTimes),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(

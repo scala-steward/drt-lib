@@ -25,10 +25,10 @@ object Stn extends AirportConfigLike {
     defaultWalkTimeMillis = Map(T1 -> 600000L),
     terminalPaxSplits = Map(T1 -> SplitRatios(
       SplitSources.TerminalAverage,
-      SplitRatio(eeaMachineReadableToDesk, 0.1916),
-      SplitRatio(eeaMachineReadableToEGate, 0.8084),
-      SplitRatio(eeaNonMachineReadableToDesk, 0.0),
-      SplitRatio(visaNationalToDesk, 0.0),
+      SplitRatio(eeaMachineReadableToDesk, 0.13),
+      SplitRatio(eeaMachineReadableToEGate, 0.8),
+      SplitRatio(eeaNonMachineReadableToDesk, 0.05),
+      SplitRatio(visaNationalToDesk, 0.01),
       SplitRatio(nonVisaNationalToDesk, 0.01)
     )),
     terminalProcessingTimes = Map(T1 -> Map(
