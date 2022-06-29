@@ -2,7 +2,7 @@ package uk.gov.homeoffice.drt.ports
 
 import org.specs2.mutable.Specification
 import org.specs2.specification.core.Fragment
-import uk.gov.homeoffice.drt.ports.Queues.{EGate, EeaDesk, NonEeaDesk, Queue}
+import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.Terminals.{T1, T2, Terminal}
 import uk.gov.homeoffice.drt.ports.config.{Bhx, Ema, Lhr, Stn}
 
@@ -20,10 +20,18 @@ class AirportConfigSpec extends Specification {
     splitOrder(Bhx, T2, List(Queues.EeaDesk, Queues.NonEeaDesk))
 
     "EMA config should give a list of queues pre-diversions" >> {
-      Ema.config.queuesByTerminalPreDiversion === Map(T1 -> Seq(EGate, NonEeaDesk, EeaDesk))
+      Ema.config.queuesByTerminalWithDiversions === Map(T1 -> Map(
+        EGate -> EGate,
+        NonEeaDesk -> QueueDesk,
+        EeaDesk -> QueueDesk
+      ))
     }
     "STN config give a list of queues pre-diversions for ports with no diverted queues" should {
-      Stn.config.queuesByTerminalPreDiversion === Map(T1 -> Seq(EeaDesk, EGate, NonEeaDesk))
+      Stn.config.queuesByTerminalWithDiversions === Map(T1 -> Map(
+        EGate -> EGate,
+        NonEeaDesk -> NonEeaDesk,
+        EeaDesk -> EeaDesk
+      ))
     }
   }
 

@@ -63,9 +63,13 @@ case class AirportConfig(portCode: PortCode,
                          useTimePredictions: Boolean = false,
                          noLivePortFeed: Boolean = false,
                         ) {
-  def queuesByTerminalPreDiversion: Map[Terminal, Seq[Queue]] = queuesByTerminal
+  def queuesByTerminalWithDiversions: Map[Terminal, Map[Queue, Queue]] = queuesByTerminal
     .mapValues { queues =>
-      queues.filterNot(q => divertedQueues.values.toSet.contains(q)) ++ divertedQueues.keys
+      val diversionQueues = divertedQueues.values.toSet
+      val nonDivertedQueues = queues
+        .filterNot(q => diversionQueues.contains(q))
+        .map(q => (q, q))
+      (nonDivertedQueues ++ divertedQueues).toMap
     }.view.toMap
 
   def assertValid(): Unit = {
