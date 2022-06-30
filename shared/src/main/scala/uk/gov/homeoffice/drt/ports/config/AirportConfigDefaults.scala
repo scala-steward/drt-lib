@@ -38,7 +38,7 @@ object AirportConfigDefaults {
     EeaNonMachineReadable -> List(Queues.EeaDesk -> 1.0),
     NonVisaNational -> List(Queues.NonEeaDesk -> 1.0),
     VisaNational -> List(Queues.NonEeaDesk -> 1.0),
-    B5JPlusNational -> List(Queues.EGate -> 0.8, Queues.EeaDesk -> 0.2),
+    B5JPlusNational -> List(Queues.EGate -> 0.7, Queues.EeaDesk -> 0.3),
     B5JPlusNationalBelowEGateAge -> List(Queues.EeaDesk -> 1),
     PaxTypes.Transit -> List(),
   )
@@ -49,15 +49,17 @@ object AirportConfigDefaults {
     B5JPlusNational -> List(EeaDesk -> 1.0),
   )
 
+  val b5jScalingFactor = 0.25
+
   val defaultProcessingTimes: Map[PaxTypeAndQueue, Double] = Map(
-    b5jsskToDesk -> 55d / 60,
-    b5jsskChildToDesk -> 55d / 60,
+    b5jsskToDesk -> (55d / 60) * b5jScalingFactor,
+    b5jsskChildToDesk -> (55d / 60) * b5jScalingFactor,
     eeaChildToDesk -> 38d / 60,
     eeaMachineReadableToDesk -> 38d / 60,
     eeaNonMachineReadableToDesk -> 38d / 60,
     gbrNationalToDesk -> 30d / 60,
     gbrNationalChildToDesk -> 30d / 60,
-    b5jsskToEGate -> 46d / 60,
+    b5jsskToEGate -> (46d / 60) * b5jScalingFactor,
     eeaMachineReadableToEGate -> 46d / 60,
     gbrNationalToEgate -> 46d / 60,
     visaNationalToDesk -> 109d / 60,
