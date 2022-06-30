@@ -32,14 +32,14 @@ object Stn extends AirportConfigLike {
       SplitRatio(nonVisaNationalToDesk, 0.01)
     )),
     terminalProcessingTimes = Map(T1 -> Map(
-      b5jsskToDesk -> 50d / 60,
-      b5jsskChildToDesk -> 50d / 60,
+      b5jsskToDesk -> 0, //50d / 60,
+      b5jsskChildToDesk -> 0, //50d / 60,
       eeaMachineReadableToDesk -> 33d / 60,
       eeaNonMachineReadableToDesk -> 33d / 60,
       eeaChildToDesk -> 33d / 60,
       gbrNationalToDesk -> 26d / 60,
       gbrNationalChildToDesk -> 26d / 60,
-      b5jsskToEGate -> 45d / 60,
+      b5jsskToEGate -> 0, //45d / 60,
       eeaMachineReadableToEGate -> 45d / 60,
       gbrNationalToEgate -> 45d / 60,
       visaNationalToDesk -> 89d / 60,
