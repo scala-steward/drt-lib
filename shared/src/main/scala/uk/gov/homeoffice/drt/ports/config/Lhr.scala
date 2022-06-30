@@ -20,7 +20,7 @@ object Lhr extends AirportConfigLike {
     Transit -> List(Queues.Transfer -> 1.0),
     NonVisaNational -> List(Queues.NonEeaDesk -> 1.0),
     VisaNational -> List(Queues.NonEeaDesk -> 1.0),
-    B5JPlusNational -> List(Queues.EGate -> 0.6, Queues.EeaDesk -> 0.4),
+    B5JPlusNational -> List(Queues.EGate -> 0.85, Queues.EeaDesk -> 0.15),
     B5JPlusNationalBelowEGateAge -> List(Queues.EeaDesk -> 1)
   )
 

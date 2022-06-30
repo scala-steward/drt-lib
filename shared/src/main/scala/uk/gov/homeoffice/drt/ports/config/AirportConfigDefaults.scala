@@ -38,7 +38,7 @@ object AirportConfigDefaults {
     EeaNonMachineReadable -> List(Queues.EeaDesk -> 1.0),
     NonVisaNational -> List(Queues.NonEeaDesk -> 1.0),
     VisaNational -> List(Queues.NonEeaDesk -> 1.0),
-    B5JPlusNational -> List(Queues.EGate -> 0.6, Queues.EeaDesk -> 0.4),
+    B5JPlusNational -> List(Queues.EGate -> 0.8, Queues.EeaDesk -> 0.2),
     B5JPlusNationalBelowEGateAge -> List(Queues.EeaDesk -> 1),
     PaxTypes.Transit -> List(),
   )
