@@ -44,17 +44,17 @@ object PaxTypesAndQueues {
     gbrNationalToEgate -> "GBR to eGates",
     gbrNationalToDesk -> "GBR to Desk",
     gbrNationalChildToDesk -> "GBR Child to Desk",
-    eeaMachineReadableToDesk -> "EEA (Machine Readable)",
+    eeaMachineReadableToDesk -> "EEA (Machine Readable) to Desk",
     eeaChildToDesk -> "EEA child to Desk",
-    eeaMachineReadableToEGate -> "eGates",
-    eeaNonMachineReadableToDesk -> "EEA (Non Machine Readable)",
+    eeaMachineReadableToEGate -> "EEA (Machine Readable) to eGates",
+    eeaNonMachineReadableToDesk -> "EEA (Non Machine Readable) to Desk",
     b5jsskToDesk -> "B5JSSK to Desk",
     b5jsskChildToDesk -> "B5JSSK child to Desk",
     b5jsskToEGate -> "B5JSSK to eGates",
-    visaNationalToDesk -> "Non EEA (Visa)",
-    nonVisaNationalToDesk -> "Non EEA (Non Visa)",
-    visaNationalToFastTrack -> "Fast Track (Visa)",
-    nonVisaNationalToFastTrack -> "Fast Track (Non Visa)",
+    visaNationalToDesk -> "Non EEA (Visa) to Desk",
+    nonVisaNationalToDesk -> "Non EEA (Non Visa) to Desk",
+    visaNationalToFastTrack -> "Fast Track (Visa) to Desk",
+    nonVisaNationalToFastTrack -> "Fast Track (Non Visa) to Desk",
   )
 
   val inOrder = List(
@@ -72,6 +72,25 @@ object PaxTypesAndQueues {
     nonVisaNationalToDesk,
     visaNationalToFastTrack,
     nonVisaNationalToFastTrack,
+    transitToTransfer,
+  )
+
+  val cedatInOrder = List(
+    b5jsskToEGate,
+    b5jsskToDesk,
+    b5jsskChildToDesk,
+    gbrNationalToEgate,
+    gbrNationalToDesk,
+    gbrNationalChildToDesk,
+    eeaMachineReadableToEGate,
+    eeaMachineReadableToDesk,
+    eeaChildToDesk,
+    eeaNonMachineReadableToDesk,
+    nonVisaNationalToFastTrack,
+    visaNationalToFastTrack,
+    nonVisaNationalToDesk,
+    visaNationalToDesk,
+    transitToTransfer,
   )
 }
 
