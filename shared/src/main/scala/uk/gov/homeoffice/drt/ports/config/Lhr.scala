@@ -7,7 +7,6 @@ import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
-import uk.gov.homeoffice.drt.ports.config.AirportConfigDefaults.b5jScalingFactor
 
 import scala.collection.immutable.SortedMap
 
@@ -48,14 +47,14 @@ object Lhr extends AirportConfigLike {
     ))).toMap,
     terminalProcessingTimes = Map(
       T2 -> Map(
-        b5jsskToDesk -> (55d / 60) * b5jScalingFactor,
-        b5jsskChildToDesk -> (55d / 60) * b5jScalingFactor,
+        b5jsskToDesk -> (55d / 60),
+        b5jsskChildToDesk -> (55d / 60),
         eeaMachineReadableToDesk -> 43d / 60,
         eeaNonMachineReadableToDesk -> 43d / 60,
         eeaChildToDesk -> 43d / 60,
         gbrNationalToDesk -> 35d / 60,
         gbrNationalChildToDesk -> 35d / 60,
-        b5jsskToEGate -> (44d / 60) * b5jScalingFactor,
+        b5jsskToEGate -> (44d / 60),
         eeaMachineReadableToEGate -> 44d / 60,
         gbrNationalToEgate -> 44d / 60,
         visaNationalToDesk -> 111d / 60,
@@ -65,14 +64,14 @@ object Lhr extends AirportConfigLike {
         transitToTransfer -> 0d,
       ),
       T3 -> Map(
-        b5jsskToDesk -> (52d / 60) * b5jScalingFactor,
-        b5jsskChildToDesk -> (52d / 60) * b5jScalingFactor,
+        b5jsskToDesk -> (52d / 60),
+        b5jsskChildToDesk -> (52d / 60),
         eeaMachineReadableToDesk -> 40d / 60,
         eeaNonMachineReadableToDesk -> 40d / 60,
         eeaChildToDesk -> 40d / 60,
         gbrNationalToDesk -> 33d / 60,
         gbrNationalChildToDesk -> 33d / 60,
-        b5jsskToEGate -> (44d / 60) * b5jScalingFactor,
+        b5jsskToEGate -> (44d / 60),
         eeaMachineReadableToEGate -> 44d / 60,
         gbrNationalToEgate -> 44d / 60,
         visaNationalToDesk -> 108d / 60,
@@ -82,14 +81,14 @@ object Lhr extends AirportConfigLike {
         transitToTransfer -> 0d,
       ),
       T4 -> Map(
-        b5jsskToDesk -> (55d / 60) * b5jScalingFactor,
-        b5jsskChildToDesk -> (55d / 60) * b5jScalingFactor,
+        b5jsskToDesk -> (55d / 60),
+        b5jsskChildToDesk -> (55d / 60),
         eeaMachineReadableToDesk -> 43d / 60,
         eeaNonMachineReadableToDesk -> 43d / 60,
         eeaChildToDesk -> 43d / 60,
         gbrNationalToDesk -> 35d / 60,
         gbrNationalChildToDesk -> 35d / 60,
-        b5jsskToEGate -> (44d / 60) * b5jScalingFactor,
+        b5jsskToEGate -> (44d / 60),
         eeaMachineReadableToEGate -> 44d / 60,
         gbrNationalToEgate -> 44d / 60,
         visaNationalToDesk -> 111d / 60,
@@ -99,14 +98,14 @@ object Lhr extends AirportConfigLike {
         transitToTransfer -> 0d,
       ),
       T5 -> Map(
-        b5jsskToDesk -> (55d / 60) * b5jScalingFactor,
-        b5jsskChildToDesk -> (55d / 60) * b5jScalingFactor,
+        b5jsskToDesk -> (55d / 60),
+        b5jsskChildToDesk -> (55d / 60),
         eeaMachineReadableToDesk -> 42d / 60,
         eeaNonMachineReadableToDesk -> 42d / 60,
         eeaChildToDesk -> 42d / 60,
         gbrNationalToDesk -> 34d / 60,
         gbrNationalChildToDesk -> 34d / 60,
-        b5jsskToEGate -> (47d / 60) * b5jScalingFactor,
+        b5jsskToEGate -> (47d / 60),
         eeaMachineReadableToEGate -> 47d / 60,
         gbrNationalToEgate -> 47d / 60,
         visaNationalToDesk -> 115d / 60,
