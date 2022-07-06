@@ -55,7 +55,6 @@ object PaxTypesAndQueues {
     nonVisaNationalToDesk,
     visaNationalToFastTrack,
     nonVisaNationalToFastTrack,
-    transitToTransfer,
   )
 }
 
