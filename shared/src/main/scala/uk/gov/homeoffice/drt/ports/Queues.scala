@@ -81,7 +81,7 @@ object Queues {
     case NonEeaDesk => "Non-EEA"
     case EGate => "e-Gates"
     case FastTrack => "Fast Track"
-    case Transfer => "Tx"
+    case Transfer => "Transfer"
     case QueueDesk => "Desk"
     case _ => "Invalid"
   }

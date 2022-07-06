@@ -6,10 +6,6 @@ import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
 
 class PaxTypesAndQueuesTest extends AnyWordSpec with Matchers {
   "PaxTypesAndQueues" should {
-    "have matching entries in the cedat display names" in {
-      val intersect = PaxTypesAndQueues.cedatDisplayName.keys.toSet.intersect(allPaxTypeAndQueues)
-      intersect should ===(PaxTypesAndQueues.allPaxTypeAndQueues - transitToTransfer)
-    }
     "have matching entries in in-order" in {
       val intersect = PaxTypesAndQueues.inOrder.toSet.intersect(allPaxTypeAndQueues)
       intersect should ===(PaxTypesAndQueues.allPaxTypeAndQueues - transitToTransfer)

@@ -40,23 +40,6 @@ object PaxTypesAndQueues {
     transitToTransfer,
   )
 
-  def cedatDisplayName: Map[PaxTypeAndQueue, String] = Map(
-    gbrNationalToEgate -> "GBR to eGates",
-    gbrNationalToDesk -> "GBR to Desk",
-    gbrNationalChildToDesk -> "GBR Child to Desk",
-    eeaMachineReadableToDesk -> "EEA (Machine Readable)",
-    eeaChildToDesk -> "EEA child to Desk",
-    eeaMachineReadableToEGate -> "eGates",
-    eeaNonMachineReadableToDesk -> "EEA (Non Machine Readable)",
-    b5jsskToDesk -> "B5JSSK to Desk",
-    b5jsskChildToDesk -> "B5JSSK child to Desk",
-    b5jsskToEGate -> "B5JSSK to eGates",
-    visaNationalToDesk -> "Non EEA (Visa)",
-    nonVisaNationalToDesk -> "Non EEA (Non Visa)",
-    visaNationalToFastTrack -> "Fast Track (Visa)",
-    nonVisaNationalToFastTrack -> "Fast Track (Non Visa)",
-  )
-
   val inOrder = List(
     eeaMachineReadableToEGate,
     eeaMachineReadableToDesk,
