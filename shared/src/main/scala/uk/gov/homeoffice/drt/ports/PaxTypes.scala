@@ -28,6 +28,7 @@ object PaxType {
     case "B5JPlusNational$" => B5JPlusNational
     case "B5JPlusNationalBelowEGateAge$" => B5JPlusNationalBelowEGateAge
     case "Transit$" => Transit
+    case _ => UndefinedPaxType
   }
 
   implicit val paxTypeReaderWriter: ReadWriter[PaxType] =
@@ -54,6 +55,8 @@ object PaxTypes {
   case object B5JPlusNationalBelowEGateAge extends NonEeaPaxType
 
   case object Transit extends PaxType
+
+  case object UndefinedPaxType extends PaxType
 
   val allPaxTypes: Iterable[PaxType] = Iterable(
     GBRNational,
