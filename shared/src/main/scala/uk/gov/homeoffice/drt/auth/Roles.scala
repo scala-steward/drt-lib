@@ -36,6 +36,7 @@ object Roles {
     StaffEdit,
     TerminalDashboard,
     ViewConfig,
+    SuperAdmin,
   ) ++ portRoles ++ Set(TEST, TEST2)
 
   def parse(roleName: String): Option[Role] = availableRoles.find(role => role.name.toLowerCase == roleName.toLowerCase)
@@ -291,5 +292,9 @@ object Roles {
 
   case object NeboUpload extends Role {
     override val name: String = "nebo:upload"
+  }
+
+  case object SuperAdmin extends Role {
+    override val name: String = "super-admin"
   }
 }
