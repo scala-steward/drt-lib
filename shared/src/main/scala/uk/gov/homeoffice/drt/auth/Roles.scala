@@ -292,4 +292,8 @@ object Roles {
   case object NeboUpload extends Role {
     override val name: String = "nebo:upload"
   }
+
+  case object SuperAdmin extends Role {
+    override val name: String = "super-admin"
+  }
 }
