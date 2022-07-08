@@ -36,6 +36,7 @@ object Roles {
     StaffEdit,
     TerminalDashboard,
     ViewConfig,
+    SuperAdmin,
   ) ++ portRoles ++ Set(TEST, TEST2)
 
   def parse(roleName: String): Option[Role] = availableRoles.find(role => role.name.toLowerCase == roleName.toLowerCase)
