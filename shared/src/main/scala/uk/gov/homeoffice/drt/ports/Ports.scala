@@ -35,4 +35,5 @@ object Ports {
   def isCta(port: PortCode): Boolean = cta.contains(port)
 
   def isDomesticOrCta(port: PortCode): Boolean = isDomestic(port) || isCta(port)
+
 }

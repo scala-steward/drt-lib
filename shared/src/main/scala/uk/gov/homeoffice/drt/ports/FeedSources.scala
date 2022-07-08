@@ -12,7 +12,10 @@ trait FeedSource {
 
   val description: Boolean => String
 
+  val displayName: Option[String] => String = dName => dName.getOrElse(name)
+
   override val toString: String = getClass.getSimpleName.split("\\$").last
+
 }
 
 case object HistoricApiFeedSource extends FeedSource {
@@ -58,7 +61,11 @@ case object LiveFeedSource extends FeedSource {
 
   val maybeLastUpdateThreshold: Option[FiniteDuration] = Option(12.hours)
 
-  val description: Boolean => String = _ => "Up-to-date passenger numbers, estimated and actual arrival times, gates and stands."
+  val description: Boolean => String = isCiriumAsLiveFeedSource => if (isCiriumAsLiveFeedSource)
+    "Estimated and actual arrival time updates where not available from the port operator."
+  else
+    "Up-to-date passenger numbers, estimated and actual arrival times, gates and stands."
+
 }
 
 case object ScenarioSimulationSource extends FeedSource {
