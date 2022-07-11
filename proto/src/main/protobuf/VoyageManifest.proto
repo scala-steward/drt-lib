@@ -22,6 +22,10 @@ message VoyageManifestsMessage {
     repeated VoyageManifestMessage manifestMessages = 2;
 }
 
+message MaybeVoyageManifestMessage {
+    optional VoyageManifestMessage maybeVoyageManifest = 1;
+}
+
 message VoyageManifestMessage {
     optional int64 createdAt = 1;
     optional string eventCode = 2;
