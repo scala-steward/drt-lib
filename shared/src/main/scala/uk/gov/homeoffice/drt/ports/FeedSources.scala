@@ -45,6 +45,8 @@ case object AclFeedSource extends FeedSource {
 
   val maybeLastUpdateThreshold: Option[FiniteDuration] = Option(36.hours)
 
+  override val displayName: Option[String] => String = dName => dName.getOrElse("Forecast schedule")
+
   val description: Boolean => String = _ => "Flight schedule for up to 6 months."
 }
 
@@ -80,6 +82,8 @@ case object LiveBaseFeedSource extends FeedSource {
   val name: String = "Cirium live"
 
   val maybeLastUpdateThreshold: Option[FiniteDuration] = Option(12.hours)
+
+  override val displayName: Option[String] => String = dName => dName.getOrElse("Live arrival")
 
   val description: Boolean => String = isLiveFeedAvailable => if (isLiveFeedAvailable)
     "Estimated and actual arrival time updates where not available from live feed."
