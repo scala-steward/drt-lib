@@ -22,7 +22,7 @@ message VoyageManifestsMessage {
     repeated VoyageManifestMessage manifestMessages = 2;
 }
 
-message MaybeVoyageManifestMessage {
+message MaybeManifestLikeMessage {
     optional ManifestLikeMessage maybeVoyageManifest = 1;
 }
 
