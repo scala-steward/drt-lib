@@ -16,7 +16,7 @@ import uk.gov.homeoffice.drt.protobuf.messages.RegisteredArrivalMessage.{Registe
 import uk.gov.homeoffice.drt.protobuf.messages.ShiftMessage.{ShiftMessage, ShiftStateSnapshotMessage, ShiftsMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.StaffMovementMessages.{RemoveStaffMovementMessage, StaffMovementMessage, StaffMovementsMessage, StaffMovementsStateSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.TerminalQueuesSummary.TerminalQueuesSummaryMessage
-import uk.gov.homeoffice.drt.protobuf.messages.VoyageManifest.{VoyageManifestLatestFileNameMessage, VoyageManifestMessage, VoyageManifestStateSnapshotMessage, VoyageManifestsMessage}
+import uk.gov.homeoffice.drt.protobuf.messages.VoyageManifest.{ManifestLikeMessage, ManifestPassengerProfileMessage, MaybeManifestLikeMessage, VoyageManifestLatestFileNameMessage, VoyageManifestMessage, VoyageManifestStateSnapshotMessage, VoyageManifestsMessage}
 
 class Serializer extends SerializerWithStringManifest {
   override def identifier: Int = 9001
@@ -75,6 +75,9 @@ class Serializer extends SerializerWithStringManifest {
   final val NeboArrival: String = classOf[NeboArrivalMessage].getName
   final val NeboArrivalSnapshot: String = classOf[NeboArrivalSnapshotMessage].getName
   final val ModelAndFeatures: String = classOf[ModelAndFeaturesMessage].getName
+  final val MaybeManifestLike: String = classOf[MaybeManifestLikeMessage].getName
+  final val ManifestLike: String = classOf[ManifestLikeMessage].getName
+  final val ManifestPassengerProfile: String = classOf[ManifestPassengerProfileMessage].getName
 
   override def toBinary(objectToSerialize: AnyRef): Array[Byte] = objectToSerialize match {
     case m: GeneratedMessage => m.toByteArray
@@ -134,6 +137,9 @@ class Serializer extends SerializerWithStringManifest {
       case NeboArrival => NeboArrivalMessage.parseFrom(bytes)
       case NeboArrivalSnapshot => NeboArrivalSnapshotMessage.parseFrom(bytes)
       case ModelAndFeatures => ModelAndFeaturesMessage.parseFrom(bytes)
+      case MaybeManifestLike => MaybeManifestLikeMessage.parseFrom(bytes)
+      case ManifestLike => ManifestLikeMessage.parseFrom(bytes)
+      case ManifestPassengerProfile => ManifestPassengerProfileMessage.parseFrom(bytes)
     }
   }
 }
