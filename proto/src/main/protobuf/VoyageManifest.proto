@@ -23,7 +23,8 @@ message VoyageManifestsMessage {
 }
 
 message MaybeManifestLikeMessage {
-    optional ManifestLikeMessage maybeVoyageManifest = 1;
+    optional int64 createdAt = 1;
+    optional ManifestLikeMessage maybeVoyageManifest = 2;
 }
 
 message VoyageManifestMessage {
