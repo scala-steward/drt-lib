@@ -40,14 +40,15 @@ message VoyageManifestMessage {
 
 message ManifestLikeMessage {
     optional int64 createdAt = 1;
-    optional string eventCode = 2;
-    optional string arrivalPortCode = 3;
-    optional string departurePortCode = 4;
-    optional string voyageNumber = 5;
-    optional string carrierCode = 6;
-    optional string scheduledDateOfArrival = 7;
-    optional string scheduledTimeOfArrival = 8;
-    repeated ManifestPassengerProfileMessage passengerList = 9;
+    optional string splitSource = 2;
+    optional string eventCode = 3;
+    optional string arrivalPortCode = 4;
+    optional string departurePortCode = 5;
+    optional string voyageNumber = 6;
+    optional string carrierCode = 7;
+    optional string scheduledDateOfArrival = 8;
+    optional string scheduledTimeOfArrival = 9;
+    repeated ManifestPassengerProfileMessage passengerList = 10;
 }
 
 message PassengerInfoJsonMessage {
