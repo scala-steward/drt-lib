@@ -22,6 +22,11 @@ message VoyageManifestsMessage {
     repeated VoyageManifestMessage manifestMessages = 2;
 }
 
+message MaybeManifestLikeMessage {
+    optional int64 createdAt = 1;
+    optional ManifestLikeMessage maybeVoyageManifest = 2;
+}
+
 message VoyageManifestMessage {
     optional int64 createdAt = 1;
     optional string eventCode = 2;
@@ -32,6 +37,19 @@ message VoyageManifestMessage {
     optional string scheduledDateOfArrival = 7;
     optional string scheduledTimeOfArrival = 8;
     repeated PassengerInfoJsonMessage passengerList = 9;
+}
+
+message ManifestLikeMessage {
+    optional int64 createdAt = 1;
+    optional string splitSource = 2;
+    optional string eventCode = 3;
+    optional string arrivalPortCode = 4;
+    optional string departurePortCode = 5;
+    optional string voyageNumber = 6;
+    optional string carrierCode = 7;
+    optional string scheduledDateOfArrival = 8;
+    optional string scheduledTimeOfArrival = 9;
+    repeated ManifestPassengerProfileMessage passengerList = 10;
 }
 
 message PassengerInfoJsonMessage {
@@ -45,3 +63,12 @@ message PassengerInfoJsonMessage {
     optional string nationalityCountryCode = 8;
     optional string passengerIdentifier = 9;
 }
+
+message ManifestPassengerProfileMessage {
+    optional string nationality = 1;
+    optional string documentType = 2;
+    optional string age = 3;
+    optional bool inTransit = 4;
+    optional string passengerIdentifier = 5;
+}
+
