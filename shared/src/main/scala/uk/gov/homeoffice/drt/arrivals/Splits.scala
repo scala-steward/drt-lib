@@ -31,8 +31,8 @@ object Splits {
           "source" -> Try(writeJs(splits.source)).getOrElse(throw new Exception(s"Failed to write splits.source: ${splits.source}")),
           "maybeEventType" -> Try(writeJs(splits.maybeEventType)).getOrElse(throw new Exception(s"Failed to write splits.maybeEventType: ${splits.maybeEventType}")),
           "splitStyle" -> Try(writeJs(splits.splitStyle)).getOrElse(throw new Exception(s"Failed to write splits.splitStyle: ${splits.splitStyle}")),
-        ))
-      ,
+        )
+      ),
       json => {
         val splits = read[Set[ApiPaxTypeAndQueueCount]](json("splits"))
         val source = read[SplitSource](json("source"))
