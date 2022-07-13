@@ -8,7 +8,7 @@ import upickle.default.{ReadWriter, macroRW}
 sealed trait EventType extends ClassNameForToString
 
 object EventType {
-  implicit val rw: default.ReadWriter[EventType] = ReadWriter.merge(macroRW[DC.type], macroRW[CI.type])
+  implicit val rw: default.ReadWriter[EventType] = ReadWriter.merge(macroRW[DC.type], macroRW[CI.type], macroRW[InvalidEventType.type])
 
   def apply(eventType: String): EventType = eventType match {
     case "DC" => DC
