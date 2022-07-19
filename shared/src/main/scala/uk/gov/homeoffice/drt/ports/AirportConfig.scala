@@ -62,7 +62,8 @@ case class AirportConfig(portCode: PortCode,
                          assumedAdultsPerChild: Double = 1.0,
                          useTimePredictions: Boolean = false,
                          noLivePortFeed: Boolean = false,
-                         aclDisabled: Boolean = false
+                         aclDisabled: Boolean = false,
+                         idealStaffAsDefault: Boolean = false
                         ) {
   def queuesByTerminalWithDiversions: Map[Terminal, Map[Queue, Queue]] = queuesByTerminal
     .mapValues { queues =>
