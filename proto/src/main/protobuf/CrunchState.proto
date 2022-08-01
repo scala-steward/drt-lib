@@ -92,6 +92,8 @@ message CrunchMinuteMessage {
     optional int32 actDesks = 10;
     optional int32 actWait = 11;
     optional int64 lastUpdated = 12;
+    optional int32 maybePaxInQueue = 13;
+    optional int32 maybeDeployedPaxInQueue = 14;
 }
 
 message StaffMinutesMessage {
