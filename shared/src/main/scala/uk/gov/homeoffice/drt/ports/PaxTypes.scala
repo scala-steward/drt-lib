@@ -86,6 +86,8 @@ object PaxTypes {
   }
 
   def displayNameShort(pt: PaxType): String = pt match {
+    case GBRNational => "GBR"
+    case GBRNationalBelowEgateAge => "GBR U12"
     case EeaMachineReadable => "EEA MR"
     case EeaNonMachineReadable => "EEA NMR"
     case EeaBelowEGateAge => "EEA U12"
