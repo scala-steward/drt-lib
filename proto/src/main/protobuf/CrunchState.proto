@@ -94,6 +94,15 @@ message CrunchMinuteMessage {
     optional int64 lastUpdated = 12;
     optional int32 maybePaxInQueue = 13;
     optional int32 maybeDeployedPaxInQueue = 14;
+    optional PassengersMessage passengers = 15;
+}
+
+message PassengersMessage {
+    repeated PassengerMessage passengers = 1;
+}
+
+message PassengerMessage {
+    optional double load = 1;
 }
 
 message StaffMinutesMessage {
