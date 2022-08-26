@@ -102,6 +102,10 @@ message PassengersMinuteMessage {
     repeated double passengers = 3;
 }
 
+message PassengersMinutesMessage {
+    repeated PassengersMinuteMessage minutes = 1;
+}
+
 message StaffMinutesMessage {
     repeated StaffMinuteMessage minutes = 1;
 }
