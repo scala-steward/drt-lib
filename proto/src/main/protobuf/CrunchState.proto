@@ -96,8 +96,10 @@ message CrunchMinuteMessage {
     optional int32 maybeDeployedPaxInQueue = 14;
 }
 
-message PassengersMessage {
-    repeated double passengers = 1;
+message PassengersMinuteMessage {
+    optional string queueName = 1;
+    optional int64 minute = 2;
+    repeated double passengers = 3;
 }
 
 message StaffMinutesMessage {
