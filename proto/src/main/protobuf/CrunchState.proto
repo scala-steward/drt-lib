@@ -97,14 +97,14 @@ message CrunchMinuteMessage {
 }
 
 message PassengersMinuteMessage {
-    optional string queueName = 1;
-    optional int64 minute = 2;
-    repeated double passengers = 3;
-    optional int64 lastUpdated = 4;
+    optional int64 minute = 1;
+    repeated double passengers = 2;
 }
 
 message PassengersMinutesMessage {
-    repeated PassengersMinuteMessage minutes = 1;
+    optional string queueName = 1;
+    repeated PassengersMinuteMessage minutes = 2;
+    optional int64 lastUpdated = 3;
 }
 
 message StaffMinutesMessage {
