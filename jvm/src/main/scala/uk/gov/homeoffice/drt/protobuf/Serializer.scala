@@ -78,6 +78,8 @@ class Serializer extends SerializerWithStringManifest {
   final val MaybeManifestLike: String = classOf[MaybeManifestLikeMessage].getName
   final val ManifestLike: String = classOf[ManifestLikeMessage].getName
   final val ManifestPassengerProfile: String = classOf[ManifestPassengerProfileMessage].getName
+  final val PassengersMinute: String = classOf[PassengersMinuteMessage].getName
+  final val PassengersMinutes: String = classOf[PassengersMinutesMessage].getName
 
   override def toBinary(objectToSerialize: AnyRef): Array[Byte] = objectToSerialize match {
     case m: GeneratedMessage => m.toByteArray
@@ -139,7 +141,8 @@ class Serializer extends SerializerWithStringManifest {
       case ModelAndFeatures => ModelAndFeaturesMessage.parseFrom(bytes)
       case MaybeManifestLike => MaybeManifestLikeMessage.parseFrom(bytes)
       case ManifestLike => ManifestLikeMessage.parseFrom(bytes)
-      case ManifestPassengerProfile => ManifestPassengerProfileMessage.parseFrom(bytes)
+      case PassengersMinute => PassengersMinuteMessage.parseFrom(bytes)
+      case PassengersMinutes => PassengersMinutesMessage.parseFrom(bytes)
     }
   }
 }
