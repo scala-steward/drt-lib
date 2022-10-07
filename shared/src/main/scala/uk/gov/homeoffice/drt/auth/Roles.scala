@@ -2,6 +2,8 @@ package uk.gov.homeoffice.drt.auth
 
 
 import ujson.Value
+import uk.gov.homeoffice.drt.AppEnvironment
+import uk.gov.homeoffice.drt.AppEnvironment.AppEnvironment
 import upickle.default.{readwriter, _}
 
 
@@ -317,5 +319,19 @@ object Roles {
 
   case object SuperAdmin extends Role {
     override val name: String = "super-admin"
+  }
+
+  trait SingleEnvironmentAccess extends Role {
+    val environment: AppEnvironment
+  }
+
+  case object AccessOnlyProd extends SingleEnvironmentAccess {
+    override val name: String = "access-only:prod"
+    override val environment: AppEnvironment = AppEnvironment.ProdEnv
+  }
+
+  case object AccessOnlyPreprod extends SingleEnvironmentAccess {
+    override val name: String = "access-only:preprod"
+    override val environment: AppEnvironment = AppEnvironment.PreProdEnv
   }
 }
