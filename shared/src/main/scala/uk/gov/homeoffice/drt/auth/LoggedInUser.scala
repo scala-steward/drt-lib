@@ -1,6 +1,7 @@
 package uk.gov.homeoffice.drt.auth
 
-import uk.gov.homeoffice.drt.auth.Roles.{PortAccess, Role}
+import uk.gov.homeoffice.drt.AppEnvironment.AppEnvironment
+import uk.gov.homeoffice.drt.auth.Roles.{PortAccess, Role, SingleEnvironmentAccess}
 import upickle.default.{macroRW, ReadWriter => RW}
 
 case class LoggedInUser(userName: String, id: String, email: String, roles: Set[Role]) {
@@ -10,6 +11,13 @@ case class LoggedInUser(userName: String, id: String, email: String, roles: Set[
     case Some(role: PortAccess) => roles.contains(role)
     case _ => false
   }
+
+  val restrictToEnvironments: Set[AppEnvironment] = roles.collect {
+    case sea: SingleEnvironmentAccess => sea.environment
+  }
+
+  def canAccessEnvironment(environment: AppEnvironment): Boolean =
+    restrictToEnvironments.isEmpty || restrictToEnvironments.contains(environment)
 
   def portRoles: Set[Role] = roles.filter(_.isInstanceOf[PortAccess])
 }

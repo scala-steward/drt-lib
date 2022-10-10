@@ -2,6 +2,7 @@ package uk.gov.homeoffice.drt.auth
 
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import uk.gov.homeoffice.drt.AppEnvironment.{OtherEnv, PreProdEnv, ProdEnv, TestEnv}
 import uk.gov.homeoffice.drt.auth.Roles._
 
 class LoggedInUserSpec extends AnyWordSpec with Matchers {
@@ -87,6 +88,38 @@ class LoggedInUserSpec extends AnyWordSpec with Matchers {
       val isAccessible = user.canAccessPort(LHR.toString)
 
       isAccessible mustEqual true
+    }
+
+    "know if the user is not restricted to particular environments" in {
+      val user = LoggedInUser("", "", "", Set())
+      user.canAccessEnvironment(ProdEnv) mustEqual true
+      user.canAccessEnvironment(PreProdEnv) mustEqual true
+      user.canAccessEnvironment(TestEnv) mustEqual true
+      user.canAccessEnvironment(OtherEnv) mustEqual true
+    }
+
+    "know if the user is restricted to the prod environment" in {
+      val user = LoggedInUser("", "", "", Set(AccessOnlyProd))
+      user.canAccessEnvironment(ProdEnv) mustEqual true
+      user.canAccessEnvironment(PreProdEnv) mustEqual false
+      user.canAccessEnvironment(TestEnv) mustEqual false
+      user.canAccessEnvironment(OtherEnv) mustEqual false
+    }
+
+    "know if the user is restricted to the preprod environment" in {
+      val user = LoggedInUser("", "", "", Set(AccessOnlyPreprod))
+      user.canAccessEnvironment(ProdEnv) mustEqual false
+      user.canAccessEnvironment(PreProdEnv) mustEqual true
+      user.canAccessEnvironment(TestEnv) mustEqual false
+      user.canAccessEnvironment(OtherEnv) mustEqual false
+    }
+
+    "know if the user is restricted to the prod & preprod environments" in {
+      val user = LoggedInUser("", "", "", Set(AccessOnlyProd, AccessOnlyPreprod))
+      user.canAccessEnvironment(ProdEnv) mustEqual true
+      user.canAccessEnvironment(PreProdEnv) mustEqual true
+      user.canAccessEnvironment(TestEnv) mustEqual false
+      user.canAccessEnvironment(OtherEnv) mustEqual false
     }
   }
 }
