@@ -4,6 +4,18 @@ import org.specs2.mutable.Specification
 import uk.gov.homeoffice.drt.ports._
 
 class ArrivalSpec extends Specification {
+  "An Arrival" should {
+    "Know it has no source of passengers when there are no sources" in {
+      ArrivalGenerator.arrival(totalPax = Set()).hasNoPaxSource shouldEqual(true)
+    }
+    "Know it has no source of passengers when there are no sources with a pax figure" in {
+      ArrivalGenerator.arrival(totalPax = Set(TotalPaxSource(None, LiveFeedSource))).hasNoPaxSource shouldEqual(true)
+    }
+    "Know it has a source of passengers when there is a source with a pax figure" in {
+      ArrivalGenerator.arrival(totalPax = Set(TotalPaxSource(Option(100), LiveFeedSource))).hasNoPaxSource shouldEqual(false)
+    }
+  }
+
   "Arrival bestPcpPaxEstimate" should {
     val arrivalBase = ArrivalGenerator.arrival()
     val liveFeedTotalPaxSource = TotalPaxSource(Option(10), LiveFeedSource)
@@ -25,7 +37,7 @@ class ArrivalSpec extends Specification {
       arrival.bestPcpPaxEstimate mustEqual portForecastFeedTotalPaxSource
     }
 
-    "Gives Forecast feed source as bestPcpPaxEstimate, " +
+    "Give Forecast feed source as bestPcpPaxEstimate, " +
       "When Forecast feed source and Acl Feed source is present in total pax set" in {
       val arrival = arrivalBase.copy(TotalPax = Set(aclFeedTotalPaxSource,
         portForecastFeedTotalPaxSource))
