@@ -1,3 +1,0 @@
--J-XX:MetaspaceSize=512M
--J-Xms2G
--J-Xmx2G
