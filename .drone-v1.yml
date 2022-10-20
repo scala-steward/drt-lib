@@ -8,6 +8,16 @@ platform:
   arch: amd64
 
 steps:
+  - name: Debug
+    pull: if-not-exists
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
+    commands:
+      - /root/entrypoint.sh
+      - sbt -v
+    when:
+      event:
+        - push
+
   - name: Build
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
