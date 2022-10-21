@@ -153,7 +153,7 @@ case class Arrival(Operator: Option[Operator],
     }
   }
 
-  def excludeTransferPax(totalPaxSource: Option[TotalPaxSource]) = {
+  def excludeTransferPax(totalPaxSource: Option[TotalPaxSource]): Option[TotalPaxSource] = {
     val excludeTransPax = totalPaxSource.flatMap(_.pax.map(_ - TranPax.getOrElse(0)))
     if (excludeTransPax.exists(_ > 0)) {
       totalPaxSource.map(tps => tps.copy(pax = excludeTransPax))
@@ -215,6 +215,8 @@ case class Arrival(Operator: Option[Operator],
       Gate = if (incoming.Gate.exists(_.nonEmpty)) incoming.Gate else this.Gate,
       RedListPax = if (incoming.RedListPax.nonEmpty) incoming.RedListPax else this.RedListPax
     )
+
+  lazy val hasNoPaxSource: Boolean = !TotalPax.exists(_.pax.nonEmpty)
 }
 
 object Arrival {
