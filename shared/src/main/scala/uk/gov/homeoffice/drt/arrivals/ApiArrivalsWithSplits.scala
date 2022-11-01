@@ -78,7 +78,14 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
 
   def hasValidApi: Boolean = {
     val maybeApiSplits = splits.find(_.source == SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages)
-    val hasLiveSource = apiFlight.FeedSources.contains(LiveFeedSource)
+    val totalPaxSourceIntroductionMillis = 1655247600000L // 2022-06-15 midnight BST
+
+    val paxSourceAvailable = apiFlight.Scheduled >= totalPaxSourceIntroductionMillis
+    val hasLiveSource = if (paxSourceAvailable)
+      apiFlight.TotalPax.exists(tp => tp.feedSource == LiveFeedSource && tp.pax.nonEmpty)
+    else
+      apiFlight.FeedSources.contains(LiveFeedSource)
+
     val hasSimulationSource = apiFlight.FeedSources.contains(ScenarioSimulationSource)
     (maybeApiSplits, hasLiveSource, hasSimulationSource) match {
       case (Some(_), _, true) => true
