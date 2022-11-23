@@ -9,6 +9,7 @@ trait DateLike extends Ordered[DateLike] {
   val month: Int
   val day: Int
   val toISOString: String = f"$year-$month%02d-$day%02d"
+  val ddmmyyyy: String = f"$day%02d/$month%02d/$year"
 
   override def toString: String = toISOString
 
