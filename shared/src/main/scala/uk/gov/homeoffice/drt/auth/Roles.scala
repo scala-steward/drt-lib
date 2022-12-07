@@ -17,7 +17,6 @@ object Roles {
     ArrivalSimulationUpload,
     ArrivalSource,
     BorderForceStaff,
-    CedatStaff,
     CreateAlerts,
     Debug,
     DesksAndQueuesView,
@@ -309,10 +308,6 @@ object Roles {
 
   case object RedListFeature extends Role {
     override val name: String = "red-list-feature"
-  }
-
-  case object CedatStaff extends Role {
-    override val name: String = "cedat-staff"
   }
 
   case object NeboUpload extends Role {
