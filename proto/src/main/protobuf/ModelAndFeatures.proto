@@ -11,6 +11,10 @@ message ModelAndFeaturesMessage {
   optional int64 timestamp = 6;
 }
 
+message RemoveModelMessage {
+  optional int64 timestamp = 6;
+}
+
 message RegressionModelMessage {
   repeated double coefficients = 1;
   optional double intercept = 2;
