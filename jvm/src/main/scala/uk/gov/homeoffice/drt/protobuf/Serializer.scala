@@ -8,7 +8,7 @@ import uk.gov.homeoffice.drt.protobuf.messages.EgateBanksUpdates.{PortEgateBanks
 import uk.gov.homeoffice.drt.protobuf.messages.FixedPointMessage.{FixedPointMessage, FixedPointsMessage, FixedPointsStateSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage._
 import uk.gov.homeoffice.drt.protobuf.messages.FlightsSummary.FlightsSummaryMessage
-import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.ModelAndFeaturesMessage
+import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.{ModelAndFeaturesMessage, RemoveModelMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.NeboPassengersMessage.{NeboArrivalMessage, NeboArrivalSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.PaxMessage.{OriginTerminalPaxCountsMessage, OriginTerminalPaxCountsMessages, PaxCountMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.RedListUpdates._
@@ -75,6 +75,7 @@ class Serializer extends SerializerWithStringManifest {
   final val NeboArrival: String = classOf[NeboArrivalMessage].getName
   final val NeboArrivalSnapshot: String = classOf[NeboArrivalSnapshotMessage].getName
   final val ModelAndFeatures: String = classOf[ModelAndFeaturesMessage].getName
+  final val RemoveModel: String = classOf[RemoveModelMessage].getName
   final val MaybeManifestLike: String = classOf[MaybeManifestLikeMessage].getName
   final val ManifestLike: String = classOf[ManifestLikeMessage].getName
   final val ManifestPassengerProfile: String = classOf[ManifestPassengerProfileMessage].getName
@@ -139,6 +140,7 @@ class Serializer extends SerializerWithStringManifest {
       case NeboArrival => NeboArrivalMessage.parseFrom(bytes)
       case NeboArrivalSnapshot => NeboArrivalSnapshotMessage.parseFrom(bytes)
       case ModelAndFeatures => ModelAndFeaturesMessage.parseFrom(bytes)
+      case RemoveModel => RemoveModelMessage.parseFrom(bytes)
       case MaybeManifestLike => MaybeManifestLikeMessage.parseFrom(bytes)
       case ManifestLike => ManifestLikeMessage.parseFrom(bytes)
       case PassengersMinute => PassengersMinuteMessage.parseFrom(bytes)
