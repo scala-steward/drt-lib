@@ -16,5 +16,6 @@ object ModelAndFeatures {
             improvementPct: Double,
            ): ModelAndFeatures = targetName match {
     case TouchdownModelAndFeatures.targetName => TouchdownModelAndFeatures(model, features, examplesTrainedOn, improvementPct)
+    case ToChoxModelAndFeatures.targetName => ToChoxModelAndFeatures(model, features, examplesTrainedOn, improvementPct)
   }
 }
