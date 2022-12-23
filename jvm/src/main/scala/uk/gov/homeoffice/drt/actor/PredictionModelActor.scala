@@ -38,6 +38,7 @@ class PredictionModelActor(val now: () => SDateLike,
   override val log: Logger = LoggerFactory.getLogger(getClass)
 
   override val recoveryStartMillis: Long = now().millisSinceEpoch
+  override val maybeSnapshotInterval: Option[Int] = Option(100)
 
   var state: Map[String, ModelAndFeatures] = Map()
 
