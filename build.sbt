@@ -33,7 +33,12 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
   jvmSettings(
     crossScalaVersions := supportedScalaVersions,
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-actor" % "2.6.17"
+      "com.typesafe.akka" %% "akka-actor" % "2.6.18",
+      "com.typesafe.akka" %% "akka-persistence" % "2.6.18",
+      "com.typesafe.akka" %% "akka-slf4j" % "2.6.18",
+      "joda-time" % "joda-time" % "2.10.12",
+      "com.lihaoyi" %%% "upickle" % "2.0.0",
+      "org.apache.spark" %% "spark-mllib" % "3.2.0",
     ),
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
     Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
