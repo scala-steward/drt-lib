@@ -3,14 +3,16 @@ package uk.gov.homeoffice.drt.actor
 import org.apache.spark.ml.regression.LinearRegressionModel
 import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
-import uk.gov.homeoffice.drt.actor.PredictionModelActor.{Ack, RemoveModel}
-import uk.gov.homeoffice.drt.actor.TerminalDateActor.WithId
+import uk.gov.homeoffice.drt.actor.PredictionModelActor.{Ack, Models, RemoveModel}
+import uk.gov.homeoffice.drt.actor.TerminalDateActor.{GetState, WithId}
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, RegressionModel}
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.{ModelAndFeaturesMessage, ModelsAndFeaturesMessage, RemoveModelMessage}
 import uk.gov.homeoffice.drt.time.SDateLike
 
 object PredictionModelActor {
   case object Ack
+
+  case class Models(models: Map[String, ModelAndFeatures])
 
   case class ModelUpdate(model: RegressionModel,
                          features: FeaturesWithOneToManyValues,
@@ -59,6 +61,9 @@ class PredictionModelActor(val now: () => SDateLike,
     modelsAndFeaturesToMessage(state.values, now().millisSinceEpoch)
 
   override def receiveCommand: Receive = {
+    case GetState =>
+      sender() ! Models(state)
+
     case maf: ModelAndFeatures =>
       val isUpdated = state.get(maf.targetName) match {
         case Some(existingMaf) => maf != existingMaf
@@ -66,15 +71,15 @@ class PredictionModelActor(val now: () => SDateLike,
       }
       if (isUpdated) {
         state = state.updated(maf.targetName, maf)
-        val replyToAndAck = Option(sender(), Ack)
-        persistAndMaybeSnapshot(modelAndFeaturesToMessage(maf, now().millisSinceEpoch), replyToAndAck)
+        val replyToAndAck = List((sender(), Ack))
+        persistAndMaybeSnapshotWithAck(modelAndFeaturesToMessage(maf, now().millisSinceEpoch), replyToAndAck)
       }
 
     case RemoveModel(targetName) =>
       if (state.contains(targetName)) {
         state = state - targetName
-        val replyToAndAck = Option(sender(), Ack)
-        persistAndMaybeSnapshot(RemoveModelMessage(Option(targetName), Option(now().millisSinceEpoch)), replyToAndAck)
+        val replyToAndAck = List((sender(), Ack))
+        persistAndMaybeSnapshotWithAck(RemoveModelMessage(Option(targetName), Option(now().millisSinceEpoch)), replyToAndAck)
       }
   }
 }

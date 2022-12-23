@@ -1,10 +1,13 @@
 package uk.gov.homeoffice.drt.actor
 
 import akka.actor.ActorRef
-import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
+import akka.persistence._
 import org.slf4j.Logger
 import scalapb.GeneratedMessage
-import uk.gov.homeoffice.drt.time.SDateLike
+import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch
+import uk.gov.homeoffice.drt.time.SDate
+
+import scala.util.{Failure, Try}
 
 object Sizes {
   val oneMegaByte: Int = 1024 * 1024
@@ -13,14 +16,30 @@ object Sizes {
 trait RecoveryActorLike extends PersistentActor with RecoveryLogging {
   val log: Logger
 
-  def now: () => SDateLike
-
-  val recoveryStartMillis: Long
-
+  val recoveryStartMillis: MillisSinceEpoch = SDate.now().millisSinceEpoch
+  var messageRecoveryStartMillis: Option[MillisSinceEpoch] = None
+  val maybePointInTime: Option[Long] = None
   val snapshotBytesThreshold: Int = Sizes.oneMegaByte
-  val maybeSnapshotInterval: Option[Int] = None
+  val maybeSnapshotInterval: Option[Int]
   var messagesPersistedSinceSnapshotCounter = 0
   var bytesSinceSnapshotCounter = 0
+  var maybeAckAfterSnapshot: List[(ActorRef, Any)] = List()
+
+  override def recovery: Recovery = maybePointInTime match {
+    case None =>
+      Recovery(SnapshotSelectionCriteria(Long.MaxValue, maxTimestamp = Long.MaxValue, 0L, 0L))
+    case Some(pointInTime) =>
+      val replayMax = maybeSnapshotInterval.map(_.toLong).getOrElse(Long.MaxValue)
+      val criteria = SnapshotSelectionCriteria(maxTimestamp = pointInTime)
+      Recovery(fromSnapshot = criteria, replayMax = replayMax)
+  }
+
+  def ackIfRequired(): Unit = {
+    maybeAckAfterSnapshot.foreach {
+      case (replyTo, msg) => replyTo ! msg
+    }
+    maybeAckAfterSnapshot = List()
+  }
 
   def unknownMessage: PartialFunction[Any, Unit] = {
     case unknown => logUnknown(unknown)
@@ -40,7 +59,9 @@ trait RecoveryActorLike extends PersistentActor with RecoveryLogging {
 
   def stateToMessage: GeneratedMessage
 
-  def persistAndMaybeSnapshot(messageToPersist: GeneratedMessage, maybeAck: Option[(ActorRef, Any)] = None): Unit = {
+  def persistAndMaybeSnapshot(message: GeneratedMessage): Unit = persistAndMaybeSnapshotWithAck(message, List())
+
+  def persistAndMaybeSnapshotWithAck(messageToPersist: GeneratedMessage, acks: List[(ActorRef, Any)]): Unit = {
     persist(messageToPersist) { message =>
       val messageBytes = message.serializedSize
       log.debug(s"Persisting $messageBytes bytes of ${message.getClass}")
@@ -50,15 +71,17 @@ trait RecoveryActorLike extends PersistentActor with RecoveryLogging {
       messagesPersistedSinceSnapshotCounter += 1
       logCounters(bytesSinceSnapshotCounter, messagesPersistedSinceSnapshotCounter, snapshotBytesThreshold, maybeSnapshotInterval)
 
-      snapshotIfNeeded(stateToMessage)
-
-      maybeAck.foreach {
-        case (replyTo, ackMsg) => replyTo ! ackMsg
+      if (shouldTakeSnapshot) {
+        takeSnapshot(stateToMessage)
+        maybeAckAfterSnapshot = acks
+      } else {
+        acks.foreach {
+          case (replyTo, ackMsg) =>
+            replyTo ! ackMsg
+        }
       }
     }
   }
-
-  def snapshotIfNeeded(stateToSnapshot: => GeneratedMessage): Unit = if (shouldTakeSnapshot) takeSnapshot(stateToSnapshot)
 
   def takeSnapshot(stateToSnapshot: GeneratedMessage): Unit = {
     log.debug(s"Snapshotting ${stateToSnapshot.serializedSize} bytes of ${stateToSnapshot.getClass}. Resetting counters to zero")
@@ -85,13 +108,29 @@ trait RecoveryActorLike extends PersistentActor with RecoveryLogging {
       playSnapshotMessage(ss)
 
     case RecoveryCompleted =>
-      log.debug(s"Recovery complete. Took ${now().millisSinceEpoch - recoveryStartMillis}ms. $messagesPersistedSinceSnapshotCounter messages replayed.")
+      logRecoveryTime()
       postRecoveryComplete()
 
     case event: GeneratedMessage =>
-      bytesSinceSnapshotCounter += event.serializedSize
-      messagesPersistedSinceSnapshotCounter += 1
-      playRecoveryMessage(event)
+      Try {
+        bytesSinceSnapshotCounter += event.serializedSize
+        messagesPersistedSinceSnapshotCounter += 1
+        playRecoveryMessage(event)
+      } match {
+        case Failure(exception) =>
+          log.error(s"Failed to replay recovery message $event", exception)
+        case _ =>
+      }
+  }
+
+  private def logRecoveryTime(): Unit = {
+    val tookMs: MillisSinceEpoch = SDate.now().millisSinceEpoch - recoveryStartMillis
+    val message = s"Recovery complete. $messagesPersistedSinceSnapshotCounter messages replayed. Took ${tookMs}ms."
+
+    if (250L <= tookMs && tookMs < 5000L)
+      log.warn(s"$message (slow)")
+    else if (tookMs >= 5000L)
+      log.error(s"$message (very slow)")
   }
 }
 
