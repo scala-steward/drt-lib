@@ -9,7 +9,7 @@ import uk.gov.homeoffice.drt.actor.PredictionModelActor.ModelUpdate
 import uk.gov.homeoffice.drt.actor.TerminalDateActor.FlightRoute
 import uk.gov.homeoffice.drt.prediction.Feature.{OneToMany, Single}
 import uk.gov.homeoffice.drt.prediction.category.FlightCategory
-import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, RegressionModel, TouchdownModelAndFeatures}
+import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, RegressionModel, OffScheduleModelAndFeatures}
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.ModelAndFeaturesMessage
 import uk.gov.homeoffice.drt.time.SDate
 
@@ -31,7 +31,7 @@ class PredictionModelActorTest extends TestKit(ActorSystem("TouchdownPredictions
 
   "A touchdown actor" should {
     val features = FeaturesWithOneToManyValues(List(Single("col_a"), OneToMany(List("col_b", "col_c"), "x")), IndexedSeq("t", "h", "u"))
-    val modelUpdate = ModelUpdate(RegressionModel(Seq(1, 2), 1.4), features, 10, 10.1, TouchdownModelAndFeatures.targetName)
+    val modelUpdate = ModelUpdate(RegressionModel(Seq(1, 2), 1.4), features, 10, 10.1, OffScheduleModelAndFeatures.targetName)
 
     "Persist an incoming model" in {
       val probe = TestProbe()

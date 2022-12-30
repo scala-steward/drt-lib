@@ -3,14 +3,14 @@ package uk.gov.homeoffice.drt.prediction
 import uk.gov.homeoffice.drt.arrivals.Arrival
 import uk.gov.homeoffice.drt.time.{MilliTimes, SDateLike}
 
-object TouchdownModelAndFeatures {
-  val targetName: String = "touchdown"
+object OffScheduleModelAndFeatures {
+  val targetName: String = "to-chox"
 }
 
-case class TouchdownModelAndFeatures(model: RegressionModel, features: FeaturesWithOneToManyValues, examplesTrainedOn: Int, improvementPct: Double) extends ModelAndFeatures {
-  override val targetName: String = TouchdownModelAndFeatures.targetName
+case class OffScheduleModelAndFeatures(model: RegressionModel, features: FeaturesWithOneToManyValues, examplesTrainedOn: Int, improvementPct: Double) extends ModelAndFeatures {
+  override val targetName: String = OffScheduleModelAndFeatures.targetName
 
-  def maybePrediction(arrival: Arrival)(implicit sDateProvider: Long => SDateLike): Option[Long] = {
+  def maybeOffScheduleMinutes(arrival: Arrival)(implicit sDateProvider: Long => SDateLike): Option[Int] = {
     val dow = s"dow_${sDateProvider(arrival.Scheduled).getDayOfWeek()}"
     val partOfDay = s"pod_${sDateProvider(arrival.Scheduled).getHours() / 12}"
     val dowIdx = features.oneToManyValues.indexOf(dow)
@@ -19,8 +19,7 @@ case class TouchdownModelAndFeatures(model: RegressionModel, features: FeaturesW
       dowCo <- model.coefficients.toIndexedSeq.lift(dowIdx)
       partOfDayCo <- model.coefficients.toIndexedSeq.lift(partOfDayIds)
     } yield {
-      val offScheduled = (model.intercept + dowCo + partOfDayCo).toInt
-      arrival.Scheduled + (offScheduled * MilliTimes.oneMinuteMillis)
+      (model.intercept + dowCo + partOfDayCo).toInt
     }
   }
 }

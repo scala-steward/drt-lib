@@ -10,7 +10,7 @@ object ToChoxModelAndFeatures {
 case class ToChoxModelAndFeatures(model: RegressionModel, features: FeaturesWithOneToManyValues, examplesTrainedOn: Int, improvementPct: Double) extends ModelAndFeatures {
   override val targetName: String = ToChoxModelAndFeatures.targetName
 
-  def maybePrediction(arrival: Arrival)(implicit sDateProvider: Long => SDateLike): Option[Long] = {
+  def maybeToChoxMinutes(arrival: Arrival)(implicit sDateProvider: Long => SDateLike): Option[Int] = {
     val dow = s"dow_${sDateProvider(arrival.Scheduled).getDayOfWeek()}"
     val partOfDay = s"pod_${sDateProvider(arrival.Scheduled).getHours() / 12}"
     val dowIdx = features.oneToManyValues.indexOf(dow)
@@ -19,8 +19,7 @@ case class ToChoxModelAndFeatures(model: RegressionModel, features: FeaturesWith
       dowCo <- model.coefficients.toIndexedSeq.lift(dowIdx)
       partOfDayCo <- model.coefficients.toIndexedSeq.lift(partOfDayIds)
     } yield {
-      val toChox = (model.intercept + dowCo + partOfDayCo).toInt
-      toChox * MilliTimes.oneMinuteMillis
+      (model.intercept + dowCo + partOfDayCo).toInt
     }
   }
 }
