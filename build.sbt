@@ -25,6 +25,7 @@ lazy val root = project.in(file(".")).
   )
 
 lazy val akkaVersion = "2.6.20"
+lazy val akkaPersistenceInMemoryVersion = "2.5.15.2"
 lazy val jodaVersion = "2.10.12"
 lazy val upickleVersion = "2.0.0"
 lazy val sparkMlLibVersion = "3.2.0"
@@ -40,10 +41,14 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-actor" % akkaVersion,
       "com.typesafe.akka" %% "akka-persistence" % akkaVersion,
+      "com.typesafe.akka" %% "akka-persistence-query" % akkaVersion,
       "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
       "joda-time" % "joda-time" % jodaVersion,
       "com.lihaoyi" %%% "upickle" % upickleVersion,
       "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion,
+
+      "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
+      "com.github.dnvriend" %% "akka-persistence-inmemory" % akkaPersistenceInMemoryVersion % "test",
     ),
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
     Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
