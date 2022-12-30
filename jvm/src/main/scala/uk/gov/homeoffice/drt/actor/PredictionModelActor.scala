@@ -5,7 +5,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.actor.PredictionModelActor.{Ack, Models, RemoveModel}
 import uk.gov.homeoffice.drt.actor.TerminalDateActor.{GetState, WithId}
-import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, RegressionModel}
+import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, ModelCategory, RegressionModel}
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.{ModelAndFeaturesMessage, ModelsAndFeaturesMessage, RemoveModelMessage}
 import uk.gov.homeoffice.drt.time.SDateLike
 
@@ -29,7 +29,7 @@ object PredictionModelActor {
 }
 
 class PredictionModelActor(val now: () => SDateLike,
-                           persistenceType: String,
+                           modelCategory: ModelCategory,
                            identifier: WithId,
                           ) extends RecoveryActorLike {
 
@@ -42,7 +42,7 @@ class PredictionModelActor(val now: () => SDateLike,
 
   var state: Map[String, ModelAndFeatures] = Map()
 
-  override def persistenceId: String = s"$persistenceType-prediction-${identifier.id}".toLowerCase
+  override def persistenceId: String = s"${modelCategory.name}-prediction-${identifier.id}".toLowerCase
 
   override def processRecoveryMessage: PartialFunction[Any, Unit] = {
     case RemoveModelMessage(targetName, _) =>
