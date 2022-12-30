@@ -33,7 +33,7 @@ class PredictionModelActor(val now: () => SDateLike,
                            identifier: WithId,
                           ) extends RecoveryActorLike {
 
-  import uk.gov.homeoffice.drt.protobuf.serialisers.ModelAndFeaturesConversion._
+  import uk.gov.homeoffice.drt.protobuf.serialisation.ModelAndFeaturesConversion._
 
   override val log: Logger = LoggerFactory.getLogger(getClass)
 

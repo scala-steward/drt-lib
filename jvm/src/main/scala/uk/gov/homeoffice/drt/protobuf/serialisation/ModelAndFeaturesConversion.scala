@@ -1,4 +1,4 @@
-package uk.gov.homeoffice.drt.protobuf.serialisers
+package uk.gov.homeoffice.drt.protobuf.serialisation
 
 import uk.gov.homeoffice.drt.prediction.Feature.{OneToMany, Single}
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, RegressionModel}
