@@ -18,7 +18,7 @@ class ModelAndFeaturesConversionTest extends Specification {
       deserialised === modelAndFeatures
     }
   }
-  "Given a TouchdownModelAndFeatures class" >> {
+  "Given an OffScheduleModelAndFeatures class" >> {
     "I should be able to serialise and deserialise it back to its original form" >> {
       val model = RegressionModel(Seq(1, 2, 3), -1.45)
       val features = FeaturesWithOneToManyValues(List(OneToMany(List("a", "b"), "_a"), Single("c")), IndexedSeq("aa", "bb", "cc"))

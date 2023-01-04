@@ -15,13 +15,13 @@ import uk.gov.homeoffice.drt.time.SDate
 
 import scala.concurrent.duration.DurationInt
 
-class MockTouchdownPredictionActor(probeRef: ActorRef) extends PredictionModelActor(() => SDate.now(), FlightCategory, FlightRoute("T1", 100, "JFK")) {
+class MockPredictionModelActor(probeRef: ActorRef) extends PredictionModelActor(() => SDate.now(), FlightCategory, FlightRoute("T1", 100, "JFK")) {
   override def persistAndMaybeSnapshotWithAck(messageToPersist: GeneratedMessage, maybeAck:List[(ActorRef, Any)]): Unit = {
     probeRef ! messageToPersist
   }
 }
 
-class PredictionModelActorTest extends TestKit(ActorSystem("TouchdownPredictions"))
+class PredictionModelActorTest extends TestKit(ActorSystem("Predictions"))
   with AnyWordSpecLike
   with BeforeAndAfterAll {
 
@@ -29,20 +29,20 @@ class PredictionModelActorTest extends TestKit(ActorSystem("TouchdownPredictions
     TestKit.shutdownActorSystem(system)
   }
 
-  "A touchdown actor" should {
+  "A PredictionModel actor" should {
     val features = FeaturesWithOneToManyValues(List(Single("col_a"), OneToMany(List("col_b", "col_c"), "x")), IndexedSeq("t", "h", "u"))
     val modelUpdate = ModelUpdate(RegressionModel(Seq(1, 2), 1.4), features, 10, 10.1, OffScheduleModelAndFeatures.targetName)
 
     "Persist an incoming model" in {
       val probe = TestProbe()
-      val actor = system.actorOf(Props(new MockTouchdownPredictionActor(probe.ref)))
+      val actor = system.actorOf(Props(new MockPredictionModelActor(probe.ref)))
       actor ! modelUpdate
       probe.expectMsgClass(classOf[ModelAndFeaturesMessage])
     }
 
     "Not persist an incoming model if it's the same as the last one received" in {
       val probe = TestProbe()
-      val actor = system.actorOf(Props(new MockTouchdownPredictionActor(probe.ref)))
+      val actor = system.actorOf(Props(new MockPredictionModelActor(probe.ref)))
       actor ! modelUpdate
       probe.expectMsgClass(classOf[ModelAndFeaturesMessage])
       actor ! modelUpdate
