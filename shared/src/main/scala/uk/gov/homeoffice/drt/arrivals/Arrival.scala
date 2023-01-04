@@ -170,20 +170,22 @@ case class Arrival(Operator: Option[Operator],
       .get(OffScheduleModelAndFeatures.targetName)
       .map(offScheduleMinutes  => Scheduled + (offScheduleMinutes * oneMinuteMillis))
 
-  lazy val minutesToChox: Option[Int] = Predictions.predictions.get(ToChoxModelAndFeatures.targetName)
+  lazy val minutesToChox: Int = Predictions.predictions.getOrElse(ToChoxModelAndFeatures.targetName, Arrival.defaultMinutesToChox)
 
-  def bestArrivalTime(timeToChox: Long, considerPredictions: Boolean): Long =
+  def bestArrivalTime(considerPredictions: Boolean): Long = {
+    val millisToChox = minutesToChox * oneMinuteMillis
     (ActualChox, EstimatedChox, Actual, Estimated, predictedTouchdown, Scheduled) match {
       case (Some(actChox), _, _, _, _, _) => actChox
       case (_, Some(estChox), _, _, _, _) => estChox
-      case (_, _, Some(touchdown), _, _, _) => touchdown + timeToChox
-      case (_, _, _, Some(estimated), _, _) => estimated + timeToChox
-      case (_, _, _, _, Some(predictedTd), _) if considerPredictions => predictedTd + timeToChox
-      case (_, _, _, _, _, scheduled) => scheduled + timeToChox
+      case (_, _, Some(touchdown), _, _, _) => touchdown + millisToChox
+      case (_, _, _, Some(estimated), _, _) => estimated + millisToChox
+      case (_, _, _, _, Some(predictedTd), _) if considerPredictions => predictedTd + millisToChox
+      case (_, _, _, _, _, scheduled) => scheduled + millisToChox
     }
+  }
 
-  def walkTime(timeToChox: Long, firstPaxOff: Long, considerPredictions: Boolean): Option[Long] =
-    PcpTime.map(pcpTime => pcpTime - (bestArrivalTime(timeToChox, considerPredictions) + firstPaxOff))
+  def walkTime(firstPaxOff: Long, considerPredictions: Boolean): Option[Long] =
+    PcpTime.map(pcpTime => pcpTime - (bestArrivalTime(considerPredictions) + firstPaxOff))
 
   def minutesOfPaxArrivals: Int = {
     val totalPax = bestPcpPaxEstimate
@@ -230,6 +232,8 @@ case class Arrival(Operator: Option[Operator],
 }
 
 object Arrival {
+  val defaultMinutesToChox: Int = 5
+
   val flightCodeRegex: Regex = "^([A-Z0-9]{2,3}?)([0-9]{1,4})([A-Z]*)$".r
 
   def isInRange(rangeStart: Long, rangeEnd: Long)(needle: Long): Boolean =
