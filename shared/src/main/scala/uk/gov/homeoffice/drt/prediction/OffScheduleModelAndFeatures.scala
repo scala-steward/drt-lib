@@ -4,7 +4,7 @@ import uk.gov.homeoffice.drt.arrivals.Arrival
 import uk.gov.homeoffice.drt.time.{MilliTimes, SDateLike}
 
 object OffScheduleModelAndFeatures {
-  val targetName: String = "to-chox"
+  val targetName: String = "off-schedule"
 }
 
 case class OffScheduleModelAndFeatures(model: RegressionModel, features: FeaturesWithOneToManyValues, examplesTrainedOn: Int, improvementPct: Double) extends ModelAndFeatures {

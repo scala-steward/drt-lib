@@ -4,8 +4,6 @@ import uk.gov.homeoffice.drt.ports.Terminals.{T1, Terminal}
 import uk.gov.homeoffice.drt.ports.{FeedSource, PortCode}
 import uk.gov.homeoffice.drt.time.SDateLike
 
-import scala.collection.SortedSet
-
 object ArrivalGenerator {
   def arrival(
                iata: String = "",
@@ -17,7 +15,7 @@ object ArrivalGenerator {
                origin: PortCode = PortCode(""),
                operator: Option[Operator] = None,
                status: ArrivalStatus = ArrivalStatus(""),
-               predDt: Option[Prediction[Long]] = None,
+               predictions: Predictions = Predictions(0L, Map()),
                est: Long = 0L,
                act: Long = 0L,
                estChox: Long = 0L,
@@ -35,7 +33,7 @@ object ArrivalGenerator {
     Arrival(
       Operator = operator,
       Status = status,
-      PredictedTouchdown = predDt,
+      Predictions = predictions,
       Estimated = if (est != 0L) Option(est) else None,
       Actual = if (act != 0L) Option(act) else None,
       EstimatedChox = if (estChox != 0L) Option(estChox) else None,
