@@ -1,13 +1,17 @@
 package uk.gov.homeoffice.drt.prediction
 
 import uk.gov.homeoffice.drt.arrivals.Arrival
-import uk.gov.homeoffice.drt.time.{MilliTimes, SDateLike}
+import uk.gov.homeoffice.drt.time.SDateLike
 
 object OffScheduleModelAndFeatures {
   val targetName: String = "off-schedule"
 }
 
-case class OffScheduleModelAndFeatures(model: RegressionModel, features: FeaturesWithOneToManyValues, examplesTrainedOn: Int, improvementPct: Double) extends ModelAndFeatures {
+case class OffScheduleModelAndFeatures(model: RegressionModel,
+                                       features: FeaturesWithOneToManyValues,
+                                       examplesTrainedOn: Int,
+                                       improvementPct: Double,
+                                      ) extends ModelAndFeatures {
   override val targetName: String = OffScheduleModelAndFeatures.targetName
 
   def maybeOffScheduleMinutes(arrival: Arrival)(implicit sDateProvider: Long => SDateLike): Option[Int] = {
