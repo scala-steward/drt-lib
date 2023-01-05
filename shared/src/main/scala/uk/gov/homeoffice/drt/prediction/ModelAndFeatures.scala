@@ -1,7 +1,5 @@
 package uk.gov.homeoffice.drt.prediction
 
-import org.slf4j.LoggerFactory
-
 trait ModelAndFeatures {
   val model: RegressionModel
   val features: FeaturesWithOneToManyValues
@@ -11,7 +9,6 @@ trait ModelAndFeatures {
 }
 
 object ModelAndFeatures {
-  private val log = LoggerFactory.getLogger(getClass)
   def apply(model: RegressionModel,
             features: FeaturesWithOneToManyValues,
             targetName: String,
