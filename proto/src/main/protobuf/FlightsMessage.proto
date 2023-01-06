@@ -35,11 +35,12 @@ message FlightMessage {
     optional int32 ApiPax = 25;
     optional int32 RedListPax = 26;
     optional int64 ScheduledDeparture = 27;
-    optional PredictionLongMessage PredictedTouchdown = 29;
     repeated TotalPaxSourceMessage TotalPax = 30;
+    optional PredictionsMessage Predictions = 31;
     optional int32 FlightID__OLD = 10;
     optional int32 LastKnownPax__OLD = 22;
     optional int64 PredictedTouchdown__OLD = 28;
+    optional PredictionLongMessage PredictedTouchdown2__OLD = 29;
 }
 
 message UniqueArrivalMessage {

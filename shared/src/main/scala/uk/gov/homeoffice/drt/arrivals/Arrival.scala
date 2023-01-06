@@ -2,6 +2,7 @@ package uk.gov.homeoffice.drt.arrivals
 
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.prediction.{OffScheduleModelAndFeatures, ToChoxModelAndFeatures}
 import uk.gov.homeoffice.drt.time.MilliTimes.oneMinuteMillis
 import uk.gov.homeoffice.drt.time.{MilliTimes, SDateLike}
 import upickle.default.{ReadWriter, macroRW}
@@ -28,13 +29,15 @@ object Prediction {
 
 case class TotalPaxSource(pax: Option[Int], feedSource: FeedSource)
 
+case class Predictions(lastChecked: Long, predictions: Map[String, Int])
+
 case class Arrival(Operator: Option[Operator],
                    CarrierCode: CarrierCode,
                    VoyageNumber: VoyageNumber,
                    FlightCodeSuffix: Option[FlightCodeSuffix],
                    Status: ArrivalStatus,
                    Estimated: Option[Long],
-                   PredictedTouchdown: Option[Prediction[Long]],
+                   Predictions: Predictions,
                    Actual: Option[Long],
                    EstimatedChox: Option[Long],
                    ActualChox: Option[Long],
@@ -162,18 +165,27 @@ case class Arrival(Operator: Option[Operator],
     }
   }
 
-  def bestArrivalTime(timeToChox: Long, considerPredictions: Boolean): Long =
-    (ActualChox, EstimatedChox, Actual, Estimated, PredictedTouchdown, Scheduled) match {
+  lazy val predictedTouchdown: Option[Long] =
+    Predictions.predictions
+      .get(OffScheduleModelAndFeatures.targetName)
+      .map(offScheduleMinutes  => Scheduled + (offScheduleMinutes * oneMinuteMillis))
+
+  lazy val minutesToChox: Int = Predictions.predictions.getOrElse(ToChoxModelAndFeatures.targetName, Arrival.defaultMinutesToChox)
+
+  def bestArrivalTime(considerPredictions: Boolean): Long = {
+    val millisToChox = minutesToChox * oneMinuteMillis
+    (ActualChox, EstimatedChox, Actual, Estimated, predictedTouchdown, Scheduled) match {
       case (Some(actChox), _, _, _, _, _) => actChox
       case (_, Some(estChox), _, _, _, _) => estChox
-      case (_, _, Some(touchdown), _, _, _) => touchdown + timeToChox
-      case (_, _, _, Some(estimated), _, _) => estimated + timeToChox
-      case (_, _, _, _, Some(Prediction(_, predictedTd)), _) if considerPredictions => predictedTd + timeToChox
-      case (_, _, _, _, _, scheduled) => scheduled + timeToChox
+      case (_, _, Some(touchdown), _, _, _) => touchdown + millisToChox
+      case (_, _, _, Some(estimated), _, _) => estimated + millisToChox
+      case (_, _, _, _, Some(predictedTd), _) if considerPredictions => predictedTd + millisToChox
+      case (_, _, _, _, _, scheduled) => scheduled + millisToChox
     }
+  }
 
-  def walkTime(timeToChox: Long, firstPaxOff: Long, considerPredictions: Boolean): Option[Long] =
-    PcpTime.map(pcpTime => pcpTime - (bestArrivalTime(timeToChox, considerPredictions) + firstPaxOff))
+  def walkTime(firstPaxOff: Long, considerPredictions: Boolean): Option[Long] =
+    PcpTime.map(pcpTime => pcpTime - (bestArrivalTime(considerPredictions) + firstPaxOff))
 
   def minutesOfPaxArrivals: Int = {
     val totalPax = bestPcpPaxEstimate
@@ -220,6 +232,8 @@ case class Arrival(Operator: Option[Operator],
 }
 
 object Arrival {
+  val defaultMinutesToChox: Int = 5
+
   val flightCodeRegex: Regex = "^([A-Z0-9]{2,3}?)([0-9]{1,4})([A-Z]*)$".r
 
   def isInRange(rangeStart: Long, rangeEnd: Long)(needle: Long): Boolean =
@@ -254,13 +268,14 @@ object Arrival {
   implicit val arrivalSuffixRw: ReadWriter[FlightCodeSuffix] = macroRW
   implicit val operatorRw: ReadWriter[Operator] = macroRW
   implicit val portCodeRw: ReadWriter[PortCode] = macroRW
+  implicit val predictionsRw: ReadWriter[Predictions] = macroRW
   implicit val arrivalRw: ReadWriter[Arrival] = macroRW
   implicit val totalPaxSourceRw: ReadWriter[TotalPaxSource] = macroRW
 
   def apply(Operator: Option[Operator],
             Status: ArrivalStatus,
             Estimated: Option[Long],
-            PredictedTouchdown: Option[Prediction[Long]],
+            Predictions: Predictions,
             Actual: Option[Long],
             EstimatedChox: Option[Long],
             ActualChox: Option[Long],
@@ -302,7 +317,7 @@ object Arrival {
       FlightCodeSuffix = maybeSuffix,
       Status = Status,
       Estimated = Estimated,
-      PredictedTouchdown = PredictedTouchdown,
+      Predictions = Predictions,
       Actual = Actual,
       EstimatedChox = EstimatedChox,
       ActualChox = ActualChox,

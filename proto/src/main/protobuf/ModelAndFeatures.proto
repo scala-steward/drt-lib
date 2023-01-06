@@ -2,6 +2,10 @@ syntax = "proto2";
 
 package uk.gov.homeoffice.drt.protobuf.messages;
 
+message ModelsAndFeaturesMessage {
+  repeated ModelAndFeaturesMessage modelsAndFeatures = 1;
+}
+
 message ModelAndFeaturesMessage {
   optional RegressionModelMessage model = 1;
   optional FeaturesMessage features = 2;
@@ -9,6 +13,11 @@ message ModelAndFeaturesMessage {
   optional double improvementPct = 4;
   optional string targetName = 5;
   optional int64 timestamp = 6;
+}
+
+message RemoveModelMessage {
+  optional string targetName = 1;
+  optional int64 timestamp = 2;
 }
 
 message RegressionModelMessage {

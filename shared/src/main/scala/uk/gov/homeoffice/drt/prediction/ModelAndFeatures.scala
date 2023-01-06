@@ -3,6 +3,7 @@ package uk.gov.homeoffice.drt.prediction
 trait ModelAndFeatures {
   val model: RegressionModel
   val features: FeaturesWithOneToManyValues
+  val targetName: String
   val examplesTrainedOn: Int
   val improvementPct: Double
 }
@@ -14,6 +15,9 @@ object ModelAndFeatures {
             examplesTrainedOn: Int,
             improvementPct: Double,
            ): ModelAndFeatures = targetName match {
-    case TouchdownModelAndFeatures.targetName => TouchdownModelAndFeatures(model, features, examplesTrainedOn, improvementPct)
+    case OffScheduleModelAndFeatures.targetName => OffScheduleModelAndFeatures(model, features, examplesTrainedOn, improvementPct)
+    case ToChoxModelAndFeatures.targetName => ToChoxModelAndFeatures(model, features, examplesTrainedOn, improvementPct)
+    case unknown =>
+      throw new RuntimeException(s"Unrecognised model name: $unknown")
   }
 }
