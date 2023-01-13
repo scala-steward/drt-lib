@@ -50,18 +50,18 @@ object AirportConfigDefaults {
   )
 
   val defaultProcessingTimes: Map[PaxTypeAndQueue, Double] = Map(
-    b5jsskToDesk -> (55d / 60),
-    b5jsskChildToDesk -> (55d / 60),
-    eeaChildToDesk -> 38d / 60,
-    eeaMachineReadableToDesk -> 38d / 60,
-    eeaNonMachineReadableToDesk -> 38d / 60,
-    gbrNationalToDesk -> 30d / 60,
-    gbrNationalChildToDesk -> 30d / 60,
+    b5jsskToDesk -> (54d / 60),
+    b5jsskChildToDesk -> (54d / 60),
+    eeaChildToDesk -> 31d / 60,
+    eeaMachineReadableToDesk -> 31d / 60,
+    eeaNonMachineReadableToDesk -> 31d / 60,
+    gbrNationalToDesk -> 24d / 60,
+    gbrNationalChildToDesk -> 24d / 60,
     b5jsskToEGate -> (46d / 60),
     eeaMachineReadableToEGate -> 46d / 60,
     gbrNationalToEgate -> 46d / 60,
-    visaNationalToDesk -> 109d / 60,
-    nonVisaNationalToDesk -> 87d / 60
+    visaNationalToDesk -> 119d / 60,
+    nonVisaNationalToDesk -> 101d / 60
   )
 
   val fallbackProcessingTime: Double = defaultProcessingTimes.values.sum / defaultProcessingTimes.size

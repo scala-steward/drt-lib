@@ -39,31 +39,31 @@ object Bhx extends AirportConfigLike {
         SplitRatio(nonVisaNationalToDesk, 0.04)
       )),
     terminalProcessingTimes = Map(T1 -> Map(
-      b5jsskToDesk -> 54d / 60,
-      b5jsskChildToDesk -> 54d / 60,
-      eeaMachineReadableToDesk -> 36d / 60,
-      eeaNonMachineReadableToDesk -> 36d / 60,
-      eeaChildToDesk -> 36d / 60,
-      gbrNationalToDesk -> 26d / 60,
-      gbrNationalChildToDesk -> 26d / 60,
+      b5jsskToDesk -> 62d / 60,
+      b5jsskChildToDesk -> 62d / 60,
+      eeaMachineReadableToDesk -> 41d / 60,
+      eeaNonMachineReadableToDesk -> 41d / 60,
+      eeaChildToDesk -> 41d / 60,
+      gbrNationalToDesk -> 29d / 60,
+      gbrNationalChildToDesk -> 29d / 60,
       b5jsskToEGate -> 48d / 60,
       eeaMachineReadableToEGate -> 48d / 60,
       gbrNationalToEgate -> 48d / 60,
-      visaNationalToDesk -> 96d / 60,
-      nonVisaNationalToDesk -> 92d / 60
+      visaNationalToDesk -> 100d / 60,
+      nonVisaNationalToDesk -> 98d / 60
     ), T2 -> Map(
-      b5jsskToDesk -> 54d / 60,
-      b5jsskChildToDesk -> 54d / 60,
-      eeaMachineReadableToDesk -> 36d / 60,
-      eeaNonMachineReadableToDesk -> 36d / 60,
-      eeaChildToDesk -> 36d / 60,
-      gbrNationalToDesk -> 26d / 60,
-      gbrNationalChildToDesk -> 26d / 60,
+      b5jsskToDesk -> 62d / 60,
+      b5jsskChildToDesk -> 62d / 60,
+      eeaMachineReadableToDesk -> 41d / 60,
+      eeaNonMachineReadableToDesk -> 41d / 60,
+      eeaChildToDesk -> 41d / 60,
+      gbrNationalToDesk -> 29d / 60,
+      gbrNationalChildToDesk -> 29d / 60,
       b5jsskToEGate -> 48d / 60,
       eeaMachineReadableToEGate -> 48d / 60,
       gbrNationalToEgate -> 48d / 60,
-      visaNationalToDesk -> 96d / 60,
-      nonVisaNationalToDesk -> 92d / 60
+      visaNationalToDesk -> 100d / 60,
+      nonVisaNationalToDesk -> 98d / 60
     )),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(
