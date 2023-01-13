@@ -25,16 +25,16 @@ object Ltn extends AirportConfigLike {
     terminalProcessingTimes = Map(T1 -> Map(
       b5jsskToDesk -> 59d / 60,
       b5jsskChildToDesk -> 59d / 60,
-      eeaMachineReadableToDesk -> 37d / 60,
-      eeaNonMachineReadableToDesk -> 37d / 60,
-      eeaChildToDesk -> 37d / 60,
-      gbrNationalToDesk -> 29d / 60,
-      gbrNationalChildToDesk -> 29d / 60,
+      eeaMachineReadableToDesk -> 40d / 60,
+      eeaNonMachineReadableToDesk -> 40d / 60,
+      eeaChildToDesk -> 40d / 60,
+      gbrNationalToDesk -> 31d / 60,
+      gbrNationalChildToDesk -> 31d / 60,
       b5jsskToEGate -> 47d / 60,
       eeaMachineReadableToEGate -> 47d / 60,
       gbrNationalToEgate -> 47d / 60,
-      visaNationalToDesk -> 88d / 60,
-      nonVisaNationalToDesk -> 53d / 60,
+      visaNationalToDesk -> 92d / 60,
+      nonVisaNationalToDesk -> 56d / 60,
     )),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(
