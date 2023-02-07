@@ -1,11 +1,7 @@
 import Dependencies._
 import sbt.Keys.libraryDependencies
 
-lazy val scala = "2.12.15"
-
-lazy val scala212 = "2.12.15"
-lazy val scala213 = "2.13.8"
-lazy val supportedScalaVersions = List(scala212, scala213)
+lazy val scala = "2.13.10"
 
 ThisBuild / scalaVersion := scala
 ThisBuild / organization := "uk.gov.homeoffice"
@@ -28,7 +24,7 @@ lazy val akkaVersion = "2.7.0"
 lazy val akkaPersistenceInMemoryVersion = "2.5.15.2"
 lazy val jodaVersion = "2.10.12"
 lazy val upickleVersion = "2.0.0"
-lazy val sparkMlLibVersion = "3.2.0"
+lazy val sparkMlLibVersion = "3.3.1"
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .in(file("."))
@@ -37,7 +33,6 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= libDeps
   ).
   jvmSettings(
-    crossScalaVersions := supportedScalaVersions,
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-actor" % akkaVersion,
       "com.typesafe.akka" %% "akka-persistence" % akkaVersion,
@@ -56,5 +51,4 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
   ).
   jsSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release"),
-    crossScalaVersions := supportedScalaVersions
   )

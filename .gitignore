@@ -11,6 +11,7 @@ target
 .cache/
 .history/
 .lib/
+.bsp
 dist/*
 
 # IntelliJ IDEA
