@@ -70,18 +70,18 @@ case class Arrival(Operator: Option[Operator],
     case Some(s) => s.suffix
   }
 
-  def displayStatus: ArrivalStatus = {
+  def displayStatus(isMobile:Boolean): ArrivalStatus = {
 
     val fifteenMinutes = 15 * 60 * 1000
 
     (this.Estimated, this.ActualChox, this.Actual) match {
-      case (_, _, _) if isCancelledStatus(this.Status.description.toLowerCase) => ArrivalStatus("Cancelled")
-      case (_, _, _) if isDivertedStatus(this.Status.description.toLowerCase) => ArrivalStatus("Diverted")
-      case (_, Some(_), _) => ArrivalStatus("On Chocks")
-      case (_, _, Some(_)) => ArrivalStatus("Landed")
-      case (Some(e), _, _) if this.Scheduled + fifteenMinutes < e => ArrivalStatus("Delayed")
-      case (Some(_), _, _) => ArrivalStatus("Expected")
-      case (None, _, _) => ArrivalStatus("Scheduled")
+      case (_, _, _) if isCancelledStatus(this.Status.description.toLowerCase) => if(isMobile) ArrivalStatus("Can") else ArrivalStatus("Cancelled")
+      case (_, _, _) if isDivertedStatus(this.Status.description.toLowerCase) => if(isMobile) ArrivalStatus("Div") else ArrivalStatus("Diverted")
+      case (_, Some(_), _) => if(isMobile) ArrivalStatus("On Ch") else ArrivalStatus("On Chocks")
+      case (_, _, Some(_)) => if(isMobile) ArrivalStatus("Lan") else ArrivalStatus("Landed")
+      case (Some(e), _, _) if this.Scheduled + fifteenMinutes < e => if(isMobile) ArrivalStatus("Dela") else ArrivalStatus("Delayed")
+      case (Some(_), _, _) => if(isMobile) ArrivalStatus("Exp") else ArrivalStatus("Expected")
+      case (None, _, _) => if(isMobile) ArrivalStatus("Sch") else ArrivalStatus("Scheduled")
 
     }
   }
