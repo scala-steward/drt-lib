@@ -64,26 +64,37 @@ case class Arrival(Operator: Option[Operator],
   lazy val differenceFromScheduled: Option[FiniteDuration] = Actual.map(a => (a - Scheduled).milliseconds)
 
   val paxOffPerMinute = 20
+  val fifteenMinutes = 15 * 60 * 1000
 
   def suffixString: String = FlightCodeSuffix match {
     case None => ""
     case Some(s) => s.suffix
   }
 
-  def displayStatus(isMobile:Boolean): ArrivalStatus = {
-
-    val fifteenMinutes = 15 * 60 * 1000
-
+  def displayStatus: ArrivalStatus = {
     (this.Estimated, this.ActualChox, this.Actual) match {
-      case (_, _, _) if isCancelledStatus(this.Status.description.toLowerCase) => if(isMobile) ArrivalStatus("Can") else ArrivalStatus("Cancelled")
-      case (_, _, _) if isDivertedStatus(this.Status.description.toLowerCase) => if(isMobile) ArrivalStatus("Div") else ArrivalStatus("Diverted")
-      case (_, Some(_), _) => if(isMobile) ArrivalStatus("On Ch") else ArrivalStatus("On Chocks")
-      case (_, _, Some(_)) => if(isMobile) ArrivalStatus("Lan") else ArrivalStatus("Landed")
-      case (Some(e), _, _) if this.Scheduled + fifteenMinutes < e => if(isMobile) ArrivalStatus("Dela") else ArrivalStatus("Delayed")
-      case (Some(_), _, _) => if(isMobile) ArrivalStatus("Exp") else ArrivalStatus("Expected")
-      case (None, _, _) => if(isMobile) ArrivalStatus("Sch") else ArrivalStatus("Scheduled")
+      case (_, _, _) if isCancelledStatus(this.Status.description.toLowerCase) => ArrivalStatus("Cancelled")
+      case (_, _, _) if isDivertedStatus(this.Status.description.toLowerCase) => ArrivalStatus("Diverted")
+      case (_, Some(_), _) => ArrivalStatus("On Chocks")
+      case (_, _, Some(_)) => ArrivalStatus("Landed")
+      case (Some(e), _, _) if this.Scheduled + fifteenMinutes < e => ArrivalStatus("Delayed")
+      case (Some(_), _, _) => ArrivalStatus("Expected")
+      case (None, _, _) => ArrivalStatus("Scheduled")
 
     }
+  }
+
+  def displayStatusMobile: ArrivalStatus = {
+    (this.Estimated, this.ActualChox, this.Actual) match {
+      case (_, _, _) if isCancelledStatus(this.Status.description.toLowerCase) => ArrivalStatus("Can")
+      case (_, _, _) if isDivertedStatus(this.Status.description.toLowerCase) => ArrivalStatus("Div")
+      case (_, Some(_), _) => ArrivalStatus("On Ch")
+      case (_, _, Some(_)) => ArrivalStatus("Landed")
+      case (Some(e), _, _) if this.Scheduled + fifteenMinutes < e => ArrivalStatus("Dela")
+      case (Some(_), _, _) => ArrivalStatus("Exp")
+      case (None, _, _) => ArrivalStatus("Sch")
+    }
+
   }
 
   val isDivertedStatus: String => Boolean = description => description == "redirected" | description == "diverted"
@@ -168,7 +179,7 @@ case class Arrival(Operator: Option[Operator],
   lazy val predictedTouchdown: Option[Long] =
     Predictions.predictions
       .get(OffScheduleModelAndFeatures.targetName)
-      .map(offScheduleMinutes  => Scheduled + (offScheduleMinutes * oneMinuteMillis))
+      .map(offScheduleMinutes => Scheduled + (offScheduleMinutes * oneMinuteMillis))
 
   lazy val minutesToChox: Int = Predictions.predictions.getOrElse(ToChoxModelAndFeatures.targetName, Arrival.defaultMinutesToChox)
 
