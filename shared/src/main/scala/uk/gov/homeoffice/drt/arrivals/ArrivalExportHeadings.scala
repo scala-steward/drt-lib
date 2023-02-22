@@ -5,7 +5,6 @@ import uk.gov.homeoffice.drt.ports.{PaxTypesAndQueues, Queues}
 import uk.gov.homeoffice.drt.splits.ApiSplitsToSplitRatio
 
 object ArrivalExportHeadings {
-
   private val queueNamesInOrder: Seq[Queue] = ApiSplitsToSplitRatio.queuesFromPaxTypeAndQueue(PaxTypesAndQueues.inOrder)
 
   private val arrivalHeadings: String = Seq(
@@ -35,14 +34,13 @@ object ArrivalExportHeadings {
 
   private val regionalExportPrefixHeadings: String = Seq("Region", "Port", "Terminal").mkString(",")
 
+  private def headingsForSplitSource(source: String): String = queueNamesInOrder
+    .map(q => s"$source ${Queues.displayName(q)}")
+    .mkString(",")
+
   val arrivalWithSplitsHeadings: String = Seq(arrivalHeadings, splitsHeadings).mkString(",")
 
   val arrivalWithSplitsAndRawApiHeadings: String = Seq(arrivalWithSplitsHeadings, actualApiHeadings, apiAdditionalHeadings).mkString(",")
 
   val regionalExportHeadings: String = Seq(regionalExportPrefixHeadings, arrivalWithSplitsHeadings).mkString(",")
-
-  private def headingsForSplitSource(source: String): String = queueNamesInOrder
-    .map(q => s"$source ${Queues.displayName(q)}")
-    .mkString(",")
-
 }
