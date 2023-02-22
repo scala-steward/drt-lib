@@ -28,8 +28,6 @@ object ArrivalExportHeadings {
 
   private val splitsHeadings: String = Seq("API", "Historical", "Terminal Average").map(headingsForSplitSource).mkString(",")
 
-  private val actualApiHeadings: String = PaxTypesAndQueues.inOrder.map(heading => s"API Actual - ${heading.displayName}").mkString(",")
-
   private val apiAdditionalHeadings: String = Seq("Nationalities", "Ages").mkString(",")
 
   private val regionalExportPrefixHeadings: String = Seq("Region", "Port", "Terminal").mkString(",")
@@ -37,6 +35,8 @@ object ArrivalExportHeadings {
   private def headingsForSplitSource(source: String): String = queueNamesInOrder
     .map(q => s"$source ${Queues.displayName(q)}")
     .mkString(",")
+
+  val actualApiHeadings: String = PaxTypesAndQueues.inOrder.map(heading => s"API Actual - ${heading.displayName}").mkString(",")
 
   val arrivalWithSplitsHeadings: String = Seq(arrivalHeadings, splitsHeadings).mkString(",")
 
