@@ -42,5 +42,5 @@ object ArrivalExportHeadings {
 
   val arrivalWithSplitsAndRawApiHeadings: String = Seq(arrivalWithSplitsHeadings, actualApiHeadings, apiAdditionalHeadings).mkString(",")
 
-  val regionalExportHeadings: String = Seq(regionalExportPrefixHeadings, arrivalWithSplitsHeadings).mkString(",")
+  val regionalExportHeadings: String = Seq(regionalExportPrefixHeadings, arrivalWithSplitsAndRawApiHeadings).mkString(",")
 }
