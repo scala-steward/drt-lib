@@ -86,11 +86,11 @@ case class Arrival(Operator: Option[Operator],
 
   def displayStatusMobile: ArrivalStatus = {
     (this.Estimated, this.ActualChox, this.Actual) match {
-      case (_, _, _) if isCancelledStatus(this.Status.description.toLowerCase) => ArrivalStatus("Can")
-      case (_, _, _) if isDivertedStatus(this.Status.description.toLowerCase) => ArrivalStatus("Div")
-      case (_, Some(_), _) => ArrivalStatus("On Ch")
+      case (_, _, _) if isCancelledStatus(this.Status.description.toLowerCase) => ArrivalStatus("Cnx")
+      case (_, _, _) if isDivertedStatus(this.Status.description.toLowerCase) => ArrivalStatus("Dvt")
+      case (_, Some(_), _) => ArrivalStatus("On Chk")
       case (_, _, Some(_)) => ArrivalStatus("Landed")
-      case (Some(e), _, _) if this.Scheduled + fifteenMinutes < e => ArrivalStatus("Dela")
+      case (Some(e), _, _) if this.Scheduled + fifteenMinutes < e => ArrivalStatus("Dla")
       case (Some(_), _, _) => ArrivalStatus("Exp")
       case (None, _, _) => ArrivalStatus("Sch")
     }
