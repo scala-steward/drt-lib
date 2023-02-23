@@ -64,6 +64,7 @@ case class Arrival(Operator: Option[Operator],
   lazy val differenceFromScheduled: Option[FiniteDuration] = Actual.map(a => (a - Scheduled).milliseconds)
 
   val paxOffPerMinute = 20
+  val fifteenMinutes = 15 * 60 * 1000
 
   def suffixString: String = FlightCodeSuffix match {
     case None => ""
@@ -71,9 +72,6 @@ case class Arrival(Operator: Option[Operator],
   }
 
   def displayStatus: ArrivalStatus = {
-
-    val fifteenMinutes = 15 * 60 * 1000
-
     (this.Estimated, this.ActualChox, this.Actual) match {
       case (_, _, _) if isCancelledStatus(this.Status.description.toLowerCase) => ArrivalStatus("Cancelled")
       case (_, _, _) if isDivertedStatus(this.Status.description.toLowerCase) => ArrivalStatus("Diverted")
@@ -84,6 +82,19 @@ case class Arrival(Operator: Option[Operator],
       case (None, _, _) => ArrivalStatus("Scheduled")
 
     }
+  }
+
+  def displayStatusMobile: ArrivalStatus = {
+    (this.Estimated, this.ActualChox, this.Actual) match {
+      case (_, _, _) if isCancelledStatus(this.Status.description.toLowerCase) => ArrivalStatus("Cnx")
+      case (_, _, _) if isDivertedStatus(this.Status.description.toLowerCase) => ArrivalStatus("Dvt")
+      case (_, Some(_), _) => ArrivalStatus("On Chk")
+      case (_, _, Some(_)) => ArrivalStatus("Landed")
+      case (Some(e), _, _) if this.Scheduled + fifteenMinutes < e => ArrivalStatus("Dla")
+      case (Some(_), _, _) => ArrivalStatus("Exp")
+      case (None, _, _) => ArrivalStatus("Sch")
+    }
+
   }
 
   val isDivertedStatus: String => Boolean = description => description == "redirected" | description == "diverted"
@@ -168,7 +179,7 @@ case class Arrival(Operator: Option[Operator],
   lazy val predictedTouchdown: Option[Long] =
     Predictions.predictions
       .get(OffScheduleModelAndFeatures.targetName)
-      .map(offScheduleMinutes  => Scheduled + (offScheduleMinutes * oneMinuteMillis))
+      .map(offScheduleMinutes => Scheduled + (offScheduleMinutes * oneMinuteMillis))
 
   lazy val minutesToChox: Int = Predictions.predictions.getOrElse(ToChoxModelAndFeatures.targetName, Arrival.defaultMinutesToChox)
 
