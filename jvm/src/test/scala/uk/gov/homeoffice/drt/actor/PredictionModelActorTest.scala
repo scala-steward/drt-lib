@@ -8,8 +8,9 @@ import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.actor.PredictionModelActor.ModelUpdate
 import uk.gov.homeoffice.drt.actor.TerminalDateActor.FlightRoute
 import uk.gov.homeoffice.drt.prediction.Feature.{OneToMany, Single}
+import uk.gov.homeoffice.drt.prediction.arrival.OffScheduleModelAndFeatures
 import uk.gov.homeoffice.drt.prediction.category.FlightCategory
-import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, RegressionModel, OffScheduleModelAndFeatures}
+import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, RegressionModel}
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.ModelAndFeaturesMessage
 import uk.gov.homeoffice.drt.time.SDate
 
