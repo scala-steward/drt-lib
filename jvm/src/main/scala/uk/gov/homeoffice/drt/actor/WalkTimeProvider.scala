@@ -8,11 +8,8 @@ import scala.jdk.CollectionConverters.IteratorHasAsScala
 import scala.util.Try
 
 case class WalkTimeProvider(walkTimes: Map[(Terminal, String), Int]) {
-  def walkTime(arrival: Arrival): Option[Int] = {
-    val terminal = arrival.Terminal
-    val standOrGate = arrival.Stand.getOrElse(arrival.Gate.getOrElse(""))
-    walkTimes.get((terminal, standOrGate))
-  }
+  def walkTime(terminal: Terminal, gateOrStand: String): Option[Int] =
+    walkTimes.get((terminal, gateOrStand))
 }
 
 object WalkTimeProvider {
