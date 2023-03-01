@@ -22,7 +22,7 @@ lazy val root = project.in(file(".")).
 
 lazy val akkaVersion = "2.7.0"
 lazy val akkaPersistenceInMemoryVersion = "2.5.15.2"
-lazy val jodaVersion = "2.10.12"
+lazy val jodaVersion = "2.10.14"
 lazy val upickleVersion = "2.0.0"
 lazy val sparkMlLibVersion = "3.3.1"
 
