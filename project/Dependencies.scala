@@ -5,7 +5,7 @@ object Dependencies {
   val uPickle = "2.0.0"
   val autowire = "0.3.2"
   val booPickle = "1.3.3"
-  val specs2 = "4.10.0"
+  val specs2 = "4.10.6"
 
   val libDeps = Seq(
     "org.scalatest" %% "scalatest" % scalaTest % Test,
