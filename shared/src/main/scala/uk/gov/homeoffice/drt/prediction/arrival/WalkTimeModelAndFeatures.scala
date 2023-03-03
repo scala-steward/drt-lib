@@ -9,6 +9,6 @@ object WalkTimeModelAndFeatures {
 case class WalkTimeModelAndFeatures(model: RegressionModel,
                                     features: FeaturesWithOneToManyValues,
                                     examplesTrainedOn: Int,
-                                    improvementPct: Double) extends ModelAndFeatures {
+                                    improvementPct: Double) extends ArrivalModelAndFeatures {
   override val targetName: String = WalkTimeModelAndFeatures.targetName
 }

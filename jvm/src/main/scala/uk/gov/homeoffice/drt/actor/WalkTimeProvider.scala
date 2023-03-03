@@ -1,32 +1,48 @@
 package uk.gov.homeoffice.drt.actor
 
 import org.apache.commons.csv.{CSVFormat, CSVParser}
-import uk.gov.homeoffice.drt.arrivals.Arrival
+import org.slf4j.LoggerFactory
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 import scala.util.Try
 
-case class WalkTimeProvider(walkTimes: Map[(Terminal, String), Int]) {
-  def walkTime(terminal: Terminal, gateOrStand: String): Option[Int] =
-    walkTimes.get((terminal, gateOrStand))
-}
-
 object WalkTimeProvider {
-  def apply(csvPath: String): WalkTimeProvider = {
-    val source = scala.io.Source.fromFile(csvPath)
-    val csvContent = source.getLines().mkString("\n")
-    source.close()
-    val csv = CSVParser.parse(csvContent, CSVFormat.DEFAULT.withFirstRecordAsHeader())
-    val rows = csv.iterator().asScala.toList
+  private val log = LoggerFactory.getLogger(getClass)
 
-    val times: Map[(Terminal, String), Int] = rows.map { row =>
-      val gateOrStand = Try(row.get("gate")).getOrElse(row.get("stand"))
-      val terminal = Terminal(row.get("terminal"))
-      val walkTime = row.get("walktime").toInt
-      ((terminal, gateOrStand), walkTime)
-    }.toMap
+  def apply(maybeGatesCsvPath: Option[String], maybeStandsCsvPath: Option[String]): (Terminal, String, String) => Option[Int] = {
+    val maybeGates = maybeGatesCsvPath.map(walkTimes)
+    val maybeStands = maybeStandsCsvPath.map(walkTimes)
 
-    WalkTimeProvider(times)
+    (terminal: Terminal, gate: String, stand: String) => {
+      (maybeGates, maybeStands) match {
+        case (None, None) => None
+        case (Some(gates), None) => gates.get((terminal, gate))
+        case (None, Some(stands)) => stands.get((terminal, stand))
+        case (Some(gates), Some(stands)) => stands.get((terminal, stand)).orElse(gates.get((terminal, gate)))
+      }
+    }
   }
+
+  private def walkTimes(csvPath: String): Map[(Terminal, String), Int] =
+    Try {
+      val source = scala.io.Source.fromFile(csvPath)
+      val csvContent = source.getLines().mkString("\n")
+
+      source.close()
+
+      CSVParser
+        .parse(csvContent, CSVFormat.DEFAULT.withFirstRecordAsHeader())
+        .iterator().asScala.toList
+        .map { row =>
+          val gateOrStand = Try(row.get("gate")).getOrElse(row.get("stand"))
+          val terminal = Terminal(row.get("terminal"))
+          val walkTime = row.get("walktime").toInt
+          ((terminal, gateOrStand), walkTime)
+        }.toMap
+    } match {
+      case scala.util.Success(walkTimes) => walkTimes
+      case scala.util.Failure(e) =>
+        throw new Exception(s"Failed to load walk times from $csvPath", e)
+    }
 }
