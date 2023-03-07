@@ -14,7 +14,7 @@ case class Flight()
                   val ec: ExecutionContext,
                   val timeout: Timeout,
                   val system: ActorSystem
-                 ) extends PersistenceImpl[FlightRoute] {
+                 ) extends PersistenceImpl {
   override val now: () => SDateLike = () => SDate.now()
   override val modelCategory: ModelCategory = FlightCategory
 }
