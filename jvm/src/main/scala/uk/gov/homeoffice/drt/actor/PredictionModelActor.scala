@@ -3,8 +3,8 @@ package uk.gov.homeoffice.drt.actor
 import org.apache.spark.ml.regression.LinearRegressionModel
 import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
-import uk.gov.homeoffice.drt.actor.PredictionModelActor.{Ack, Models, RemoveModel}
-import uk.gov.homeoffice.drt.actor.TerminalDateActor.{GetState, WithId}
+import uk.gov.homeoffice.drt.actor.PredictionModelActor.{Ack, Models, RemoveModel, WithId}
+import uk.gov.homeoffice.drt.actor.TerminalDateActor.GetState
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, ModelCategory, RegressionModel}
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.{ModelAndFeaturesMessage, ModelsAndFeaturesMessage, RemoveModelMessage}
 import uk.gov.homeoffice.drt.time.SDateLike
@@ -25,6 +25,18 @@ object PredictionModelActor {
 
   object RegressionModelFromSpark {
     def apply(lrModel: LinearRegressionModel): RegressionModel = RegressionModel(lrModel.coefficients.toArray, lrModel.intercept)
+  }
+
+  trait WithId {
+    val id: String
+  }
+
+  case class TerminalFlightNumberOrigin(terminal: String, number: Int, origin: String) extends WithId {
+    val id = s"$terminal-$number-$origin"
+  }
+
+  case class TerminalCarrierOrigin(terminal: String, carrier: String, origin: String) extends WithId {
+    val id = s"$terminal-$carrier-$origin"
   }
 }
 

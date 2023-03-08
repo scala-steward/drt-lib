@@ -15,14 +15,6 @@ trait TerminalDateActor extends Actor {
 object TerminalDateActor {
   case object GetState
 
-  trait WithId {
-    val id: String
-  }
-
-  case class FlightRoute(terminal: String, number: Int, origin: String) extends WithId {
-    val id = s"$terminal-$number-$origin"
-  }
-
   case class ArrivalKey(scheduled: Long, terminal: String, number: Int)
 
   case class ArrivalKeyWithOrigin(scheduled: Long, terminal: String, number: Int, origin: String)
