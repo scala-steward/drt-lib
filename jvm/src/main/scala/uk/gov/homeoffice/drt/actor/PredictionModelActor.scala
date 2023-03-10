@@ -5,11 +5,10 @@ import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.actor.PredictionModelActor.{Ack, Models, RemoveModel, WithId}
 import uk.gov.homeoffice.drt.actor.TerminalDateActor.GetState
-import uk.gov.homeoffice.drt.arrivals.{Arrival, FlightCode}
+import uk.gov.homeoffice.drt.arrivals.Arrival
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, ModelCategory, RegressionModel}
-import uk.gov.homeoffice.drt.protobuf.messages.CrunchState.FlightWithSplitsMessage
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.{ModelAndFeaturesMessage, ModelsAndFeaturesMessage, RemoveModelMessage}
-import uk.gov.homeoffice.drt.time.SDateLike
+import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 
 object PredictionModelActor {
   case object Ack
@@ -33,21 +32,32 @@ object PredictionModelActor {
     val id: String
   }
 
+  case class TerminalCarrier(terminal: String, carrier: String) extends WithId {
+    val id = s"$terminal-$carrier"
+  }
+
+  object TerminalCarrier {
+    val fromArrival: Arrival => Option[TerminalCarrier] = (arrival: Arrival) =>
+      Option(TerminalCarrier(arrival.Terminal.toString, arrival.CarrierCode.code))
+  }
+  case class TerminalOrigin(terminal: String, origin: String) extends WithId {
+    val id = s"$terminal-$origin"
+  }
+
+  object TerminalOrigin {
+    val fromArrival: Arrival => Option[TerminalOrigin] = (arrival: Arrival) =>
+      Option(TerminalOrigin(arrival.Terminal.toString, arrival.Origin.iata))
+  }
+
   case class TerminalFlightNumberOrigin(terminal: String, number: Int, origin: String) extends WithId {
     val id = s"$terminal-$number-$origin"
   }
 
   object TerminalFlightNumberOrigin {
-    val fromMessage: FlightWithSplitsMessage => Option[TerminalFlightNumberOrigin] = (arrival: FlightWithSplitsMessage) =>
-      for {
-        flight <- arrival.flight
-        terminal <- flight.terminal
-        iata <- flight.iATA
-        origin <- flight.origin
-      } yield {
-        val (_, flightNumber, _) = FlightCode.flightCodeToParts(iata)
-        TerminalFlightNumberOrigin(terminal, flightNumber.numeric, origin)
-      }
+    val fromArrival: Arrival => Option[WithId] = (arrival: Arrival) => {
+      val flightNumber = arrival.flightCode.voyageNumberLike.numeric
+      Option(TerminalFlightNumberOrigin(arrival.Terminal.toString, flightNumber, arrival.Origin.iata))
+    }
   }
 
   case class TerminalCarrierOrigin(terminal: String, carrier: String, origin: String) extends WithId {
@@ -55,16 +65,10 @@ object PredictionModelActor {
   }
 
   object TerminalCarrierOrigin {
-    val fromMessage: FlightWithSplitsMessage => Option[TerminalCarrierOrigin] = (arrival: FlightWithSplitsMessage) =>
-      for {
-        flight <- arrival.flight
-        terminal <- flight.terminal
-        iata <- flight.iATA
-        origin <- flight.origin
-      } yield {
-        val (carrierCode, _, _) = FlightCode.flightCodeToParts(iata)
-        TerminalCarrierOrigin(terminal, carrierCode.code, origin)
-      }
+    val fromArrival: Arrival => Option[TerminalCarrierOrigin] = (arrival: Arrival) => {
+      val carrierCode = arrival.flightCode.carrierCode.code
+      Option(TerminalCarrierOrigin(arrival.Terminal.toString, carrierCode, arrival.Origin.iata))
+    }
   }
 }
 
@@ -83,6 +87,8 @@ class PredictionModelActor(val now: () => SDateLike,
   var state: Map[String, ModelAndFeatures] = Map()
 
   override def persistenceId: String = s"${modelCategory.name}-prediction-${identifier.id}".toLowerCase
+
+  implicit val sdateProvider: Long => SDateLike = (ts: Long) => SDate(ts)
 
   override def processRecoveryMessage: PartialFunction[Any, Unit] = {
     case RemoveModelMessage(targetName, _) =>

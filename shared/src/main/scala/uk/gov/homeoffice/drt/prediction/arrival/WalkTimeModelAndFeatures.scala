@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.prediction.arrival
 
-import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, RegressionModel}
+import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, RegressionModel}
 
 object WalkTimeModelAndFeatures {
   val targetName: String = "walk-time"

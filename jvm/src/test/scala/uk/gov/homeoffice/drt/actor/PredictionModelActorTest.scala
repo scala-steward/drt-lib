@@ -7,11 +7,12 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.actor.PredictionModelActor.{ModelUpdate, TerminalFlightNumberOrigin}
 import uk.gov.homeoffice.drt.prediction.Feature.{OneToMany, Single}
+import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{DayOfWeek, PartOfDay}
 import uk.gov.homeoffice.drt.prediction.arrival.OffScheduleModelAndFeatures
 import uk.gov.homeoffice.drt.prediction.category.FlightCategory
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, RegressionModel}
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.ModelAndFeaturesMessage
-import uk.gov.homeoffice.drt.time.SDate
+import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 
 import scala.concurrent.duration.DurationInt
 
@@ -30,7 +31,8 @@ class PredictionModelActorTest extends TestKit(ActorSystem("Predictions"))
   }
 
   "A PredictionModel actor" should {
-    val features = FeaturesWithOneToManyValues(List(Single("col_a"), OneToMany(List("col_b", "col_c"), "x")), IndexedSeq("t", "h", "u"))
+    implicit val sdateProvider: Long => SDateLike = (ts: Long) => SDate(ts)
+    val features = FeaturesWithOneToManyValues(List(Single("col_a"), OneToMany(List(DayOfWeek(), PartOfDay()), "x")), IndexedSeq("t", "h", "u"))
     val modelUpdate = ModelUpdate(RegressionModel(Seq(1, 2), 1.4), features, 10, 10.1, OffScheduleModelAndFeatures.targetName)
 
     "Persist an incoming model" in {

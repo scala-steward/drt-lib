@@ -6,10 +6,10 @@ import uk.gov.homeoffice.drt.protobuf.messages.CrunchState.FlightWithSplitsMessa
 import uk.gov.homeoffice.drt.time.UtcDate
 
 
-trait TerminalDateActor extends Actor {
+trait TerminalDateActor[T] extends Actor {
   val terminal: Terminal
   val date: UtcDate
-  val extractValues: FlightWithSplitsMessage => Option[(Double, Seq[String])]
+  val extractValues: T => Option[(Double, Seq[String], Seq[Double])]
 }
 
 object TerminalDateActor {
