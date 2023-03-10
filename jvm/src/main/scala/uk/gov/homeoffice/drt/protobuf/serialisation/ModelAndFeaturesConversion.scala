@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.protobuf.serialisation
 
 import uk.gov.homeoffice.drt.prediction.Feature.{OneToMany, Single}
-import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.OneToManyFeatureColumn
+import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{OneToManyFeatureColumn, SingleFeatureColumn}
 import uk.gov.homeoffice.drt.prediction.{Feature, FeaturesWithOneToManyValues, ModelAndFeatures, RegressionModel}
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures._
 import uk.gov.homeoffice.drt.time.SDateLike
@@ -24,7 +24,7 @@ object ModelAndFeaturesConversion {
     RegressionModel(msg.coefficients, msg.intercept.getOrElse(throw new Exception("No value for intercept")))
 
   def featuresFromMessage(msg: FeaturesMessage)(implicit sdate: Long => SDateLike): FeaturesWithOneToManyValues = {
-    val singles: Seq[Single] = msg.singleFeatures.map(c => Single(OneToManyFeatureColumn.fromLabel(c)))
+    val singles: Seq[Single] = msg.singleFeatures.map(c => Single(SingleFeatureColumn.fromLabel(c)))
     val oneToManys: Seq[Feature] = msg.oneToManyFeatures.map(oneToManyFromMessage)
     val allFeatures = oneToManys ++ singles
 
@@ -35,8 +35,6 @@ object ModelAndFeaturesConversion {
     val value: List[OneToManyFeatureColumn[_]] = msg.columns.toList.map(OneToManyFeatureColumn.fromLabel)
     OneToMany(value, msg.prefix.getOrElse(throw new Exception("No value for prefix")))
   }
-  //  def oneToManyFromMessage(msg: OneToManyFeatureMessage): OneToMany =
-//    OneToMany(msg.columns.toList, msg.prefix.getOrElse(throw new Exception("No value for prefix")))
 
   def modelToMessage(model: RegressionModel): RegressionModelMessage =
     RegressionModelMessage(
