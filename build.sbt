@@ -31,7 +31,10 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .settings(
     name := "drt-lib",
     libraryDependencies ++= libDeps,
-    resolvers += "Artifactory Release Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-release/"
+    resolvers ++= Seq(
+      "Artifactory Snapshot Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-snapshot/",
+      "Artifactory Release Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-release/"
+    )
   ).
   jvmSettings(
     libraryDependencies ++= Seq(
