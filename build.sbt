@@ -30,7 +30,8 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .in(file("."))
   .settings(
     name := "drt-lib",
-    libraryDependencies ++= libDeps
+    libraryDependencies ++= libDeps,
+    resolvers += "Artifactory Release Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-release/"
   ).
   jvmSettings(
     libraryDependencies ++= Seq(
@@ -43,13 +44,12 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion,
 
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
-      "com.github.dnvriend" %% "akka-persistence-inmemory" % akkaPersistenceInMemoryVersion % "test",
+      "com.github.dnvriend" %% "akka-persistence-inmemory" % akkaPersistenceInMemoryVersion % "test"
     ),
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
     Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
-    resolvers += "Artifactory Release Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-release/",
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
   ).
   jsSettings(
-    publishTo := Some("release" at artifactory + "artifactory/libs-release"),
+    publishTo := Some("release" at artifactory + "artifactory/libs-release")
   )
