@@ -47,6 +47,7 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
     ),
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
     Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
+    resolvers += "Artifactory Release Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-release/",
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
   ).
   jsSettings(
