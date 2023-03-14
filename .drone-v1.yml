@@ -22,6 +22,15 @@ steps:
       event:
         - push
 
+  - name: Output log on failure
+    commands:
+      - cat /root/.sbt/boot/update.log
+    when:
+      status:
+        - failure
+      event:
+        - push
+
   - name: Publish
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
