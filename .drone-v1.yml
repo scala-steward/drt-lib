@@ -13,7 +13,7 @@ steps:
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     commands:
       - /root/entrypoint.sh
-      - sbt --debug +compile
+      - sbt --verbose --debug +compile
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
@@ -27,7 +27,7 @@ steps:
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     commands:
       - /root/entrypoint.sh
-      - sbt --debug +publish
+      - sbt --verbose --debug +publish
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
@@ -43,7 +43,7 @@ steps:
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     commands:
       - /root/entrypoint.sh
-      - sbt --debug --error +test
+      - sbt --verbose --debug --error +test
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
