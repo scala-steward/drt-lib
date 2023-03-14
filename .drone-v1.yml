@@ -23,6 +23,7 @@ steps:
         - push
 
   - name: Output log on failure
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     commands:
       - cat /root/.sbt/boot/update.log
     when:
