@@ -13,27 +13,14 @@ steps:
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     commands:
       - /root/entrypoint.sh
-      - sbt --verbose --debug +compile 2>&1
-      - cat /root/.sbt/boot/update.log
+      - sbt --verbose --debug +compile
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
-      ARTIFACTORY_USERNAME: drt-artifactory-robot-token
+      ARTIFACTORY_USERNAME: drt-artifactory-robot
     when:
       event:
         - push
-
-  - name: Output log on failure
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
-    commands:
-      - cat /root/.sbt/boot/update.log
-    when:
-      status:
-        - failure
-      event:
-        - push
-    depends_on:
-      - Build
 
   - name: Publish
     pull: if-not-exists
@@ -44,7 +31,7 @@ steps:
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
-      ARTIFACTORY_USERNAME: drt-artifactory-robot-token
+      ARTIFACTORY_USERNAME: drt-artifactory-robot
     when:
       event:
         - push
@@ -60,7 +47,7 @@ steps:
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
-      ARTIFACTORY_USERNAME: drt-artifactory-robot-token
+      ARTIFACTORY_USERNAME: drt-artifactory-robot
     when:
       event:
         - push
