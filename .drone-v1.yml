@@ -13,7 +13,7 @@ steps:
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     commands:
       - /root/entrypoint.sh
-      - sbt --verbose --debug +compile
+      - sbt --verbose --debug +compile 2>&1
       - cat /root/.sbt/boot/update.log
     environment:
       ARTIFACTORY_PASSWORD:
