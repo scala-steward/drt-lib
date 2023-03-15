@@ -1,11 +1,11 @@
 import sbt._
 
 object Dependencies {
-  val scalaTest = "3.2.10"
+  val scalaTest = "3.2.15"
   val uPickle = "2.0.0"
-  val autowire = "0.3.2"
+  val autowire = "0.3.3"
   val booPickle = "1.3.3"
-  val specs2 = "4.10.0"
+  val specs2 = "4.10.6"
   val csvCommons = "1.4"
 
   val libDeps: Seq[ModuleID] = Seq(
