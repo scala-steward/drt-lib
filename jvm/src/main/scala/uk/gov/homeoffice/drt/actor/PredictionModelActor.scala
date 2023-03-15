@@ -33,7 +33,7 @@ object PredictionModelActor {
   }
 
   case class TerminalCarrier(terminal: String, carrier: String) extends WithId {
-    val id = s"$terminal-$carrier"
+    val id = s"terminal-carrier-$terminal-$carrier"
   }
 
   object TerminalCarrier {
@@ -41,7 +41,7 @@ object PredictionModelActor {
       Option(TerminalCarrier(arrival.Terminal.toString, arrival.CarrierCode.code))
   }
   case class TerminalOrigin(terminal: String, origin: String) extends WithId {
-    val id = s"$terminal-$origin"
+    val id = s"terminal-origin-$terminal-$origin"
   }
 
   object TerminalOrigin {
@@ -50,7 +50,7 @@ object PredictionModelActor {
   }
 
   case class TerminalFlightNumberOrigin(terminal: String, number: Int, origin: String) extends WithId {
-    val id = s"$terminal-$number-$origin"
+    val id = s"terminal-flightnumber-origin-$terminal-$number-$origin"
   }
 
   object TerminalFlightNumberOrigin {
@@ -61,7 +61,7 @@ object PredictionModelActor {
   }
 
   case class TerminalCarrierOrigin(terminal: String, carrier: String, origin: String) extends WithId {
-    val id = s"$terminal-$carrier-$origin"
+    val id = s"terminal-carrier-origin-$terminal-$carrier-$origin"
   }
 
   object TerminalCarrierOrigin {
