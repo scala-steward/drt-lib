@@ -6,9 +6,9 @@ import uk.gov.homeoffice.drt.time.SDateLike
 
 
 trait ArrivalModelAndFeatures extends ModelAndFeatures {
-  def prediction(arrival: Arrival/*, featureValues: Iterable[Arrival => String]*/): Option[Int] = {
+  def prediction(arrival: Arrival): Option[Int] = {
     val maybeMaybePrediction = for {
-      oneToManyValues <- ArrivalFeatureValuesExtractor.oneToManyFeatureValues(arrival, features.features)
+      oneToManyValues <- ArrivalFeatureValuesExtractor.oneToManyColumnValues(arrival, features.features)
       singleValues <- ArrivalFeatureValuesExtractor.singleFeatureValues(arrival, features.features)
     } yield {
       val oneToManyFeatureValues: Seq[Option[Double]] = oneToManyValues.map { featureValue =>
@@ -26,18 +26,6 @@ trait ArrivalModelAndFeatures extends ModelAndFeatures {
       }
     }
     maybeMaybePrediction.flatten
-
-//    ArrivalFeatureValuesExtractor.oneToManyFeatureValues(arrival, features.features).flatMap { featureValues =>
-//      val coefficients = featureValues.map { featureValue =>
-//        val featureIdx = features.oneToManyValues.indexOf(featureValue)
-//        model.coefficients.toIndexedSeq.lift(featureIdx)
-//      }
-//      if (coefficients.forall(_.isDefined)) {
-//        Some((model.intercept + coefficients.map(_.get).sum).round.toInt)
-//      } else {
-//        None
-//      }
-//    }
   }
 }
 
@@ -78,9 +66,11 @@ object FeatureColumns {
     override val value: Arrival => Option[String] =
       (a: Arrival) => Option(sDateProvider(a.Scheduled).getDayOfWeek().toString)
   }
+
   object DayOfWeek {
     val label: String = "dayOfTheWeek"
   }
+
   case class PartOfDay()(implicit sDateProvider: Long => SDateLike) extends OneToManyFeatureColumn[Arrival] {
     override val label: String = PartOfDay.label
     override val value: Arrival => Option[String] =
@@ -90,6 +80,7 @@ object FeatureColumns {
   object PartOfDay {
     val label: String = "partOfDay"
   }
+
   case object Carrier extends OneToManyFeatureColumn[Arrival] {
     override val label: String = "carrier"
     override val value: Arrival => Option[String] = (a: Arrival) => Option(a.flightCode.carrierCode.code)
