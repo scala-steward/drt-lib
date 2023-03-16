@@ -45,3 +45,9 @@ case class FlightsWithSplits(flights: Map[UniqueArrival, ApiFlightWithSplits]) {
 
   def ++(other: FlightsWithSplits): FlightsWithSplits = FlightsWithSplits(flights ++ other.flights)
 }
+
+object FlightsWithSplits {
+  val empty: FlightsWithSplits = FlightsWithSplits(Map[UniqueArrival, ApiFlightWithSplits]())
+
+  def apply(flights: Iterable[ApiFlightWithSplits]): FlightsWithSplits = FlightsWithSplits(flights.map(fws => (fws.unique, fws)).toMap)
+}
