@@ -6,16 +6,38 @@ import uk.gov.homeoffice.drt.time.SDateLike
 
 
 trait ArrivalModelAndFeatures extends ModelAndFeatures {
-  def prediction(arrival: Arrival, featureValues: Iterable[Arrival => String]): Option[Int] = {
-    val coefficients = featureValues.map { featureValue =>
-      val featureIdx = features.oneToManyValues.indexOf(featureValue(arrival))
-      model.coefficients.toIndexedSeq.lift(featureIdx)
+  def prediction(arrival: Arrival/*, featureValues: Iterable[Arrival => String]*/): Option[Int] = {
+    val maybeMaybePrediction = for {
+      oneToManyValues <- ArrivalFeatureValuesExtractor.oneToManyFeatureValues(arrival, features.features)
+      singleValues <- ArrivalFeatureValuesExtractor.singleFeatureValues(arrival, features.features)
+    } yield {
+      val oneToManyFeatureValues: Seq[Option[Double]] = oneToManyValues.map { featureValue =>
+        val featureIdx = features.oneToManyValues.indexOf(featureValue)
+        model.coefficients.toIndexedSeq.lift(featureIdx)
+      }
+      val singleFeatureValues: Seq[Option[Double]] = singleValues.zipWithIndex.map { case (featureValue, idx) =>
+        model.coefficients.toIndexedSeq.lift(idx).map(_ * featureValue)
+      }
+      val allFeatureValues = oneToManyFeatureValues ++ singleFeatureValues
+      if (allFeatureValues.forall(_.isDefined)) {
+        Some((model.intercept + allFeatureValues.map(_.get).sum).round.toInt)
+      } else {
+        None
+      }
     }
-    if (coefficients.forall(_.isDefined)) {
-      Some((model.intercept + coefficients.map(_.get).sum).round.toInt)
-    } else {
-      None
-    }
+    maybeMaybePrediction.flatten
+
+//    ArrivalFeatureValuesExtractor.oneToManyFeatureValues(arrival, features.features).flatMap { featureValues =>
+//      val coefficients = featureValues.map { featureValue =>
+//        val featureIdx = features.oneToManyValues.indexOf(featureValue)
+//        model.coefficients.toIndexedSeq.lift(featureIdx)
+//      }
+//      if (coefficients.forall(_.isDefined)) {
+//        Some((model.intercept + coefficients.map(_.get).sum).round.toInt)
+//      } else {
+//        None
+//      }
+//    }
   }
 }
 
