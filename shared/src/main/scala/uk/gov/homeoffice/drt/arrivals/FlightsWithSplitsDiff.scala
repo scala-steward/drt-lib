@@ -92,3 +92,7 @@ case class FlightsWithSplitsDiff(flightsToUpdate: Iterable[ApiFlightWithSplits],
     arrivalsToRemove.filter(_.terminal == terminal)
   )
 }
+
+object FlightsWithSplitsDiff {
+  val empty: FlightsWithSplitsDiff = FlightsWithSplitsDiff(List(), List())
+}
