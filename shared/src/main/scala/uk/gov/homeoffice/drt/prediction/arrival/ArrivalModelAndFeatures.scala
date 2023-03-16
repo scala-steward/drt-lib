@@ -64,7 +64,7 @@ object FeatureColumns {
   case class DayOfWeek()(implicit sDateProvider: Long => SDateLike) extends OneToManyFeatureColumn[Arrival] {
     override val label: String = DayOfWeek.label
     override val value: Arrival => Option[String] =
-      (a: Arrival) => Option(sDateProvider(a.Scheduled).getDayOfWeek().toString)
+      (a: Arrival) => Option(sDateProvider(a.Scheduled).getDayOfWeek.toString)
   }
 
   object DayOfWeek {
@@ -74,7 +74,7 @@ object FeatureColumns {
   case class PartOfDay()(implicit sDateProvider: Long => SDateLike) extends OneToManyFeatureColumn[Arrival] {
     override val label: String = PartOfDay.label
     override val value: Arrival => Option[String] =
-      (a: Arrival) => Option((sDateProvider(a.Scheduled).getHours() / 12).toString)
+      (a: Arrival) => Option((sDateProvider(a.Scheduled).getHours / 12).toString)
   }
 
   object PartOfDay {

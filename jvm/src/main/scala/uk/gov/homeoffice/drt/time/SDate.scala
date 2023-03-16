@@ -16,19 +16,19 @@ object SDate {
 
   case class JodaSDate(dateTime: DateTime) extends SDateLike {
 
-    def getDayOfWeek(): Int = dateTime.getDayOfWeek
+    def getDayOfWeek: Int = dateTime.getDayOfWeek
 
-    def getFullYear(): Int = dateTime.getYear
+    def getFullYear: Int = dateTime.getYear
 
-    def getMonth(): Int = dateTime.getMonthOfYear
+    def getMonth: Int = dateTime.getMonthOfYear
 
-    def getDate(): Int = dateTime.getDayOfMonth
+    def getDate: Int = dateTime.getDayOfMonth
 
-    def getHours(): Int = dateTime.getHourOfDay
+    def getHours: Int = dateTime.getHourOfDay
 
-    def getMinutes(): Int = dateTime.getMinuteOfHour
+    def getMinutes: Int = dateTime.getMinuteOfHour
 
-    def getSeconds(): Int = dateTime.getSecondOfMinute
+    def getSeconds: Int = dateTime.getSecondOfMinute
 
     def addDays(daysToAdd: Int): SDateLike = dateTime.plusDays(daysToAdd)
 
@@ -42,17 +42,17 @@ object SDate {
 
     def millisSinceEpoch: MillisSinceEpoch = dateTime.getMillis
 
-    def toLocalDateTimeString(): String = {
-      f"${toLocal.getFullYear()}-${toLocal.getMonth()}%02d-${toLocal.getDate()}%02d ${toLocal.getHours()}%02d:${toLocal.getMinutes()}%02d"
+    def toLocalDateTimeString: String = {
+      f"${toLocal.getFullYear}-${toLocal.getMonth}%02d-${toLocal.getDate}%02d ${toLocal.getHours}%02d:${toLocal.getMinutes}%02d"
     }
 
-    def toISOString(): String = jodaSDateToIsoString(dateTime)
+    def toISOString: String = jodaSDateToIsoString(dateTime)
 
-    def getZone(): String = dateTime.getZone.getID
+    def getZone: String = dateTime.getZone.getID
 
-    def getTimeZoneOffsetMillis(): Long = dateTime.getZone.getOffset(millisSinceEpoch)
+    def getTimeZoneOffsetMillis: Long = dateTime.getZone.getOffset(millisSinceEpoch)
 
-    def startOfTheMonth(): SDateLike = SDate(dateTime.getFullYear(), dateTime.getMonth(), 1, 0, 0, europeLondonTimeZone)
+    def startOfTheMonth: SDateLike = SDate(dateTime.getFullYear, dateTime.getMonth, 1, 0, 0, europeLondonTimeZone)
 
     def getUtcLastMidnight: SDateLike = {
       val utcNow = SDate(dateTime, utcTimeZone)
@@ -70,11 +70,11 @@ object SDate {
       SDate(nextDay.toIsoMidnight, europeLondonTimeZone)
     }
 
-    def toLocalDate: LocalDate = LocalDate(toLocal.getFullYear(), toLocal.getMonth(), toLocal.getDate())
+    def toLocalDate: LocalDate = LocalDate(toLocal.getFullYear, toLocal.getMonth, toLocal.getDate)
 
     def toUtcDate: UtcDate = {
       val utcLastMidnight = getUtcLastMidnight
-      UtcDate(utcLastMidnight.getFullYear(), utcLastMidnight.getMonth(), utcLastMidnight.getDate())
+      UtcDate(utcLastMidnight.getFullYear, utcLastMidnight.getMonth, utcLastMidnight.getDate)
     }
   }
 
@@ -147,7 +147,7 @@ object SDate {
 
   def yearMonthDayForZone(date: SDateLike, dateTimeZone: DateTimeZone): (Int, Int, Int) = {
     val zoneDate = SDate(date, dateTimeZone)
-    (zoneDate.getFullYear(), zoneDate.getMonth(), zoneDate.getDate())
+    (zoneDate.getFullYear, zoneDate.getMonth, zoneDate.getDate)
   }
 
   def weekOfYear(date: SDateLike): Int = new DateTime(date.millisSinceEpoch, DateTimeZone.UTC).getWeekOfWeekyear
