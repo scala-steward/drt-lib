@@ -33,6 +33,7 @@ message FeaturesMessage {
 }
 
 message OneToManyFeatureMessage {
-  repeated string columns = 1;
   optional string prefix = 2;
+  optional string column = 3;
+  repeated string columns__OLD = 1;
 }

@@ -32,9 +32,13 @@ object ModelAndFeaturesConversion {
   }
 
   def oneToManyFromMessage(msg: OneToManyFeatureMessage)(implicit sdate: Long => SDateLike): Feature = {
-    val value: List[OneToManyFeatureColumn[_]] = msg.columns.toList.map(OneToManyFeatureColumn.fromLabel)
-    OneToMany(value, msg.prefix.getOrElse(throw new Exception("No value for prefix")))
-  }
+    for {
+      prefix <- msg.prefix
+      column <- msg.column
+    } yield {
+      OneToMany(OneToManyFeatureColumn.fromLabel(column), prefix)
+    }
+  }.getOrElse(throw new Exception("No value for prefix or column"))
 
   def modelToMessage(model: RegressionModel): RegressionModelMessage =
     RegressionModelMessage(
@@ -45,8 +49,11 @@ object ModelAndFeaturesConversion {
   def featuresToMessage(features: FeaturesWithOneToManyValues): FeaturesMessage = {
     FeaturesMessage(
       oneToManyFeatures = features.features.collect {
-        case OneToMany(columnNames, featurePrefix) =>
-          OneToManyFeatureMessage(columnNames.map(_.label), Option(featurePrefix))
+        case OneToMany(column, prefix) =>
+          OneToManyFeatureMessage(
+            prefix = Option(prefix),
+            column = Option(column.label)
+          )
       },
       singleFeatures = features.features.collect {
         case Single(columnName) => columnName.label

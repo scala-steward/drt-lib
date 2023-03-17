@@ -1,15 +1,17 @@
 package uk.gov.homeoffice.drt.prediction
 
 import uk.gov.homeoffice.drt.prediction.Feature.{OneToMany, Single}
-import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{OneToManyFeatureColumn, SingleFeatureColumn}
+import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{FeatureColumn, OneToManyFeatureColumn, SingleFeatureColumn}
 
 
-sealed trait Feature
+sealed trait Feature {
+  val column: FeatureColumn[_]
+}
 
 object Feature {
   case class Single(column: SingleFeatureColumn[_]) extends Feature
 
-  case class OneToMany(columns: List[OneToManyFeatureColumn[_]], featurePrefix: String) extends Feature
+  case class OneToMany(column: OneToManyFeatureColumn[_], featurePrefix: String) extends Feature
 }
 
 case class FeaturesWithOneToManyValues(features: List[Feature], oneToManyValues: IndexedSeq[String]) {

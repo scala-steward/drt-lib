@@ -8,7 +8,7 @@ import uk.gov.homeoffice.drt.time.SDateLike
 trait ArrivalModelAndFeatures extends ModelAndFeatures {
   def prediction(arrival: Arrival): Option[Int] = {
     val maybeMaybePrediction = for {
-      oneToManyValues <- ArrivalFeatureValuesExtractor.oneToManyColumnValues(arrival, features.features)
+      oneToManyValues <- ArrivalFeatureValuesExtractor.oneToManyFeatureValues(arrival, features.features)
       singleValues <- ArrivalFeatureValuesExtractor.singleFeatureValues(arrival, features.features)
     } yield {
       val oneToManyFeatureValues: Seq[Option[Double]] = oneToManyValues.map { featureValue =>
@@ -30,7 +30,11 @@ trait ArrivalModelAndFeatures extends ModelAndFeatures {
 }
 
 object FeatureColumns {
-  sealed trait SingleFeatureColumn[T] {
+  sealed trait FeatureColumn[T] {
+    val label: String
+  }
+
+  sealed trait SingleFeatureColumn[T] extends FeatureColumn[T] {
     val label: String
     val value: T => Option[Double]
   }
@@ -46,7 +50,7 @@ object FeatureColumns {
     override val value: Arrival => Option[Double] = (a: Arrival) => a.bestPcpPaxEstimate.pax.map(_.toDouble)
   }
 
-  sealed trait OneToManyFeatureColumn[T] {
+  sealed trait OneToManyFeatureColumn[T] extends FeatureColumn[T] {
     val label: String
     val value: T => Option[String]
   }

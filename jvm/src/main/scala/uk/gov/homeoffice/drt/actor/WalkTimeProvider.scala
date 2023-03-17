@@ -4,8 +4,9 @@ import org.apache.commons.csv.{CSVFormat, CSVParser}
 import org.slf4j.LoggerFactory
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 
+import scala.io.Source
 import scala.jdk.CollectionConverters.IteratorHasAsScala
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 object WalkTimeProvider {
   private val log = LoggerFactory.getLogger(getClass)
@@ -26,7 +27,7 @@ object WalkTimeProvider {
 
   private def walkTimes(csvPath: String): Map[(Terminal, String), Int] =
     Try {
-      val source = scala.io.Source.fromFile(csvPath)
+      val source = Source.fromFile(csvPath)
       val csvContent = source.getLines().mkString("\n")
 
       source.close()
@@ -41,8 +42,9 @@ object WalkTimeProvider {
           ((terminal, gateOrStand), walkTime)
         }.toMap
     } match {
-      case scala.util.Success(walkTimes) => walkTimes
-      case scala.util.Failure(e) =>
+      case Success(walkTimes) =>
+        walkTimes
+      case Failure(e) =>
         throw new Exception(s"Failed to load walk times from $csvPath", e)
     }
 }

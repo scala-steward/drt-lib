@@ -8,22 +8,10 @@ import uk.gov.homeoffice.drt.prediction.Feature.{OneToMany, Single}
 import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{OneToManyFeatureColumn, SingleFeatureColumn}
 
 object ArrivalFeatureValuesExtractor {
-  def oneToManyColumnValues[T](arrival: T, features: Seq[Feature]): Option[Seq[String]] =
-    features.collect {
-      case OneToMany(columns, prefix) =>
-        val maybeValues = columns.map {
-          case column: OneToManyFeatureColumn[T] => column.value(arrival)
-        }
-        maybeValues.traverse(identity).map(vs => s"${prefix}_${vs.mkString("_")}")
-    }.traverse(identity)
-
   def oneToManyFeatureValues[T](arrival: T, features: Seq[Feature]): Option[Seq[String]] =
     features.collect {
-      case OneToMany(columns, _) =>
-        columns.map {
-          case column: OneToManyFeatureColumn[T] => column.value(arrival)
-        }
-    }.flatten.traverse(identity)
+      case OneToMany(column: OneToManyFeatureColumn[T], prefix) => column.value(arrival).map(value => s"${prefix}_$value")
+    }.traverse(identity)
 
   def singleFeatureValues[T](arrival: T, features: Seq[Feature]): Option[Seq[Double]] =
     features.collect {
