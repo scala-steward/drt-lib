@@ -30,33 +30,35 @@ trait ArrivalModelAndFeatures extends ModelAndFeatures {
 }
 
 object FeatureColumns {
-  sealed trait FeatureColumn[T] {
+  sealed trait Feature[T] {
     val label: String
+    val prefix: String
   }
 
-  sealed trait SingleFeatureColumn[T] extends FeatureColumn[T] {
+  sealed trait Single[T] extends Feature[T] {
     val label: String
     val value: T => Option[Double]
   }
 
-  object SingleFeatureColumn {
-    def fromLabel(label: String)(implicit sDateProvider: Long => SDateLike): SingleFeatureColumn[_] = label match {
+  object Single {
+    def fromLabel(label: String)(implicit sDateProvider: Long => SDateLike): Single[_] = label match {
       case BestPax.label => BestPax
     }
   }
 
-  case object BestPax extends SingleFeatureColumn[Arrival] {
+  case object BestPax extends Single[Arrival] {
     override val label: String = "bestPax"
+    override val prefix: String = "bestpax"
     override val value: Arrival => Option[Double] = (a: Arrival) => a.bestPcpPaxEstimate.pax.map(_.toDouble)
   }
 
-  sealed trait OneToManyFeatureColumn[T] extends FeatureColumn[T] {
+  sealed trait OneToMany[T] extends Feature[T] {
     val label: String
     val value: T => Option[String]
   }
 
-  object OneToManyFeatureColumn {
-    def fromLabel(label: String)(implicit sDateProvider: Long => SDateLike): OneToManyFeatureColumn[_] = label match {
+  object OneToMany {
+    def fromLabel(label: String)(implicit sDateProvider: Long => SDateLike): OneToMany[_] = label match {
       case DayOfWeek.label => DayOfWeek()
       case PartOfDay.label => PartOfDay()
       case Carrier.label => Carrier
@@ -65,8 +67,9 @@ object FeatureColumns {
     }
   }
 
-  case class DayOfWeek()(implicit sDateProvider: Long => SDateLike) extends OneToManyFeatureColumn[Arrival] {
+  case class DayOfWeek()(implicit sDateProvider: Long => SDateLike) extends OneToMany[Arrival] {
     override val label: String = DayOfWeek.label
+    override val prefix: String = "dow"
     override val value: Arrival => Option[String] =
       (a: Arrival) => Option(sDateProvider(a.Scheduled).getDayOfWeek.toString)
   }
@@ -75,8 +78,9 @@ object FeatureColumns {
     val label: String = "dayOfTheWeek"
   }
 
-  case class PartOfDay()(implicit sDateProvider: Long => SDateLike) extends OneToManyFeatureColumn[Arrival] {
+  case class PartOfDay()(implicit sDateProvider: Long => SDateLike) extends OneToMany[Arrival] {
     override val label: String = PartOfDay.label
+    override val prefix: String = "pod"
     override val value: Arrival => Option[String] =
       (a: Arrival) => Option((sDateProvider(a.Scheduled).getHours / 12).toString)
   }
@@ -85,18 +89,21 @@ object FeatureColumns {
     val label: String = "partOfDay"
   }
 
-  case object Carrier extends OneToManyFeatureColumn[Arrival] {
+  case object Carrier extends OneToMany[Arrival] {
     override val label: String = "carrier"
+    override val prefix: String = "car"
     override val value: Arrival => Option[String] = (a: Arrival) => Option(a.flightCode.carrierCode.code)
   }
 
-  case object Origin extends OneToManyFeatureColumn[Arrival] {
+  case object Origin extends OneToMany[Arrival] {
     override val label: String = "origin"
+    override val prefix: String = "ori"
     override val value: Arrival => Option[String] = (a: Arrival) => Option(a.Origin.iata)
   }
 
-  case object FlightNumber extends OneToManyFeatureColumn[Arrival] {
+  case object FlightNumber extends OneToMany[Arrival] {
     override val label: String = "flightNumber"
+    override val prefix: String = "fln"
     override val value: Arrival => Option[String] = (a: Arrival) => Option(a.flightCode.voyageNumberLike.numeric.toString)
   }
 }

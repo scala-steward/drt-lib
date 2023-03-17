@@ -3,22 +3,20 @@ package uk.gov.homeoffice.drt.prediction.arrival
 import cats.implicits.toTraverseOps
 import uk.gov.homeoffice.drt.arrivals.Arrival
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.prediction.Feature
-import uk.gov.homeoffice.drt.prediction.Feature.{OneToMany, Single}
-import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{OneToManyFeatureColumn, SingleFeatureColumn}
+import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{Feature, OneToMany, Single}
 
 object ArrivalFeatureValuesExtractor {
-  def oneToManyFeatureValues[T](arrival: T, features: Seq[Feature]): Option[Seq[String]] =
+  def oneToManyFeatureValues[T](arrival: T, features: Seq[Feature[_]]): Option[Seq[String]] =
     features.collect {
-      case OneToMany(column: OneToManyFeatureColumn[T], prefix) => column.value(arrival).map(value => s"${prefix}_$value")
+      case feature: OneToMany[T] => feature.value(arrival).map(value => s"${feature.prefix}_$value")
     }.traverse(identity)
 
-  def singleFeatureValues[T](arrival: T, features: Seq[Feature]): Option[Seq[Double]] =
+  def singleFeatureValues[T](arrival: T, features: Seq[Feature[_]]): Option[Seq[Double]] =
     features.collect {
-      case Single(column: SingleFeatureColumn[T]) => column.value(arrival)
+      case feature: Single[T] => feature.value(arrival)
     }.traverse(identity)
 
-  val minutesOffSchedule: Seq[Feature] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
+  val minutesOffSchedule: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
     case arrival: Arrival =>
       for {
         touchdown <- arrival.Actual
@@ -33,7 +31,7 @@ object ArrivalFeatureValuesExtractor {
       None
   }
 
-  val minutesToChox: Seq[Feature] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
+  val minutesToChox: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
     case arrival: Arrival =>
       for {
         touchdown <- arrival.Actual
@@ -50,7 +48,7 @@ object ArrivalFeatureValuesExtractor {
   }
 
   def walkTimeMinutes(walkTimeProvider: (Terminal, String, String) => Option[Int],
-                     ): Seq[Feature] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
+                     ): Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
     case arrival: Arrival =>
       for {
         walkTimeMinutes <- walkTimeProvider(arrival.Terminal, arrival.Gate.getOrElse(""), arrival.Stand.getOrElse(""))

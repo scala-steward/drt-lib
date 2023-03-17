@@ -3,14 +3,14 @@ package uk.gov.homeoffice.drt.prediction.arrival
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.homeoffice.drt.arrivals.{Arrival, ArrivalGenerator}
-import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{DayOfWeek, OneToManyFeatureColumn}
+import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{DayOfWeek, OneToMany}
 import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 
-class OneToManyFeatureColumnsTest extends AnyWordSpec with Matchers {
+class OneToManyColumnsTest extends AnyWordSpec with Matchers {
   implicit val sdate: Long => SDateLike = (ts: Long) => SDate(ts)
   "DayOfWeek" should {
     "return the correct day index for an arrival's scheduled date" in {
-      val c = OneToManyFeatureColumn.fromLabel(DayOfWeek.label)
+      val c = OneToMany.fromLabel(DayOfWeek.label)
 
       val thursdayMarch092023 = SDate("2023-03-09T00:00").millisSinceEpoch
       val thursdayIdx = 4
@@ -18,7 +18,7 @@ class OneToManyFeatureColumnsTest extends AnyWordSpec with Matchers {
       val arrival = ArrivalGenerator.arrival(sch = thursdayMarch092023)
 
       val dayOfTheWeekIndex = c match {
-        case other: OneToManyFeatureColumn[Arrival] => other.value(arrival)
+        case other: OneToMany[Arrival] => other.value(arrival)
       }
 
       dayOfTheWeekIndex should ===(Some(thursdayIdx.toString))

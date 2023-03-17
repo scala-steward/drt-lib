@@ -27,13 +27,7 @@ message RegressionModelMessage {
 }
 
 message FeaturesMessage {
-  repeated OneToManyFeatureMessage oneToManyFeatures = 1;
+  repeated string oneToManyFeatures = 1;
   repeated string singleFeatures = 2;
   repeated string oneToManyValues = 3;
-}
-
-message OneToManyFeatureMessage {
-  optional string prefix = 2;
-  optional string column = 3;
-  repeated string columns__OLD = 1;
 }
