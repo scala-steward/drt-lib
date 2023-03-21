@@ -9,8 +9,6 @@ import scala.jdk.CollectionConverters.IteratorHasAsScala
 import scala.util.{Failure, Success, Try}
 
 object WalkTimeProvider {
-  private val log = LoggerFactory.getLogger(getClass)
-
   def apply(maybeGatesCsvPath: Option[String], maybeStandsCsvPath: Option[String]): (Terminal, String, String) => Option[Int] = {
     val maybeGates = maybeGatesCsvPath.map(walkTimes)
     val maybeStands = maybeStandsCsvPath.map(walkTimes)
@@ -25,7 +23,7 @@ object WalkTimeProvider {
     }
   }
 
-  private def walkTimes(csvPath: String): Map[(Terminal, String), Int] =
+  def walkTimes(csvPath: String): Map[(Terminal, String), Int] =
     Try {
       val source = Source.fromFile(csvPath)
       val csvContent = source.getLines().mkString("\n")
@@ -38,7 +36,7 @@ object WalkTimeProvider {
         .map { row =>
           val gateOrStand = Try(row.get("gate")).getOrElse(row.get("stand"))
           val terminal = Terminal(row.get("terminal"))
-          val walkTime = row.get("walktime").toInt
+          val walkTime = ((row.get("walktime").toDouble / 60).round * 60).toInt
           ((terminal, gateOrStand), walkTime)
         }.toMap
     } match {
