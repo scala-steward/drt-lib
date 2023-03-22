@@ -21,27 +21,27 @@ trait SDateLike {
    *
    * @return
    */
-  def getDayOfWeek(): Int
+  def getDayOfWeek: Int
 
-  def getFullYear(): Int
+  def getFullYear: Int
 
-  def getMonth(): Int
+  def getMonth: Int
 
-  def getMonthString(): String = months.toList(getMonth() - 1)
+  def getMonthString: String = months.toList(getMonth - 1)
 
-  def getDate(): Int
+  def getDate: Int
 
-  def getHours(): Int
+  def getHours: Int
 
-  def getMinutes(): Int
+  def getMinutes: Int
 
-  def getSeconds(): Int
+  def getSeconds: Int
 
   def millisSinceEpoch: Long
 
   def millisSinceEpochToMinuteBoundary: Long = millisSinceEpoch - (millisSinceEpoch % 60000)
 
-  def toISOString(): String
+  def toISOString: String
 
   def addDays(daysToAdd: Int): SDateLike
 
@@ -60,27 +60,27 @@ trait SDateLike {
     addMillis(-1 * remainder.toInt)
   }
 
-  def toLocalDateTimeString(): String
+  def toLocalDateTimeString: String
 
   def toLocalDate: LocalDate
 
   def toUtcDate: UtcDate
 
-  def toISODateOnly: String = f"${getFullYear()}-${getMonth()}%02d-${getDate()}%02d"
+  def toISODateOnly: String = f"$getFullYear-$getMonth%02d-$getDate%02d"
 
-  def toHoursAndMinutes: String = f"${getHours()}%02d:${getMinutes()}%02d"
+  def toHoursAndMinutes: String = f"$getHours%02d:$getMinutes%02d"
 
-  def prettyDateTime(): String = f"${getDate()}%02d-${getMonth()}%02d-${getFullYear()} ${getHours()}%02d:${getMinutes()}%02d"
+  def prettyDateTime: String = f"$getDate%02d-$getMonth%02d-$getFullYear $getHours%02d:$getMinutes%02d"
 
-  def prettyTime(): String = f"${getHours()}%02d:${getMinutes()}%02d"
+  def prettyTime: String = f"$getHours%02d:$getMinutes%02d"
 
-  def hms(): String = f"${getHours()}%02d:${getMinutes()}%02d:${getSeconds()}%02d"
+  def hms: String = f"$getHours%02d:$getMinutes%02d:$getSeconds%02d"
 
-  def getZone(): String
+  def getZone: String
 
-  def getTimeZoneOffsetMillis(): Long
+  def getTimeZoneOffsetMillis: Long
 
-  def startOfTheMonth(): SDateLike
+  def startOfTheMonth: SDateLike
 
   def getUtcLastMidnight: SDateLike
 
@@ -88,15 +88,15 @@ trait SDateLike {
 
   def getLocalNextMidnight: SDateLike
 
-  def toIsoMidnight = s"${getFullYear()}-${getMonth()}-${getDate()}T00:00"
+  def toIsoMidnight = s"$getFullYear-$getMonth-${getDate}T00:00"
 
   def getLastSunday: SDateLike =
-    if (getDayOfWeek() == 7)
+    if (getDayOfWeek == 7)
       this
     else
-      addDays(-1 * getDayOfWeek())
+      addDays(-1 * getDayOfWeek)
 
-  override def toString: String = f"${getFullYear()}-${getMonth()}%02d-${getDate()}%02dT${getHours()}%02d${getMinutes()}%02d"
+  override def toString: String = f"$getFullYear-$getMonth%02d-$getDate%02dT$getHours%02d$getMinutes%02d"
 
   override def equals(obj: scala.Any): Boolean = {
     obj match {

@@ -7,6 +7,7 @@ import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.time.MilliTimes.oneMinuteMillis
 
 import scala.collection.immutable.SortedMap
 
@@ -24,7 +25,7 @@ object Lcy extends AirportConfigLike {
       Queues.NonEeaDesk -> 45,
       Queues.EGate -> 25
     ),
-    defaultWalkTimeMillis = Map(T1 -> 780000L),
+    defaultWalkTimeMillis = Map(T1 -> 2 * oneMinuteMillis),
     terminalPaxSplits = Map(T1 -> SplitRatios(
       SplitSources.TerminalAverage,
       SplitRatio(eeaMachineReadableToDesk, 0.99 * 0.2),

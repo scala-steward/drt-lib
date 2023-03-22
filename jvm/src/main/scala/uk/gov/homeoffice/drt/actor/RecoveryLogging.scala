@@ -9,7 +9,7 @@ trait RecoveryLogging {
 
   val prefix = "Recovery"
 
-  def snapshotOfferLogMessage(md: SnapshotMetadata): String = s"$prefix received SnapshotOffer from ${SDate(md.timestamp).toISOString()}, sequence number ${md.sequenceNr}"
+  def snapshotOfferLogMessage(md: SnapshotMetadata): String = s"$prefix received SnapshotOffer from ${SDate(md.timestamp).toISOString}, sequence number ${md.sequenceNr}"
 
   def logSnapshotOffer(md: SnapshotMetadata): Unit = log.info(snapshotOfferLogMessage(md))
 
@@ -18,7 +18,7 @@ trait RecoveryLogging {
 
   def logRecoveryMessage(message: String): Unit = log.info(s"$prefix - $message")
 
-  def logPointInTimeCompleted(pit: SDateLike): Unit = log.info(s"$prefix completed to point-in-time ${pit.toISOString()}")
+  def logPointInTimeCompleted(pit: SDateLike): Unit = log.info(s"$prefix completed to point-in-time ${pit.toISOString}")
 
   def logUnknown(unknown: Any): Unit = log.warn(s"$prefix received unknown message ${unknown.getClass}")
 
