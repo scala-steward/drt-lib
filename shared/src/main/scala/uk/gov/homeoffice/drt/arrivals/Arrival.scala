@@ -2,7 +2,7 @@ package uk.gov.homeoffice.drt.arrivals
 
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.ports._
-import uk.gov.homeoffice.drt.prediction.arrival.{OffScheduleModelAndFeatures, WalkTimeModelAndFeatures}
+import uk.gov.homeoffice.drt.prediction.arrival.{OffScheduleModelAndFeatures, ToChoxModelAndFeatures}
 import uk.gov.homeoffice.drt.time.MilliTimes.oneMinuteMillis
 import uk.gov.homeoffice.drt.time.{MilliTimes, SDateLike}
 import upickle.default.{ReadWriter, macroRW}
@@ -181,8 +181,7 @@ case class Arrival(Operator: Option[Operator],
       .get(OffScheduleModelAndFeatures.targetName)
       .map(offScheduleMinutes => Scheduled + (offScheduleMinutes * oneMinuteMillis))
 
-  lazy val minutesToChox: Int = Predictions.predictions.getOrElse(WalkTimeModelAndFeatures.targetName, Arrival.defaultMinutesToChox)
-
+  lazy val minutesToChox: Int = Predictions.predictions.getOrElse(ToChoxModelAndFeatures.targetName, Arrival.defaultMinutesToChox)
   def bestArrivalTime(considerPredictions: Boolean): Long = {
     val millisToChox = minutesToChox * oneMinuteMillis
     (ActualChox, EstimatedChox, Actual, Estimated, predictedTouchdown, Scheduled) match {
