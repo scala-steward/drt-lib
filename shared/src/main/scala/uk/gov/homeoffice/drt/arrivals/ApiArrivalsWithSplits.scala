@@ -82,7 +82,7 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
 
     val paxSourceAvailable = apiFlight.Scheduled >= totalPaxSourceIntroductionMillis
     val hasLiveSource = if (paxSourceAvailable)
-      apiFlight.TotalPax.exists(tp => tp.feedSource == LiveFeedSource && tp.pax.nonEmpty)
+      apiFlight.TotalPax.get(LiveFeedSource).exists(_.nonEmpty)
     else
       apiFlight.FeedSources.contains(LiveFeedSource)
 

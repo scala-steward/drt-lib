@@ -58,7 +58,7 @@ case class Arrival(Operator: Option[Operator],
                    ApiPax: Option[Int],
                    ScheduledDeparture: Option[Long],
                    RedListPax: Option[Int],
-                   TotalPax: Set[TotalPaxSource]
+                   TotalPax: Map[FeedSource, Option[Int]]
                   )
   extends WithUnique[UniqueArrival] with Updatable[Arrival] {
   lazy val differenceFromScheduled: Option[FiniteDuration] = Actual.map(a => (a - Scheduled).milliseconds)
@@ -132,48 +132,35 @@ case class Arrival(Operator: Option[Operator],
     (minutesToDisembark * oneMinuteInMillis).toLong
   }
 
+  val excludeTransferPax: Option[Int] => Option[Int] = maybePax =>
+    maybePax.map(_ - TranPax.getOrElse(0)) match {
+      case Some(nonNegative) if nonNegative >= 0 => Some(nonNegative)
+      case Some(_) => Some(0)
+      case None => None
+    }
+
+
   val bestPcpPaxEstimate: TotalPaxSource = {
-    val matchedTotalPax = TotalPax match {
-      case totalPax if totalPax.exists(tp => tp.feedSource == ScenarioSimulationSource && tp.pax.isDefined) =>
-        excludeTransferPax(totalPax.find(tp => tp.feedSource == ScenarioSimulationSource))
-      case totalPax if totalPax.exists(tp => tp.feedSource == LiveFeedSource && tp.pax.isDefined) =>
-        excludeTransferPax(totalPax.find(tp => tp.feedSource == LiveFeedSource && tp.pax.isDefined))
-      case totalPax if totalPax.exists(tp => tp.feedSource == ApiFeedSource && tp.pax.isDefined) =>
-        totalPax.find(tp => tp.feedSource == ApiFeedSource && tp.pax.isDefined)
-      case totalPax if totalPax.exists(tp => tp.feedSource == ForecastFeedSource && tp.pax.isDefined) =>
-        excludeTransferPax(totalPax.find(tp => tp.feedSource == ForecastFeedSource && tp.pax.isDefined))
-      case totalPax if totalPax.exists(tp => tp.feedSource == HistoricApiFeedSource && tp.pax.isDefined) =>
-        totalPax.find(tp => tp.feedSource == HistoricApiFeedSource && tp.pax.isDefined)
-      case totalPax if totalPax.exists(tp => tp.feedSource == AclFeedSource && tp.pax.isDefined) =>
-        excludeTransferPax(totalPax.find(tp => tp.feedSource == AclFeedSource))
-      case _ if fallBackToFeedSource(ActPax).isDefined =>
-        excludeTransferPax(fallBackToFeedSource(ActPax))
-      case totalPax =>
-        totalPax.find(tp => tp.feedSource == UnknownFeedSource)
-    }
-    matchedTotalPax.getOrElse(TotalPaxSource(None, UnknownFeedSource))
+    val preferredSources: List[(FeedSource, Option[Int] => Option[Int])] = List(
+      (ScenarioSimulationSource, excludeTransferPax),
+      (LiveFeedSource, excludeTransferPax),
+      (ApiFeedSource, identity),
+      (ForecastFeedSource, excludeTransferPax),
+      (HistoricApiFeedSource, identity),
+      (AclFeedSource, excludeTransferPax),
+    )
+
+    preferredSources
+      .find { case (source, _) => TotalPax.get(source).exists(_.isDefined) }
+      .map { case (source, fn) => TotalPaxSource(fn(TotalPax(source)), source) }
+      .orElse(fallBackToFeedSource)
+      .getOrElse(TotalPaxSource(None, UnknownFeedSource))
   }
 
-  def fallBackToFeedSource(actPax: Option[Int]): Option[TotalPaxSource] = {
-    FeedSources match {
-      case feedSource if feedSource.contains(LiveFeedSource) =>
-        Some(TotalPaxSource(actPax, LiveFeedSource))
-      case feedSource if feedSource.contains(ForecastFeedSource) =>
-        Some(TotalPaxSource(actPax, ForecastFeedSource))
-      case feedSource if feedSource.contains(AclFeedSource) =>
-        Some(TotalPaxSource(actPax, AclFeedSource))
-      case _ =>
-        None
-    }
-  }
-
-  def excludeTransferPax(totalPaxSource: Option[TotalPaxSource]): Option[TotalPaxSource] = {
-    val excludeTransPax = totalPaxSource.flatMap(_.pax.map(_ - TranPax.getOrElse(0)))
-    if (excludeTransPax.exists(_ > 0)) {
-      totalPaxSource.map(tps => tps.copy(pax = excludeTransPax))
-    } else {
-      totalPaxSource.map(tps => tps.copy(pax = Some(0)))
-    }
+  def fallBackToFeedSource: Option[TotalPaxSource] = {
+    List(LiveFeedSource, ForecastFeedSource, AclFeedSource)
+      .find(FeedSources.contains)
+      .map(s => TotalPaxSource(ActPax, s))
   }
 
   lazy val predictedTouchdown: Option[Long] =
@@ -182,6 +169,7 @@ case class Arrival(Operator: Option[Operator],
       .map(offScheduleMinutes => Scheduled + (offScheduleMinutes * oneMinuteMillis))
 
   lazy val minutesToChox: Int = Predictions.predictions.getOrElse(ToChoxModelAndFeatures.targetName, Arrival.defaultMinutesToChox)
+
   def bestArrivalTime(considerPredictions: Boolean): Long = {
     val millisToChox = minutesToChox * oneMinuteMillis
     (ActualChox, EstimatedChox, Actual, Estimated, predictedTouchdown, Scheduled) match {
@@ -238,7 +226,7 @@ case class Arrival(Operator: Option[Operator],
       RedListPax = if (incoming.RedListPax.nonEmpty) incoming.RedListPax else this.RedListPax
     )
 
-  lazy val hasNoPaxSource: Boolean = !TotalPax.exists(_.pax.nonEmpty)
+  lazy val hasNoPaxSource: Boolean = !TotalPax.values.exists(_.nonEmpty)
 }
 
 object Arrival {
@@ -308,7 +296,7 @@ object Arrival {
             ApiPax: Option[Int] = None,
             ScheduledDeparture: Option[Long] = None,
             RedListPax: Option[Int] = None,
-            TotalPax: Set[TotalPaxSource] = Set.empty
+            TotalPax: Map[FeedSource, Option[Int]] = Map.empty
            ): Arrival = {
     val (carrierCode: CarrierCode, voyageNumber: VoyageNumber, maybeSuffix: Option[FlightCodeSuffix]) = {
       val bestCode = (rawIATA, rawICAO) match {

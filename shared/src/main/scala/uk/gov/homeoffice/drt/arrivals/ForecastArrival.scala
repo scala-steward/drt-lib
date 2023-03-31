@@ -41,6 +41,6 @@ case class ForecastArrival(carrierCode: CarrierCode,
     ApiPax = None,
     ScheduledDeparture = None,
     RedListPax = None,
-    TotalPax = Set(TotalPaxSource(totalPax, ForecastFeedSource))
+    TotalPax = Map(ForecastFeedSource -> totalPax)
   )
 }
