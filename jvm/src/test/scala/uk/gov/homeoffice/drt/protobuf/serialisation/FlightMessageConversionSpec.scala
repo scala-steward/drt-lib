@@ -41,13 +41,15 @@ class FlightMessageConversionSpec extends Specification {
     ApiPax = Option(96),
     ScheduledDeparture = Option(8L),
     RedListPax = Option(26),
-    TotalPax = Set(TotalPaxSource(Option(95), HistoricApiFeedSource),
-      TotalPaxSource(Option(0), ForecastFeedSource),
-      TotalPaxSource(Option(95), LiveFeedSource),
-      TotalPaxSource(Option(95), ApiFeedSource),
-      TotalPaxSource(Option(95), AclFeedSource),
-      TotalPaxSource(Option(95), LiveBaseFeedSource),
-      TotalPaxSource(Option(95), ScenarioSimulationSource))
+    TotalPax = Map(
+      HistoricApiFeedSource -> Option(95),
+      ForecastFeedSource -> Option(0),
+      LiveFeedSource -> Option(95),
+      ApiFeedSource -> Option(95),
+      AclFeedSource -> Option(95),
+      LiveBaseFeedSource -> Option(95),
+      ScenarioSimulationSource -> Option(95),
+    )
   )
 
   "Given an Arrival with no suffix" >> {

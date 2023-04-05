@@ -201,10 +201,10 @@ object FlightMessageConversion {
     )
   }
 
-  def convertTotalPaxToMessage(totalPax: Set[TotalPaxSource]): Seq[TotalPaxSourceMessage] =
-    totalPax.map(tp =>
-      TotalPaxSourceMessage(pax = tp.pax, feedSource = Option(tp.feedSource.name))
-    ).toSeq
+  def convertTotalPaxToMessage(totalPax: Map[FeedSource, Option[Int]]): Seq[TotalPaxSourceMessage] =
+    totalPax.map { case (source, maybePax) =>
+      TotalPaxSourceMessage(pax = maybePax, feedSource = Option(source.name))
+    }.toSeq
 
   def predictionsToMessage(predictions: Predictions): PredictionsMessage =
     PredictionsMessage(
@@ -260,12 +260,12 @@ object FlightMessageConversion {
     ApiPax = flightMessage.apiPax,
     RedListPax = flightMessage.redListPax,
     ScheduledDeparture = flightMessage.scheduledDeparture,
-    TotalPax = flightMessage.totalPax.map(totalPaxSourceFromMessage).toSet
+    TotalPax = flightMessage.totalPax.map(totalPaxSourceFromMessage).toMap
   )
 
-  def totalPaxSourceFromMessage(message: TotalPaxSourceMessage): TotalPaxSource = {
+  def totalPaxSourceFromMessage(message: TotalPaxSourceMessage): (FeedSource, Option[Int]) = {
     val feedSource = message.feedSource.flatMap(FeedSource.findByName).getOrElse(UnknownFeedSource)
-    TotalPaxSource(message.pax, feedSource)
+    (feedSource, message.pax)
   }
 
   def flightsToMessage(flights: Iterable[ApiFlightWithSplits]): FlightsWithSplitsMessage =
