@@ -6,9 +6,9 @@ import upickle.default._
 import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 trait FeedSource {
-  val name: String
+  def name: String
 
-  val displayName: String = name
+  def displayName: String = name
 
   val maybeLastUpdateThreshold: Option[FiniteDuration]
 
