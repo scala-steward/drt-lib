@@ -160,7 +160,13 @@ case class Arrival(Operator: Option[Operator],
   def fallBackToFeedSource: Option[TotalPaxSource] = {
     List(LiveFeedSource, ForecastFeedSource, AclFeedSource)
       .find(FeedSources.contains)
-      .map(s => TotalPaxSource(ActPax, s))
+      .map { s =>
+        (ActPax, TranPax) match {
+          case (Some(actPax), Some(tranPax)) if actPax - tranPax >= 0 => TotalPaxSource(Some(actPax - tranPax), s)
+          case (Some(actPax), Some(tranPax)) if actPax - tranPax < 0 => TotalPaxSource(Some(0), s)
+          case (maybeActPax, None) => TotalPaxSource(maybeActPax, s)
+        }
+      }
   }
 
   lazy val predictedTouchdown: Option[Long] =
