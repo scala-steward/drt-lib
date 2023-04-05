@@ -45,6 +45,7 @@ steps:
       - /root/entrypoint.sh
       - sbt --error +test
     environment:
+      JAVA_OPTS: -Xmx2g
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
       ARTIFACTORY_USERNAME: drt-artifactory-robot
