@@ -164,6 +164,7 @@ case class Arrival(Operator: Option[Operator],
         (ActPax, TranPax) match {
           case (Some(actPax), Some(tranPax)) if actPax - tranPax >= 0 => TotalPaxSource(Some(actPax - tranPax), s)
           case (Some(actPax), Some(tranPax)) if actPax - tranPax < 0 => TotalPaxSource(Some(0), s)
+          case (None, _) => TotalPaxSource(None, s)
           case (maybeActPax, None) => TotalPaxSource(maybeActPax, s)
         }
       }
