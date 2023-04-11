@@ -106,4 +106,31 @@ class ArrivalSpec extends Specification {
       arrival.bestPcpPaxEstimate mustEqual TotalPaxSource(aclFeedTotalPaxSource._2, aclFeedTotalPaxSource._1)
     }
   }
+  "fallBackToFeedSource should return known pax when the arrival feed sources contain one of live, forecast or acl" >> {
+    "when there is no act or trans we should get TotalPaxSource(None, _)" >> {
+      val arrival = ArrivalGenerator.arrival(feedSources = Set(LiveFeedSource), actPax = None, tranPax = None)
+
+      arrival.fallBackToFeedSource === Option(TotalPaxSource(None, LiveFeedSource))
+    }
+    "when there is no act but some trans we should get TotalPaxSource(None, _)" >> {
+      val arrival = ArrivalGenerator.arrival(feedSources = Set(LiveFeedSource), actPax = None, tranPax = Option(100))
+
+      arrival.fallBackToFeedSource === Option(TotalPaxSource(None, LiveFeedSource))
+    }
+    "when there is some act but no trans we should get TotalPaxSource(Some(act), _)" >> {
+      val arrival = ArrivalGenerator.arrival(feedSources = Set(LiveFeedSource), actPax = Option(100), tranPax = None)
+
+      arrival.fallBackToFeedSource === Option(TotalPaxSource(Option(100), LiveFeedSource))
+    }
+    "when there is some act and trans we should get TotalPaxSource(Some(act - trans), _)" >> {
+      val arrival = ArrivalGenerator.arrival(feedSources = Set(LiveFeedSource), actPax = Option(100), tranPax = Option(25))
+
+      arrival.fallBackToFeedSource === Option(TotalPaxSource(Option(75), LiveFeedSource))
+    }
+    "when there is some act and trans where trans > act we should get TotalPaxSource(Some(0), _)" >> {
+      val arrival = ArrivalGenerator.arrival(feedSources = Set(LiveFeedSource), actPax = Option(100), tranPax = Option(125))
+
+      arrival.fallBackToFeedSource === Option(TotalPaxSource(Option(0), LiveFeedSource))
+    }
+  }
 }
