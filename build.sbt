@@ -25,7 +25,7 @@ lazy val akkaVersion = "2.7.0"
 lazy val akkaPersistenceInMemoryVersion = "2.5.15.2"
 lazy val jodaVersion = "2.10.14"
 lazy val upickleVersion = "2.0.0"
-lazy val sparkMlLibVersion = "3.3.2"
+lazy val sparkMlLibVersion = "3.4.0"
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .in(file("."))
