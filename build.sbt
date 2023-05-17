@@ -18,7 +18,7 @@ lazy val root = project.in(file(".")).
     publishLocal := {},
     libraryDependencies ++= libDeps,
     crossScalaVersions := Nil,
-    logLevel := Level.Debug,
+    logLevel := Level.Debug
   )
 
 lazy val akkaVersion = "2.7.0"
