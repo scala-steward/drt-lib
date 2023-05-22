@@ -62,4 +62,18 @@ object ArrivalFeatureValuesExtractor {
       scribe.error(s"Unexpected message type ${unexpected.getClass} in walkTimeMinutes")
       None
   }
+
+  val passengerCount: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
+    case arrival: Arrival =>
+      for {
+        oneToManyValues <- oneToManyFeatureValues(arrival, features)
+        singleValues <- singleFeatureValues(arrival, features)
+      } yield {
+        (arrival.bestPcpPaxEstimate.getOrElse(0).toDouble, oneToManyValues, singleValues)
+      }
+
+    case unexpected =>
+      scribe.error(s"Unexpected message type ${unexpected.getClass} in passengerCount")
+      None
+  }
 }

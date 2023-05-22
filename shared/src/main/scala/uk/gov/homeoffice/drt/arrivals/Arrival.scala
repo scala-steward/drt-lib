@@ -157,8 +157,8 @@ case class Arrival(Operator: Option[Operator],
     )
 
     preferredSources
-      .find { case source => PassengerSources.get(source).exists(_.actual.isDefined) }
-      .flatMap { case source => PassengerSources.get(source).map(PaxSource(source, _)) }
+      .find(source => PassengerSources.get(source).exists(_.actual.isDefined))
+      .flatMap(source => PassengerSources.get(source).map(PaxSource(source, _)))
       .getOrElse(PaxSource(UnknownFeedSource, Passengers(None, None)))
 
   }

@@ -64,7 +64,30 @@ object FeatureColumns {
       case Carrier.label => Carrier
       case Origin.label => Origin
       case FlightNumber.label => FlightNumber
+      case BankHolidayWeekend.label => BankHolidayWeekend()
     }
+  }
+
+  case class BankHolidayWeekend(isBankHolidayWeekend: Long => Boolean) extends OneToMany[Arrival] {
+    override val label: String = BankHolidayWeekend.label
+    override val prefix: String = "bhw"
+    override val value: Arrival => Option[String] =
+      (a: Arrival) => Option(isBankHolidayWeekend(a.Scheduled).toString)
+  }
+
+  object BankHolidayWeekend {
+    val label: String = "bankHolidayWeekend"
+  }
+
+  case class MonthOfYear(monthOfYear: Long => Int) extends OneToMany[Arrival] {
+    override val label: String = MonthOfYear.label
+    override val prefix: String = "moy"
+    override val value: Arrival => Option[String] =
+      (a: Arrival) => Option(monthOfYear(a.Scheduled).toString)
+  }
+
+  object MonthOfYear {
+    val label: String = "monthOfYear"
   }
 
   case class DayOfWeek()(implicit sDateProvider: Long => SDateLike) extends OneToMany[Arrival] {
