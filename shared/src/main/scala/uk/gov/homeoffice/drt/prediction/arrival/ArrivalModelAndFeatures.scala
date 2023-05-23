@@ -2,7 +2,7 @@ package uk.gov.homeoffice.drt.prediction.arrival
 
 import uk.gov.homeoffice.drt.arrivals.Arrival
 import uk.gov.homeoffice.drt.prediction.ModelAndFeatures
-import uk.gov.homeoffice.drt.time.SDateLike
+import uk.gov.homeoffice.drt.time.{BankHolidays, LocalDate, SDateLike}
 
 
 trait ArrivalModelAndFeatures extends ModelAndFeatures {
@@ -58,13 +58,17 @@ object FeatureColumns {
   }
 
   object OneToMany {
-    def fromLabel(label: String)(implicit sDateProvider: Long => SDateLike): OneToMany[_] = label match {
+    def fromLabel(label: String)
+                 (implicit
+                  sDateProvider: Long => SDateLike,
+                  sDateFromLocalDate: LocalDate => SDateLike): OneToMany[_] = label match {
       case DayOfWeek.label => DayOfWeek()
       case PartOfDay.label => PartOfDay()
       case Carrier.label => Carrier
       case Origin.label => Origin
       case FlightNumber.label => FlightNumber
-      case BankHolidayWeekend.label => BankHolidayWeekend()
+      case BankHolidayWeekend.label =>
+        BankHolidayWeekend(ts => BankHolidays.isHolidayOrHolidayWeekend(sDateProvider(ts).toLocalDate))
     }
   }
 

@@ -8,7 +8,7 @@ import uk.gov.homeoffice.drt.actor.TerminalDateActor.GetState
 import uk.gov.homeoffice.drt.arrivals.Arrival
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, ModelCategory, RegressionModel}
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.{ModelAndFeaturesMessage, ModelsAndFeaturesMessage, RemoveModelMessage}
-import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
+import uk.gov.homeoffice.drt.time.{LocalDate, SDate, SDateLike}
 
 object PredictionModelActor {
   case object Ack
@@ -88,7 +88,8 @@ class PredictionModelActor(val now: () => SDateLike,
 
   override def persistenceId: String = s"${modelCategory.name}-prediction-${identifier.id}".toLowerCase
 
-  implicit val sdateProvider: Long => SDateLike = (ts: Long) => SDate(ts)
+  implicit val sdateFromLong: Long => SDateLike = (ts: Long) => SDate(ts)
+  implicit val sdateFromLocalDate: LocalDate => SDateLike = (ts: LocalDate) => SDate(ts)
 
   override def processRecoveryMessage: PartialFunction[Any, Unit] = {
     case RemoveModelMessage(targetName, _) =>

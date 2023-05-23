@@ -3,13 +3,17 @@ package uk.gov.homeoffice.drt.protobuf.serialisation
 import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{OneToMany, Single}
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, RegressionModel}
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures._
-import uk.gov.homeoffice.drt.time.SDateLike
+import uk.gov.homeoffice.drt.time.{LocalDate, SDateLike}
 
 object ModelAndFeaturesConversion {
-  def modelsAndFeaturesFromMessage[T](msg: ModelsAndFeaturesMessage)(implicit sdate: Long => SDateLike): Iterable[ModelAndFeatures] =
+  def modelsAndFeaturesFromMessage[T](msg: ModelsAndFeaturesMessage)
+                                     (implicit sdate: Long => SDateLike,
+                                      sdateFromLocalDate: LocalDate => SDateLike): Iterable[ModelAndFeatures] =
     msg.modelsAndFeatures.map(modelAndFeaturesFromMessage)
 
-  def modelAndFeaturesFromMessage[T](msg: ModelAndFeaturesMessage)(implicit sdate: Long => SDateLike): ModelAndFeatures = {
+  def modelAndFeaturesFromMessage[T](msg: ModelAndFeaturesMessage)
+                                    (implicit sdate: Long => SDateLike,
+                                     sdateFromLocalDate: LocalDate => SDateLike): ModelAndFeatures = {
     val model = msg.model.map(modelFromMessage).getOrElse(throw new Exception("No value for model"))
     val features = msg.features.map(featuresFromMessage).getOrElse(throw new Exception("No value for features"))
     val targetName = msg.targetName.getOrElse(throw new Exception("Mandatory parameter 'targetName' not specified"))
@@ -22,7 +26,11 @@ object ModelAndFeaturesConversion {
   def modelFromMessage(msg: RegressionModelMessage): RegressionModel =
     RegressionModel(msg.coefficients, msg.intercept.getOrElse(throw new Exception("No value for intercept")))
 
-  def featuresFromMessage(msg: FeaturesMessage)(implicit sdate: Long => SDateLike): FeaturesWithOneToManyValues = {
+  def featuresFromMessage(msg: FeaturesMessage)
+                         (implicit
+                          sdateFromLong: Long => SDateLike,
+                          sdateFromLocalDate: LocalDate => SDateLike,
+                         ): FeaturesWithOneToManyValues = {
     val singles = msg.singleFeatures.map(Single.fromLabel)
     val oneToManys = msg.oneToManyFeatures.map(OneToMany.fromLabel)
     val allFeatures = oneToManys ++ singles
