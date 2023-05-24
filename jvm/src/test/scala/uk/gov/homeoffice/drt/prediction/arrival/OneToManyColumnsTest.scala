@@ -4,10 +4,11 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.homeoffice.drt.arrivals.{Arrival, ArrivalGenerator}
 import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{DayOfWeek, OneToMany}
-import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
+import uk.gov.homeoffice.drt.time.{LocalDate, SDate, SDateLike}
 
 class OneToManyColumnsTest extends AnyWordSpec with Matchers {
-  implicit val sdate: Long => SDateLike = (ts: Long) => SDate(ts)
+  implicit val sdateFromLong: Long => SDateLike = (ts: Long) => SDate(ts)
+  implicit val sdateFromLocal: LocalDate => SDateLike = (ts: LocalDate) => SDate(ts)
   "DayOfWeek" should {
     "return the correct day index for an arrival's scheduled date" in {
       val c = OneToMany.fromLabel(DayOfWeek.label)
