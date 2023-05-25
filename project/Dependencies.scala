@@ -2,7 +2,7 @@ import sbt._
 
 object Dependencies {
   val scalaTest = "3.2.15"
-  val uPickle = "2.0.0"
+  val uPickle = "3.1.0"
   val autowire = "0.3.3"
   val booPickle = "1.3.3"
   val specs2 = "4.10.6"
