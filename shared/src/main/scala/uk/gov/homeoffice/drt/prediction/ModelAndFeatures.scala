@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.prediction
 
 import uk.gov.homeoffice.drt.arrivals.Arrival
-import uk.gov.homeoffice.drt.prediction.arrival.{OffScheduleModelAndFeatures, ToChoxModelAndFeatures, WalkTimeModelAndFeatures}
+import uk.gov.homeoffice.drt.prediction.arrival.{OffScheduleModelAndFeatures, PaxModelAndFeatures, ToChoxModelAndFeatures, WalkTimeModelAndFeatures}
 
 trait ModelAndFeatures {
   val model: RegressionModel
@@ -24,6 +24,8 @@ object ModelAndFeatures {
       ToChoxModelAndFeatures(model, fts, examplesTrainedOn, improvementPct)
     case (WalkTimeModelAndFeatures.targetName, fts: FeaturesWithOneToManyValues) =>
       WalkTimeModelAndFeatures(model, fts, examplesTrainedOn, improvementPct)
+    case (PaxModelAndFeatures.targetName, fts: FeaturesWithOneToManyValues) =>
+      PaxModelAndFeatures(model, fts, examplesTrainedOn, improvementPct)
     case unknown =>
       throw new RuntimeException(s"Unrecognised model name: $unknown")
   }

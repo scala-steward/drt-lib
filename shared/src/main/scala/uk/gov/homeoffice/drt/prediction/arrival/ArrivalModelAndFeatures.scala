@@ -67,6 +67,7 @@ object FeatureColumns {
       case Carrier.label => Carrier
       case Origin.label => Origin
       case FlightNumber.label => FlightNumber
+      case MonthOfYear.label => MonthOfYear(ts => sDateProvider(ts).getMonth)
       case BankHolidayWeekend.label =>
         BankHolidayWeekend(ts => BankHolidays.isHolidayOrHolidayWeekend(sDateProvider(ts).toLocalDate))
     }
