@@ -49,7 +49,7 @@ object FeatureColumns {
   case object BestPax extends Single[Arrival] {
     override val label: String = "bestPax"
     override val prefix: String = "bestpax"
-    override val value: Arrival => Option[Double] = (a: Arrival) => a.bestPcpPaxEstimate.pax.map(_.toDouble)
+    override val value: Arrival => Option[Double] = (a: Arrival) => a.bestPaxEstimate.passengers.getPcpPax.map(_.toDouble)
   }
 
   sealed trait OneToMany[T] extends Feature[T] {
