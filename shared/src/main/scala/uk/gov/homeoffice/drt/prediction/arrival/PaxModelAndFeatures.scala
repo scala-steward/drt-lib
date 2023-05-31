@@ -7,9 +7,9 @@ object PaxModelAndFeatures {
 }
 
 case class PaxModelAndFeatures(model: RegressionModel,
-                                       features: FeaturesWithOneToManyValues,
-                                       examplesTrainedOn: Int,
-                                       improvementPct: Double,
-                                      ) extends ArrivalModelAndFeatures {
+                               features: FeaturesWithOneToManyValues,
+                               examplesTrainedOn: Int,
+                               improvementPct: Double,
+                              ) extends ArrivalModelAndFeatures {
   override val targetName: String = PaxModelAndFeatures.targetName
 }

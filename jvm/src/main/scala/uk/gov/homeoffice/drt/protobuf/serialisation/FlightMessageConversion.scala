@@ -231,32 +231,38 @@ object FlightMessageConversion {
         Predictions(predictions.updatedAt.getOrElse(0L), modelPredictions.toMap)
     }
 
-  def flightMessageToApiFlight(flightMessage: FlightMessage): Arrival = Arrival(
-    Operator = flightMessage.operator.map(Operator),
-    Status = ArrivalStatus(flightMessage.status.getOrElse("")),
-    Estimated = flightMessage.estimated,
-    Predictions = predictionsFromMessage(flightMessage.predictions),
-    Actual = flightMessage.touchdown,
-    EstimatedChox = flightMessage.estimatedChox,
-    ActualChox = flightMessage.actualChox,
-    Gate = flightMessage.gate,
-    Stand = flightMessage.stand,
-    MaxPax = flightMessage.maxPax,
-    RunwayID = flightMessage.runwayID,
-    BaggageReclaimId = flightMessage.baggageReclaimId,
-    AirportID = PortCode(flightMessage.airportID.getOrElse("")),
-    Terminal = Terminal(flightMessage.terminal.getOrElse("")),
-    rawICAO = flightMessage.iCAO.getOrElse(""),
-    rawIATA = flightMessage.iATA.getOrElse(""),
-    Origin = PortCode(flightMessage.origin.getOrElse("")),
-    PcpTime = flightMessage.pcpTime,
-    Scheduled = flightMessage.scheduled.getOrElse(0L),
-    FeedSources = getFeedSources(flightMessage.feedSources),
-    CarrierScheduled = flightMessage.carrierScheduled,
-    RedListPax = flightMessage.redListPax,
-    ScheduledDeparture = flightMessage.scheduledDeparture,
-    PassengerSources = getPassengerSources(flightMessage)
-  )
+  def flightMessageToApiFlight(flightMessage: FlightMessage): Arrival = {
+    val passengerSources = getPassengerSources(flightMessage)
+//    if (!passengerSources.exists(_._2.actual.nonEmpty)) {
+//      println(s"Flight ${flightMessage.iATA} has no pax: ${flightMessage.apiPaxOLD} / ${flightMessage.apiPaxOLD} / ${flightMessage.totalPax}")
+//    }
+    Arrival(
+      Operator = flightMessage.operator.map(Operator),
+      Status = ArrivalStatus(flightMessage.status.getOrElse("")),
+      Estimated = flightMessage.estimated,
+      Predictions = predictionsFromMessage(flightMessage.predictions),
+      Actual = flightMessage.touchdown,
+      EstimatedChox = flightMessage.estimatedChox,
+      ActualChox = flightMessage.actualChox,
+      Gate = flightMessage.gate,
+      Stand = flightMessage.stand,
+      MaxPax = flightMessage.maxPax,
+      RunwayID = flightMessage.runwayID,
+      BaggageReclaimId = flightMessage.baggageReclaimId,
+      AirportID = PortCode(flightMessage.airportID.getOrElse("")),
+      Terminal = Terminal(flightMessage.terminal.getOrElse("")),
+      rawICAO = flightMessage.iCAO.getOrElse(""),
+      rawIATA = flightMessage.iATA.getOrElse(""),
+      Origin = PortCode(flightMessage.origin.getOrElse("")),
+      PcpTime = flightMessage.pcpTime,
+      Scheduled = flightMessage.scheduled.getOrElse(0L),
+      FeedSources = getFeedSources(flightMessage.feedSources),
+      CarrierScheduled = flightMessage.carrierScheduled,
+      RedListPax = flightMessage.redListPax,
+      ScheduledDeparture = flightMessage.scheduledDeparture,
+      PassengerSources = passengerSources
+    )
+  }
 
   private def passengerSourcesFromV1(flightMessage: FlightMessage): Map[FeedSource, Passengers] = {
     val source: FeedSource = if (flightMessage.actualChox.isDefined) LiveFeedSource else UnknownFeedSource

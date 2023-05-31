@@ -112,6 +112,8 @@ trait SDateLike {
 
   def <=(compareTo: Long): Boolean = millisSinceEpoch <= compareTo
 
+  def >=(compareTo: SDateLike): Boolean = millisSinceEpoch >= compareTo.millisSinceEpoch
+
   def >=(compareTo: Long): Boolean = millisSinceEpoch >= compareTo
 
   def daysBetweenInclusive(that: SDateLike): Int = ((millisSinceEpoch - that.millisSinceEpoch) / oneDayMillis).abs.toInt + 1

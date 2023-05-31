@@ -3,7 +3,8 @@ package uk.gov.homeoffice.drt.protobuf.serialisation
 import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{OneToMany, Single}
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, RegressionModel}
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures._
-import uk.gov.homeoffice.drt.time.{LocalDate, SDateLike}
+import uk.gov.homeoffice.drt.time.MilliTimes.oneDayMillis
+import uk.gov.homeoffice.drt.time.{LocalDate, SDate, SDateLike}
 
 object ModelAndFeaturesConversion {
   def modelsAndFeaturesFromMessage[T](msg: ModelsAndFeaturesMessage)
@@ -31,6 +32,8 @@ object ModelAndFeaturesConversion {
                           sdateFromLong: Long => SDateLike,
                           sdateFromLocalDate: LocalDate => SDateLike,
                          ): FeaturesWithOneToManyValues = {
+    implicit val elapsedDays = (ts: Long) => ((SDate(ts).millisSinceEpoch - SDate("2022-04-01").millisSinceEpoch) / oneDayMillis).toInt
+    implicit val now = () => SDate.now()
     val singles = msg.singleFeatures.map(Single.fromLabel)
     val oneToManys = msg.oneToManyFeatures.map(OneToMany.fromLabel)
     val allFeatures = oneToManys ++ singles

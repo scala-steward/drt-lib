@@ -4,10 +4,11 @@ import org.specs2.mutable.Specification
 import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{BestPax, DayOfWeek}
 import uk.gov.homeoffice.drt.prediction.arrival.OffScheduleModelAndFeatures
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, RegressionModel}
-import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
+import uk.gov.homeoffice.drt.time.{LocalDate, SDate, SDateLike}
 
 class ModelAndFeaturesConversionTest extends Specification {
-  implicit val sdateProvider: Long => SDateLike = (ts: Long) => SDate(ts)
+  implicit val sdateTs: Long => SDateLike = (ts: Long) => SDate(ts)
+  implicit val sdateLocal: LocalDate => SDateLike = (local: LocalDate) => SDate(local)
 
   "Given a ModelAndFeatures class" >> {
     "I should be able to serialise and deserialise it back to its original form" >> {
