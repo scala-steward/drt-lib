@@ -68,14 +68,9 @@ object ArrivalFeatureValuesExtractor {
       for {
         oneToManyValues <- oneToManyFeatureValues(arrival, features)
         singleValues <- singleFeatureValues(arrival, features)
+        paxCount <- arrival.bestPcpPaxEstimate
       } yield {
-        val i = arrival.bestPcpPaxEstimate.getOrElse {
-          arrival.MaxPax match {
-            case Some(maxPax) if maxPax > 0 => (0.8 * maxPax).toInt
-            case _ => 175
-          }
-        }
-        (i.toDouble, oneToManyValues, singleValues)
+        (paxCount.toDouble, oneToManyValues, singleValues)
       }
 
     case unexpected =>

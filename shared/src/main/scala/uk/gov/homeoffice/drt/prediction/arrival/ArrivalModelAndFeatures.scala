@@ -79,6 +79,7 @@ object FeatureColumns {
       case ChristmasDay.label => ChristmasDay()
       case OctoberHalfTerm.label => OctoberHalfTerm()
       case ChristmasHoliday.label => ChristmasHoliday()
+      case SpringHalfTerm.label => SpringHalfTerm()
       case EasterHoliday.label => EasterHoliday()
       case SummerHalfTerm.label => SummerHalfTerm()
       case SummerHoliday.label => SummerHoliday()
@@ -223,6 +224,23 @@ object FeatureColumns {
 
   object OctoberHalfTerm {
     val label: String = "octHalfTerm"
+  }
+
+  case class SpringHalfTerm()
+                            (implicit
+                             val sDateTs: Long => SDateLike,
+                             val sDateLocalDate: LocalDate => SDateLike,
+                            ) extends OneToMany[Arrival] with HolidayLike {
+    override val label: String = SpringHalfTerm.label
+    override val prefix: String = "sprht"
+    override val hols: Seq[(LocalDate, LocalDate)] = Seq(
+      (LocalDate(2022, 2, 14), LocalDate(2022, 2, 18)),
+      (LocalDate(2023, 2, 13), LocalDate(2023, 2, 17)),
+    )
+  }
+
+  object SpringHalfTerm {
+    val label: String = "springHalfTerm"
   }
 
   case class EasterHoliday()

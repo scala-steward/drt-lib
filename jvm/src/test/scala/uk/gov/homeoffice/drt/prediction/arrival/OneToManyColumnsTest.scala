@@ -9,6 +9,8 @@ import uk.gov.homeoffice.drt.time.{LocalDate, SDate, SDateLike}
 class OneToManyColumnsTest extends AnyWordSpec with Matchers {
   implicit val sdateFromLong: Long => SDateLike = (ts: Long) => SDate(ts)
   implicit val sdateFromLocal: LocalDate => SDateLike = (ts: LocalDate) => SDate(ts)
+  implicit val now = () => SDate.now()
+
   "DayOfWeek" should {
     "return the correct day index for an arrival's scheduled date" in {
       val c = OneToMany.fromLabel(DayOfWeek.label)
