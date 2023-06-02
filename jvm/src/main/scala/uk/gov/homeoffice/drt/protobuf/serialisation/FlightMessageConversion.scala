@@ -233,9 +233,6 @@ object FlightMessageConversion {
 
   def flightMessageToApiFlight(flightMessage: FlightMessage): Arrival = {
     val passengerSources = getPassengerSources(flightMessage)
-//    if (!passengerSources.exists(_._2.actual.nonEmpty)) {
-//      println(s"Flight ${flightMessage.iATA} has no pax: ${flightMessage.apiPaxOLD} / ${flightMessage.apiPaxOLD} / ${flightMessage.totalPax}")
-//    }
     Arrival(
       Operator = flightMessage.operator.map(Operator),
       Status = ArrivalStatus(flightMessage.status.getOrElse("")),

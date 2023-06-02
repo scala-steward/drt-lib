@@ -297,7 +297,6 @@ object FeatureColumns {
         .map { case (start, end) =>
           val startWithBuffer = sDateLocalDate(start).addDays(-2).toLocalDate
           val endWithBuffer = sDateLocalDate(end).addDays(2).toLocalDate
-          //          println(s"range: ${localDateRange(startWithBuffer, endWithBuffer).mkString(", ")}")
           localDateRange(startWithBuffer, endWithBuffer).indexOf(localDate).toString
         }
         .getOrElse("no")

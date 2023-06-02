@@ -1,7 +1,8 @@
 package uk.gov.homeoffice.drt.prediction.arrival
 
 import cats.implicits.toTraverseOps
-import uk.gov.homeoffice.drt.arrivals.Arrival
+import uk.gov.homeoffice.drt.arrivals.{Arrival, ArrivalStatus, Passengers}
+import uk.gov.homeoffice.drt.ports.{ApiFeedSource, LiveFeedSource}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{Feature, OneToMany, Single}
 
@@ -17,7 +18,7 @@ object ArrivalFeatureValuesExtractor {
     }.traverse(identity)
 
   val minutesOffSchedule: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
-    case arrival: Arrival =>
+    arrival =>
       for {
         touchdown <- arrival.Actual
         oneToManyValues <- oneToManyFeatureValues(arrival, features)
@@ -26,13 +27,10 @@ object ArrivalFeatureValuesExtractor {
         val minutes = (touchdown - arrival.Scheduled).toDouble / 60000
         (minutes, oneToManyValues, singleValues)
       }
-    case unexpected =>
-      scribe.error(s"Unexpected message type ${unexpected.getClass} in minutesOffSchedule")
-      None
   }
 
   val minutesToChox: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
-    case arrival: Arrival =>
+    arrival =>
       for {
         touchdown <- arrival.Actual
         actualChox <- arrival.ActualChox
@@ -42,14 +40,11 @@ object ArrivalFeatureValuesExtractor {
         val minutes = (actualChox - touchdown).toDouble / 60000
         (minutes, oneToManyValues, singleValues)
       }
-    case unexpected =>
-      scribe.error(s"Unexpected message type ${unexpected.getClass} in minutesToChox")
-      None
   }
 
   def walkTimeMinutes(walkTimeProvider: (Terminal, String, String) => Option[Int],
                      ): Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
-    case arrival: Arrival =>
+    arrival =>
       for {
         walkTimeMinutes <- walkTimeProvider(arrival.Terminal, arrival.Gate.getOrElse(""), arrival.Stand.getOrElse(""))
         oneToManyValues <- oneToManyFeatureValues(arrival, features)
@@ -57,14 +52,14 @@ object ArrivalFeatureValuesExtractor {
       } yield {
         (walkTimeMinutes.toDouble, oneToManyValues, singleValues)
       }
-
-    case unexpected =>
-      scribe.error(s"Unexpected message type ${unexpected.getClass} in walkTimeMinutes")
-      None
   }
 
   val passengerCount: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
-    case arrival: Arrival =>
+    case arrival if noReliablePaxCount(arrival) =>
+      scribe.info(s"Missing live or API passenger count for arrival ${arrival.flightCodeString}")
+      None
+    case arrival if arrival.Status == ArrivalStatus("Cancelled") => None
+    case arrival =>
       for {
         oneToManyValues <- oneToManyFeatureValues(arrival, features)
         singleValues <- singleFeatureValues(arrival, features)
@@ -72,9 +67,28 @@ object ArrivalFeatureValuesExtractor {
       } yield {
         (paxCount.toDouble, oneToManyValues, singleValues)
       }
+  }
 
-    case unexpected =>
-      scribe.error(s"Unexpected message type ${unexpected.getClass} in passengerCount")
+  private def noReliablePaxCount(arrival: Arrival): Boolean = {
+    !arrival.PassengerSources.exists {
+      case (feedSource, Passengers(maybePax, _)) => List(ApiFeedSource, LiveFeedSource).contains(feedSource) && maybePax.nonEmpty
+    }
+  }
+
+  val percentCapacity: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
+    case arrival if noReliablePaxCount(arrival) =>
+      scribe.info(s"Missing live or API passenger count for arrival ${arrival.flightCodeString}")
       None
+    case arrival if arrival.Status == ArrivalStatus("Cancelled") => None
+    case arrival =>
+      for {
+        oneToManyValues <- oneToManyFeatureValues(arrival, features)
+        singleValues <- singleFeatureValues(arrival, features)
+        paxCount <- arrival.bestPcpPaxEstimate
+        maxPax <- arrival.MaxPax
+      } yield {
+        val pctFull = 100 * paxCount.toDouble / maxPax
+        (pctFull, oneToManyValues, singleValues)
+      }
   }
 }
