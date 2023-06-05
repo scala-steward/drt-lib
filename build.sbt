@@ -18,12 +18,12 @@ lazy val root = project.in(file(".")).
     publishLocal := {},
     libraryDependencies ++= libDeps,
     crossScalaVersions := Nil,
-    logLevel := Level.Debug,
+    logLevel := Level.Debug
   )
 
 lazy val akkaVersion = "2.7.0"
 lazy val akkaPersistenceInMemoryVersion = "2.5.15.2"
-lazy val jodaVersion = "2.10.14"
+lazy val jodaVersion = "2.12.5"
 lazy val upickleVersion = "2.0.0"
 lazy val sparkMlLibVersion = "3.3.2"
 
@@ -45,8 +45,8 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
       "joda-time" % "joda-time" % jodaVersion,
       "com.lihaoyi" %%% "upickle" % upickleVersion,
-      "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion,
-
+      "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion excludeAll ("org.scala-lang.modules", "scala-xml"),
+      "org.scala-lang.modules" %% "scala-xml" % "2.1.0" force(),
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
       "com.github.dnvriend" %% "akka-persistence-inmemory" % akkaPersistenceInMemoryVersion % "test"
     ),
