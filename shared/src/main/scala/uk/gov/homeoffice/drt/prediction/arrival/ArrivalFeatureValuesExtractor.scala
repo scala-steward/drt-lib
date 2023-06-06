@@ -76,8 +76,11 @@ object ArrivalFeatureValuesExtractor {
   }
 
   val percentCapacity: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
+    case arrival if arrival.MaxPax.isEmpty =>
+      scribe.info(s"Missing capacity for arrival ${arrival.flightCodeString} / ${arrival.Origin}")
+      None
     case arrival if noReliablePaxCount(arrival) =>
-      scribe.info(s"Missing live or API passenger count for arrival ${arrival.flightCodeString}")
+      scribe.info(s"Missing live or API passenger count for arrival ${arrival.flightCodeString} / ${arrival.Origin}")
       None
     case arrival if arrival.Status == ArrivalStatus("Cancelled") => None
     case arrival =>
