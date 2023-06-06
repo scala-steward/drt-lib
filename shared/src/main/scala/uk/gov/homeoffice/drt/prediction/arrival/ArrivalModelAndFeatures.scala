@@ -233,6 +233,8 @@ object FeatureColumns {
                             ) extends OneToMany[Arrival] with HolidayLike {
     override val label: String = SpringHalfTerm.label
     override val prefix: String = "sprht"
+    override val startBufferDays: Int = 5
+    override val endBufferDays: Int = 10
     override val hols: Seq[(LocalDate, LocalDate)] = Seq(
       (LocalDate(2022, 2, 14), LocalDate(2022, 2, 18)),
       (LocalDate(2023, 2, 13), LocalDate(2023, 2, 17)),
@@ -250,6 +252,8 @@ object FeatureColumns {
                           ) extends OneToMany[Arrival] with HolidayLike {
     override val label: String = EasterHoliday.label
     override val prefix: String = "easter"
+    override val startBufferDays: Int = 7
+    override val endBufferDays: Int = 7
     override val hols: Seq[(LocalDate, LocalDate)] = Seq(
       (LocalDate(2022, 4, 4), LocalDate(2022, 4, 18)),
       (LocalDate(2023, 4, 3), LocalDate(2023, 4, 14)),

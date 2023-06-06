@@ -54,21 +54,6 @@ object ArrivalFeatureValuesExtractor {
       }
   }
 
-  val passengerCount: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
-    case arrival if noReliablePaxCount(arrival) =>
-      scribe.info(s"Missing live or API passenger count for arrival ${arrival.flightCodeString}")
-      None
-    case arrival if arrival.Status == ArrivalStatus("Cancelled") => None
-    case arrival =>
-      for {
-        oneToManyValues <- oneToManyFeatureValues(arrival, features)
-        singleValues <- singleFeatureValues(arrival, features)
-        paxCount <- arrival.bestPcpPaxEstimate
-      } yield {
-        (paxCount.toDouble, oneToManyValues, singleValues)
-      }
-  }
-
   private def noReliablePaxCount(arrival: Arrival): Boolean = {
     !arrival.PassengerSources.exists {
       case (feedSource, Passengers(maybePax, _)) => List(ApiFeedSource, LiveFeedSource).contains(feedSource) && maybePax.nonEmpty
@@ -77,10 +62,10 @@ object ArrivalFeatureValuesExtractor {
 
   val percentCapacity: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
     case arrival if arrival.MaxPax.isEmpty =>
-      scribe.info(s"Missing capacity for arrival ${arrival.flightCodeString} / ${arrival.Origin}")
+      scribe.debug(s"Missing capacity for arrival ${arrival.flightCodeString} / ${arrival.Origin}")
       None
     case arrival if noReliablePaxCount(arrival) =>
-      scribe.info(s"Missing live or API passenger count for arrival ${arrival.flightCodeString} / ${arrival.Origin}")
+      scribe.debug(s"Missing live or API passenger count for arrival ${arrival.flightCodeString} / ${arrival.Origin}")
       None
     case arrival if arrival.Status == ArrivalStatus("Cancelled") => None
     case arrival =>
