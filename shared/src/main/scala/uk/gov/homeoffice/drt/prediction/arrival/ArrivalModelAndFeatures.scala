@@ -446,7 +446,7 @@ object FeatureColumns {
         .map { case (start, end) =>
           val daysInHoliday = localDateRange(start, end)
           val dayOfHoliday = daysInHoliday.indexOf(localDate) + 1
-          val numParts = if (daysInHoliday.size <= 28) daysInHoliday.size else 28
+          val numParts = if (daysInHoliday.size <= 21) daysInHoliday.size else 21
           val fraction = 1d / numParts
           val partOfHoliday = (dayOfHoliday.toDouble / daysInHoliday.size / fraction).round.toInt
 
