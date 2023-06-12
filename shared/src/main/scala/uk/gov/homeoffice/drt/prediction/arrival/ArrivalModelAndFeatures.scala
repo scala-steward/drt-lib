@@ -55,7 +55,7 @@ object FeatureColumns {
     override val value: Arrival => Option[Double] = _.bestPaxEstimate.passengers.getPcpPax.map(_.toDouble)
   }
 
-  sealed trait OneToMany[T] extends Feature[T] {
+  trait OneToMany[T] extends Feature[T] {
     val label: String
     val value: T => Option[String]
   }
@@ -77,11 +77,17 @@ object FeatureColumns {
       case Year.label => Year()
       case DayOfMonth.label => DayOfMonth()
       case ChristmasDay.label => ChristmasDay()
+      case Term1a.label => Term1a()
       case OctoberHalfTerm.label => OctoberHalfTerm()
+      case Term1b.label => Term1b()
       case ChristmasHoliday.label => ChristmasHoliday()
+      case Term2a.label => Term2a()
       case SpringHalfTerm.label => SpringHalfTerm()
+      case Term2b.label => Term2b()
       case EasterHoliday.label => EasterHoliday()
+      case Term3a.label => Term3a()
       case SummerHalfTerm.label => SummerHalfTerm()
+      case Term3b.label => Term3b()
       case SummerHoliday.label => SummerHoliday()
       case BankHolidayWeekend.label =>
         BankHolidayWeekend(ts => BankHolidays.isHolidayOrHolidayWeekend(sDateProvider(ts).toLocalDate))
@@ -399,7 +405,18 @@ object FeatureColumns {
 
     val sDateTs: Long => SDateLike
     implicit val sDateLocalDate: LocalDate => SDateLike
-    val value: Arrival => Option[String] = (a: Arrival) => dayOfHoliday(sDateTs(a.Scheduled).toLocalDate)
+    val value: Arrival => Option[String] = (a: Arrival) => dayOfHolidayNoBuffer(sDateTs(a.Scheduled).toLocalDate)
+
+    def localDateRange(start: LocalDate, end: LocalDate)
+                      (implicit sdate: LocalDate => SDateLike): Seq[LocalDate] = {
+      @tailrec
+      def constructRange(date: LocalDate, acc: List[LocalDate]): List[LocalDate] = {
+        if (date == end) (date :: acc).reverse
+        else constructRange(sdate(date).addDays(1).toLocalDate, date :: acc)
+      }
+
+      constructRange(start, List.empty)
+    }
 
     def dayOfHoliday(localDate: LocalDate): Option[String] = {
       val date = sDateLocalDate(localDate)
@@ -418,15 +435,25 @@ object FeatureColumns {
       Option(day)
     }
 
-    def localDateRange(start: LocalDate, end: LocalDate)
-                      (implicit sdate: LocalDate => SDateLike): Seq[LocalDate] = {
-      @tailrec
-      def constructRange(date: LocalDate, acc: List[LocalDate]): List[LocalDate] = {
-        if (date == end) (date :: acc).reverse
-        else constructRange(sdate(date).addDays(1).toLocalDate, date :: acc)
-      }
+    def dayOfHolidayNoBuffer(localDate: LocalDate): Option[String] = {
+      val date = sDateLocalDate(localDate)
+      val day = hols
+        .find { case (start, end) =>
+          val afterStart = date >= sDateLocalDate(start)
+          val beforeEnd = date <= sDateLocalDate(end)
+          afterStart && beforeEnd
+        }
+        .map { case (start, end) =>
+          val daysInHoliday = localDateRange(start, end)
+          val dayOfHoliday = daysInHoliday.indexOf(localDate) + 1
+          val numParts = if (daysInHoliday.size <= 28) daysInHoliday.size else 28
+          val fraction = 1d / numParts
+          val partOfHoliday = (dayOfHoliday.toDouble / daysInHoliday.size / fraction).round.toInt
 
-      constructRange(start, List.empty)
+          partOfHoliday.toString
+        }
+        .getOrElse("no")
+      Option(day)
     }
   }
 
