@@ -88,10 +88,12 @@ object FeatureColumns {
       case Term3a.label => Term3a()
       case SummerHalfTerm.label => SummerHalfTerm()
       case Term3b.label => Term3b()
+      case PreSummerHoliday.label => PreSummerHoliday()
       case SummerHoliday.label => SummerHoliday()
       case BankHolidayWeekend.label =>
         BankHolidayWeekend(ts => BankHolidays.isHolidayOrHolidayWeekend(sDateProvider(ts).toLocalDate))
       case Since6MonthsAgo.label => Since6MonthsAgo(now)
+      case PrePandemicRecovery.label => PrePandemicRecovery(sDateFromLocalDate(LocalDate(2022, 6, 1)))
     }
   }
 
@@ -164,6 +166,21 @@ object FeatureColumns {
     val label: String = "dayOfTheWeek"
   }
 
+  case class PrePandemicRecovery(recoveryDate: SDateLike)
+                                (implicit sDateProvider: Long => SDateLike) extends OneToMany[Arrival] {
+    override val label: String = PrePandemicRecovery.label
+    override val prefix: String = "pdr"
+    override val value: Arrival => Option[String] =
+      (a: Arrival) => {
+        val isPre = if (sDateProvider(a.Scheduled) < recoveryDate) "y" else "n"
+        Option(isPre)
+      }
+  }
+
+  object PrePandemicRecovery {
+    val label: String = "prePanRecovery"
+  }
+
   case class ChristmasDay()(implicit sDateProvider: Long => SDateLike) extends OneToMany[Arrival] {
     override val label: String = ChristmasDay.label
     override val prefix: String = "dow"
@@ -233,6 +250,24 @@ object FeatureColumns {
     val label: String = "term3SecondHalf"
   }
 
+  case class PreSummerHoliday()
+                          (implicit
+                           val sDateTs: Long => SDateLike,
+                           val sDateLocalDate: LocalDate => SDateLike,
+                          ) extends OneToMany[Arrival] with HolidayLike {
+    override val label: String = PreSummerHoliday.label
+    override val prefix: String = "psumhol"
+    override val hols: Seq[(LocalDate, LocalDate)] = Seq(
+      (LocalDate(2022, 6, 28), LocalDate(2022, 7, 24)),
+      (LocalDate(2023, 6, 26), LocalDate(2023, 7, 23)),
+      (LocalDate(2024, 6, 24), LocalDate(2024, 7, 24)),
+    )
+  }
+
+  object PreSummerHoliday {
+    val label: String = "preSummerHoliday"
+  }
+
   case class SummerHoliday()
                           (implicit
                            val sDateTs: Long => SDateLike,
@@ -240,8 +275,6 @@ object FeatureColumns {
                           ) extends OneToMany[Arrival] with HolidayLike {
     override val label: String = SummerHoliday.label
     override val prefix: String = "sumhol"
-    override val startBufferDays: Int = 10
-    override val endBufferDays: Int = 10
     override val hols: Seq[(LocalDate, LocalDate)] = Seq(
       (LocalDate(2022, 7, 25), LocalDate(2022, 8, 31)),
       (LocalDate(2023, 7, 24), LocalDate(2023, 9, 3)),
@@ -311,7 +344,6 @@ object FeatureColumns {
                              ) extends OneToMany[Arrival] with HolidayLike {
     override val label: String = ChristmasHoliday.label
     override val prefix: String = "xmas"
-    override val startBufferDays: Int = 12
     override val hols: Seq[(LocalDate, LocalDate)] = Seq(
       (LocalDate(2022, 12, 19), LocalDate(2023, 1, 2)),
       (LocalDate(2023, 12, 22), LocalDate(2024, 1, 7)),
@@ -347,8 +379,6 @@ object FeatureColumns {
                            ) extends OneToMany[Arrival] with HolidayLike {
     override val label: String = SpringHalfTerm.label
     override val prefix: String = "sprht"
-    override val startBufferDays: Int = 5
-    override val endBufferDays: Int = 10
     override val hols: Seq[(LocalDate, LocalDate)] = Seq(
       (LocalDate(2022, 2, 14), LocalDate(2022, 2, 20)),
       (LocalDate(2023, 2, 13), LocalDate(2023, 2, 19)),
@@ -385,8 +415,6 @@ object FeatureColumns {
                           ) extends OneToMany[Arrival] with HolidayLike {
     override val label: String = EasterHoliday.label
     override val prefix: String = "easter"
-    override val startBufferDays: Int = 7
-    override val endBufferDays: Int = 7
     override val hols: Seq[(LocalDate, LocalDate)] = Seq(
       (LocalDate(2022, 4, 4), LocalDate(2022, 4, 18)),
       (LocalDate(2023, 4, 3), LocalDate(2023, 4, 16)),
@@ -400,12 +428,10 @@ object FeatureColumns {
 
   trait HolidayLike {
     val hols: Seq[(LocalDate, LocalDate)]
-    val startBufferDays: Int = 2
-    val endBufferDays: Int = 2
 
     val sDateTs: Long => SDateLike
     implicit val sDateLocalDate: LocalDate => SDateLike
-    val value: Arrival => Option[String] = (a: Arrival) => dayOfHolidayNoBuffer(sDateTs(a.Scheduled).toLocalDate)
+    val value: Arrival => Option[String] = (a: Arrival) => dayOfHoliday(sDateTs(a.Scheduled).toLocalDate)
 
     def localDateRange(start: LocalDate, end: LocalDate)
                       (implicit sdate: LocalDate => SDateLike): Seq[LocalDate] = {
@@ -419,23 +445,6 @@ object FeatureColumns {
     }
 
     def dayOfHoliday(localDate: LocalDate): Option[String] = {
-      val date = sDateLocalDate(localDate)
-      val day = hols
-        .find { case (start, end) =>
-          val afterStart = date >= sDateLocalDate(start).addDays(-startBufferDays)
-          val beforeEnd = date <= sDateLocalDate(end).addDays(endBufferDays)
-          afterStart && beforeEnd
-        }
-        .map { case (start, end) =>
-          val startWithBuffer = sDateLocalDate(start).addDays(-2).toLocalDate
-          val endWithBuffer = sDateLocalDate(end).addDays(2).toLocalDate
-          localDateRange(startWithBuffer, endWithBuffer).indexOf(localDate).toString
-        }
-        .getOrElse("no")
-      Option(day)
-    }
-
-    def dayOfHolidayNoBuffer(localDate: LocalDate): Option[String] = {
       val date = sDateLocalDate(localDate)
       val day = hols
         .find { case (start, end) =>

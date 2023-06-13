@@ -29,8 +29,7 @@ class HolidayLikeSpec extends AnyWordSpec with Matchers {
         val arrival = ArrivalGenerator.arrival(sch = SDate("2023-01-1T00:00").addDays(d).millisSinceEpoch)
         holiday.value(arrival)
       }
-      println(s"values: $values")
-      values should ===(Seq.fill(5)(Option("0")))
+      values should ===((1 to 7).map(n => Some(n.toString)))
     }
   }
 }

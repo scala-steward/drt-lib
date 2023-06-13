@@ -1,5 +1,6 @@
 package uk.gov.homeoffice.drt.actor
 
+import akka.persistence.{RecoveryCompleted, SnapshotOffer}
 import org.apache.spark.ml.regression.LinearRegressionModel
 import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
@@ -9,6 +10,8 @@ import uk.gov.homeoffice.drt.arrivals.Arrival
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, ModelCategory, RegressionModel}
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.{ModelAndFeaturesMessage, ModelsAndFeaturesMessage, RemoveModelMessage}
 import uk.gov.homeoffice.drt.time.{LocalDate, SDate, SDateLike}
+
+import scala.util.{Failure, Try}
 
 object PredictionModelActor {
   case object Ack
@@ -96,6 +99,26 @@ class PredictionModelActor(val now: () => SDateLike,
   implicit val sdateFromLong: Long => SDateLike = (ts: Long) => SDate(ts)
   implicit val sdateFromLocalDate: LocalDate => SDateLike = (ts: LocalDate) => SDate(ts)
 
+  override def receiveRecover: Receive = {
+    case SnapshotOffer(md, ss) =>
+      logSnapshotOffer(md)
+      playSnapshotMessage(ss)
+
+    case RecoveryCompleted =>
+      postRecoveryComplete()
+
+    case event: GeneratedMessage =>
+      Try {
+        bytesSinceSnapshotCounter += event.serializedSize
+        messagesPersistedSinceSnapshotCounter += 1
+        playRecoveryMessage(event)
+      } match {
+        case Failure(exception) =>
+          log.error(s"Failed to replay recovery message $event", exception)
+        case _ =>
+      }
+  }
+
   override def processRecoveryMessage: PartialFunction[Any, Unit] = {
     case RemoveModelMessage(targetName, _) =>
       targetName.foreach(tn => state = state - tn)
@@ -107,7 +130,9 @@ class PredictionModelActor(val now: () => SDateLike,
 
   override def processSnapshotMessage: PartialFunction[Any, Unit] = {
     case msg: ModelsAndFeaturesMessage =>
-      state = modelsAndFeaturesFromMessage(msg).map(maf => maf.targetName -> maf).toMap
+      state = modelsAndFeaturesFromMessage(msg).map { maf =>
+        maf.targetName -> maf
+      }.toMap
   }
 
   override def stateToMessage: GeneratedMessage =
