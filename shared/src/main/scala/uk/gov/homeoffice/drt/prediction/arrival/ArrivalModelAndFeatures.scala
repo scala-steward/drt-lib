@@ -8,6 +8,21 @@ import scala.annotation.tailrec
 
 
 trait ArrivalModelAndFeatures extends ModelAndFeatures {
+  def maybePrediction(arrival: Arrival, minimumImprovementPctThreshold: Int, upperThreshold: Option[Int]): Option[Int] =
+    if (improvementPct > minimumImprovementPctThreshold) {
+      for {
+        valueThreshold <- upperThreshold
+        value <- prediction(arrival)
+        maybePrediction <- if (value.abs < valueThreshold)
+          Option(value)
+        else {
+          None
+        }
+      } yield maybePrediction
+    } else {
+      None
+    }
+
   def prediction(arrival: Arrival): Option[Int] = {
     val maybeMaybePrediction = for {
       oneToManyValues <- ArrivalFeatureValuesExtractor.oneToManyFeatureValues(arrival, features.features)
@@ -29,6 +44,15 @@ trait ArrivalModelAndFeatures extends ModelAndFeatures {
     }
     maybeMaybePrediction.flatten
   }
+
+  def updatePrediction(arrival: Arrival, minimumImprovementPctThreshold: Int, upperThreshold: Option[Int], now: SDateLike): Arrival = {
+    val updatedPredictions: Map[String, Int] = maybePrediction(arrival, minimumImprovementPctThreshold, upperThreshold) match {
+      case None => arrival.Predictions.predictions.removed(targetName)
+      case Some(update) => arrival.Predictions.predictions.updated(targetName, update)
+    }
+    arrival.copy(Predictions = arrival.Predictions.copy(predictions = updatedPredictions, lastChecked = now.millisSinceEpoch))
+  }
+
 }
 
 object FeatureColumns {
