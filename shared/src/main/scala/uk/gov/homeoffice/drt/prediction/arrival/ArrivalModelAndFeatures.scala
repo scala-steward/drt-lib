@@ -16,10 +16,12 @@ trait ArrivalModelAndFeatures extends ModelAndFeatures {
         maybePrediction <- if (value.abs < valueThreshold)
           Option(value)
         else {
+          scribe.warn(s"Prediction of $value is greater than threshold of $valueThreshold")
           None
         }
       } yield maybePrediction
     } else {
+      scribe.warn(s"Improvement of $improvementPct% is less than threshold of $minimumImprovementPctThreshold%")
       None
     }
 
@@ -36,11 +38,7 @@ trait ArrivalModelAndFeatures extends ModelAndFeatures {
         model.coefficients.toIndexedSeq.lift(idx).map(_ * featureValue)
       }
       val allFeatureValues = oneToManyFeatureValues ++ singleFeatureValues
-      if (allFeatureValues.forall(_.isDefined)) {
-        Some((model.intercept + allFeatureValues.map(_.get).sum).round.toInt)
-      } else {
-        None
-      }
+      Option((model.intercept + allFeatureValues.map(_.getOrElse(0d)).sum).round.toInt)
     }
     maybeMaybePrediction.flatten
   }
@@ -67,8 +65,7 @@ object FeatureColumns {
   }
 
   object Single {
-    def fromLabel(label: String)
-                 (implicit elapsedDays: Long => Int): Single[_] = label match {
+    def fromLabel(label: String): Single[_] = label match {
       case BestPax.label => BestPax
     }
   }
@@ -275,10 +272,10 @@ object FeatureColumns {
   }
 
   case class PreSummerHoliday()
-                          (implicit
-                           val sDateTs: Long => SDateLike,
-                           val sDateLocalDate: LocalDate => SDateLike,
-                          ) extends OneToMany[Arrival] with HolidayLike {
+                             (implicit
+                              val sDateTs: Long => SDateLike,
+                              val sDateLocalDate: LocalDate => SDateLike,
+                             ) extends OneToMany[Arrival] with HolidayLike {
     override val label: String = PreSummerHoliday.label
     override val prefix: String = "psumhol"
     override val hols: Seq[(LocalDate, LocalDate)] = Seq(

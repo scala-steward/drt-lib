@@ -16,11 +16,24 @@ case class PaxCapModelAndFeatures(model: RegressionModel,
                                  ) extends ArrivalModelAndFeatures {
   override val targetName: String = PaxCapModelAndFeatures.targetName
 
+  private val fallback: Int = 175
+
   override def updatePrediction(arrival: Arrival, minimumImprovementPctThreshold: Int, upperThreshold: Option[Int], now: SDateLike): Arrival = {
     val updatedPassengers = maybePrediction(arrival, minimumImprovementPctThreshold, upperThreshold) match {
-      case None => arrival.PassengerSources.removed(MlFeedSource)
-      case Some(update) => arrival.PassengerSources.updated(MlFeedSource, Passengers(Option(update), Option(0)))
+      case None =>
+        arrival.PassengerSources.removed(MlFeedSource)
+      case Some(pctFull) =>
+        val pax = arrival.MaxPax
+          .map { maxPax =>
+            ((pctFull.toDouble / 100) * maxPax).toInt
+          }
+          .getOrElse({
+            scribe.warn(s"Unknown capacity for ${arrival.flightCode} @ ${arrival.Scheduled}. Using fallback value of $fallback")
+            fallback
+          })
+        arrival.PassengerSources.updated(MlFeedSource, Passengers(Option(pax), Option(0)))
     }
+
     arrival.copy(PassengerSources = updatedPassengers)
   }
 }

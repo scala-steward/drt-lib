@@ -9,7 +9,10 @@ import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{Feature, OneToMa
 object ArrivalFeatureValuesExtractor {
   def oneToManyFeatureValues[T](arrival: T, features: Seq[Feature[_]]): Option[Seq[String]] =
     features.collect {
-      case feature: OneToMany[T] => feature.value(arrival).map(value => s"${feature.prefix}_$value")
+      case feature: OneToMany[T] =>
+        val value: Option[String] = feature.value(arrival).map(value => s"${feature.prefix}_$value")
+        if (value.isEmpty) scribe.warn(s"Feature ${feature.label} has no value for ${arrival.toString}")
+        value
     }.traverse(identity)
 
   def singleFeatureValues[T](arrival: T, features: Seq[Feature[_]]): Option[Seq[Double]] =
@@ -61,12 +64,8 @@ object ArrivalFeatureValuesExtractor {
   }
 
   val percentCapacity: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
-    case arrival if arrival.MaxPax.isEmpty =>
-      scribe.debug(s"Missing capacity for arrival ${arrival.flightCodeString} / ${arrival.Origin}")
-      None
-    case arrival if noReliablePaxCount(arrival) =>
-      scribe.debug(s"Missing live or API passenger count for arrival ${arrival.flightCodeString} / ${arrival.Origin}")
-      None
+    case arrival if arrival.MaxPax.isEmpty => None
+    case arrival if noReliablePaxCount(arrival) => None
     case arrival if arrival.Status == ArrivalStatus("Cancelled") => None
     case arrival =>
       for {
