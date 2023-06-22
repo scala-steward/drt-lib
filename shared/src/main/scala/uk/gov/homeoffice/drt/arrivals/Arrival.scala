@@ -9,6 +9,7 @@ import upickle.default.{ReadWriter, macroRW}
 
 import scala.collection.immutable.{List, NumericRange}
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
+import scala.util.Try
 import scala.util.matching.Regex
 
 
@@ -237,6 +238,11 @@ object Arrival {
 
   val flightCodeRegex: Regex = "^([A-Z0-9]{2,3}?)([0-9]{1,4})([A-Z]*)$".r
 
+  def parseFlightNumber(code: String): Option[Int] = code match {
+    case Arrival.flightCodeRegex(_, flightNumber, _) => Try(flightNumber.toInt).toOption
+    case _ => None
+  }
+
   def isInRange(rangeStart: Long, rangeEnd: Long)(needle: Long): Boolean =
     rangeStart < needle && needle < rangeEnd
 
@@ -254,8 +260,6 @@ object Arrival {
   def summaryString(arrival: Arrival): String = arrival.AirportID + "/" + arrival.Terminal + "@" + arrival.Scheduled + "!" + arrival.flightCodeString
 
   def standardiseFlightCode(flightCode: String): String = {
-    val flightCodeRegex = "^([A-Z0-9]{2,3}?)([0-9]{1,4})([A-Z]?)$".r
-
     flightCode match {
       case flightCodeRegex(operator, flightNumber, suffix) =>
         val number = f"${flightNumber.toInt}%04d"
