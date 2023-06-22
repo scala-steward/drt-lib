@@ -151,6 +151,8 @@ class PredictionModelActor(val now: () => SDateLike,
         state = state.updated(maf.targetName, maf)
         val replyToAndAck = List((sender(), Ack))
         persistAndMaybeSnapshotWithAck(modelAndFeaturesToMessage(maf, now().millisSinceEpoch), replyToAndAck)
+      } else {
+        sender() ! Ack
       }
 
     case RemoveModel(targetName) =>
@@ -158,6 +160,8 @@ class PredictionModelActor(val now: () => SDateLike,
         state = state - targetName
         val replyToAndAck = List((sender(), Ack))
         persistAndMaybeSnapshotWithAck(RemoveModelMessage(Option(targetName), Option(now().millisSinceEpoch)), replyToAndAck)
+      } else {
+        sender() ! Ack
       }
   }
 }
