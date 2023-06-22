@@ -111,7 +111,7 @@ object FeatureColumns {
       case Term3b.label => Term3b()
       case PreSummerHoliday.label => PreSummerHoliday()
       case SummerHoliday.label => SummerHoliday()
-      case PrePandemicRecovery.label => PrePandemicRecovery(sDateFromLocalDate(LocalDate(2022, 6, 1)))
+      case PostPandemicRecovery.label => PostPandemicRecovery(sDateFromLocalDate(LocalDate(2022, 6, 1)))
     }
   }
 
@@ -159,9 +159,9 @@ object FeatureColumns {
     val label: String = "dayOfTheWeek"
   }
 
-  case class PrePandemicRecovery(recoveryDate: SDateLike)
-                                (implicit sDateProvider: Long => SDateLike) extends OneToMany[Arrival] {
-    override val label: String = PrePandemicRecovery.label
+  case class PostPandemicRecovery(recoveryDate: SDateLike)
+                                 (implicit sDateProvider: Long => SDateLike) extends OneToMany[Arrival] {
+    override val label: String = PostPandemicRecovery.label
     override val prefix: String = "pdr"
     override val value: Arrival => Option[String] =
       (a: Arrival) => {
@@ -170,8 +170,8 @@ object FeatureColumns {
       }
   }
 
-  object PrePandemicRecovery {
-    val label: String = "prePanRecovery"
+  object PostPandemicRecovery {
+    val label: String = "postPanRecovery"
   }
 
   case class ChristmasDay()(implicit sDateProvider: Long => SDateLike) extends OneToMany[Arrival] {
