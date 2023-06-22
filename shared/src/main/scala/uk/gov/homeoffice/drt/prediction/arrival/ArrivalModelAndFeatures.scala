@@ -13,7 +13,7 @@ trait ArrivalModelAndFeatures extends ModelAndFeatures {
       for {
         valueThreshold <- upperValueThreshold
         value <- prediction(arrival)
-        maybePrediction <- if (value.abs < valueThreshold)
+        maybePrediction <- if (value.abs <= valueThreshold)
           Option(value)
         else {
           scribe.warn(s"Prediction of $value is greater than threshold of $valueThreshold")
