@@ -2,7 +2,7 @@ package uk.gov.homeoffice.drt.prediction.arrival
 
 import uk.gov.homeoffice.drt.arrivals.Arrival
 import uk.gov.homeoffice.drt.prediction.ModelAndFeatures
-import uk.gov.homeoffice.drt.time.{BankHolidays, LocalDate, SDateLike}
+import uk.gov.homeoffice.drt.time.{LocalDate, SDateLike}
 
 import scala.annotation.tailrec
 
@@ -111,22 +111,9 @@ object FeatureColumns {
       case Term3b.label => Term3b()
       case PreSummerHoliday.label => PreSummerHoliday()
       case SummerHoliday.label => SummerHoliday()
-      case BankHolidayWeekend.label =>
-        BankHolidayWeekend(ts => BankHolidays.isHolidayOrHolidayWeekend(sDateProvider(ts).toLocalDate))
       case Since6MonthsAgo.label => Since6MonthsAgo(now)
       case PrePandemicRecovery.label => PrePandemicRecovery(sDateFromLocalDate(LocalDate(2022, 6, 1)))
     }
-  }
-
-  case class BankHolidayWeekend(isBankHolidayWeekend: Long => Boolean) extends OneToMany[Arrival] {
-    override val label: String = BankHolidayWeekend.label
-    override val prefix: String = "bhw"
-    override val value: Arrival => Option[String] =
-      (a: Arrival) => Option(isBankHolidayWeekend(a.Scheduled).toString)
-  }
-
-  object BankHolidayWeekend {
-    val label: String = "bankHolidayWeekend"
   }
 
   case class MonthOfYear()(implicit sDateProvider: Long => SDateLike) extends OneToMany[Arrival] {
