@@ -111,7 +111,6 @@ object FeatureColumns {
       case Term3b.label => Term3b()
       case PreSummerHoliday.label => PreSummerHoliday()
       case SummerHoliday.label => SummerHoliday()
-      case Since6MonthsAgo.label => Since6MonthsAgo(now)
       case PrePandemicRecovery.label => PrePandemicRecovery(sDateFromLocalDate(LocalDate(2022, 6, 1)))
     }
   }
@@ -125,20 +124,6 @@ object FeatureColumns {
 
   object MonthOfYear {
     val label: String = "monthOfYear"
-  }
-
-  case class Since6MonthsAgo(now: () => SDateLike)(implicit sDateProvider: Long => SDateLike) extends OneToMany[Arrival] {
-    override val label: String = Since6MonthsAgo.label
-    override val prefix: String = "snc6"
-    override val value: Arrival => Option[String] =
-      (a: Arrival) => {
-        val isSince6Months: String = if (sDateProvider(a.Scheduled) >= now()) "y" else "n"
-        Option(isSince6Months)
-      }
-  }
-
-  object Since6MonthsAgo {
-    val label: String = "since6Months"
   }
 
   object DayOfMonth {

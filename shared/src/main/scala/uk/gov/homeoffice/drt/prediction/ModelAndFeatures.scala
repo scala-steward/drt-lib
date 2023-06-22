@@ -23,8 +23,6 @@ object ModelAndFeatures {
       ToChoxModelAndFeatures(model, fts, examplesTrainedOn, improvementPct)
     case (WalkTimeModelAndFeatures.targetName, fts: FeaturesWithOneToManyValues) =>
       WalkTimeModelAndFeatures(model, fts, examplesTrainedOn, improvementPct)
-    case (PaxModelAndFeatures.targetName, fts: FeaturesWithOneToManyValues) =>
-      PaxModelAndFeatures(model, fts, examplesTrainedOn, improvementPct)
     case (PaxCapModelAndFeatures.targetName, fts: FeaturesWithOneToManyValues) =>
       PaxCapModelAndFeatures(model, fts, examplesTrainedOn, improvementPct)
     case unknown =>
