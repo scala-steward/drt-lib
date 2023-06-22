@@ -29,14 +29,14 @@ trait Persistence {
       actor.ask(msg).map(_ => actor ! PoisonPill)
     }
 
-  val getModels: WithId => Future[Models] =
+  def getModels(validModelNames: Seq[String]): WithId => Future[Models] =
     identifier => {
       val actor = actorProvider(modelCategory, identifier)
       actor
         .ask(GetState).mapTo[Models]
-        .map { state =>
+        .map { models =>
           actor ! PoisonPill
-          state
+          Models(models.models.view.filterKeys(validModelNames.contains).toMap)
         }
     }
 }
