@@ -8,10 +8,10 @@ import scala.annotation.tailrec
 
 
 trait ArrivalModelAndFeatures extends ModelAndFeatures {
-  def maybePrediction(arrival: Arrival, minimumImprovementPctThreshold: Int, upperThreshold: Option[Int]): Option[Int] =
+  def maybePrediction(arrival: Arrival, minimumImprovementPctThreshold: Int, upperValueThreshold: Option[Int]): Option[Int] =
     if (improvementPct > minimumImprovementPctThreshold) {
       for {
-        valueThreshold <- upperThreshold
+        valueThreshold <- upperValueThreshold
         value <- prediction(arrival)
         maybePrediction <- if (value.abs < valueThreshold)
           Option(value)
