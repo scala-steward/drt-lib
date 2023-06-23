@@ -21,7 +21,7 @@ class ModelAndFeaturesConversionTest extends Specification {
 
       val deserialised = ModelAndFeaturesConversion.modelAndFeaturesFromMessage(serialised)
 
-      deserialised === modelAndFeatures
+      deserialised === Option(modelAndFeatures)
     }
   }
   "Given an OffScheduleModelAndFeatures class" >> {
@@ -34,7 +34,7 @@ class ModelAndFeaturesConversionTest extends Specification {
 
       val deserialised = ModelAndFeaturesConversion.modelAndFeaturesFromMessage(serialised)
 
-      deserialised === modelAndFeatures
+      deserialised === Option(modelAndFeatures)
     }
   }
   "Two ModelAndFeatures with different values should not be equal" >> {
