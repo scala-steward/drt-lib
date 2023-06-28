@@ -2,6 +2,7 @@ package uk.gov.homeoffice.drt.arrivals
 
 import uk.gov.homeoffice.drt.DataUpdates.FlightUpdates
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
+import uk.gov.homeoffice.drt.ports._
 
 import scala.util.Try
 
@@ -41,10 +42,9 @@ case class FlightsWithSplitsDiff(flightsToUpdate: Iterable[ApiFlightWithSplits],
 
   def nonEmpty: Boolean = !isEmpty
 
-  val updateMinutes: Set[Long] = flightsToUpdate.flatMap(_.apiFlight.pcpRange).toSet
+  def updateMinutes(sourceOrderPreference: List[FeedSource]): Set[Long] = flightsToUpdate.flatMap(_.apiFlight.pcpRange(sourceOrderPreference)).toSet
 
-  def applyTo(flightsWithSplits: FlightsWithSplits,
-              nowMillis: Long): (FlightsWithSplits, Set[Long]) = {
+  def applyTo(flightsWithSplits: FlightsWithSplits, nowMillis: Long, sourceOrderPreference: List[FeedSource]): (FlightsWithSplits, Set[Long]) = {
     val updated = flightsWithSplits.flights ++ flightsToUpdate.map(f => (f.apiFlight.unique, f.copy(lastUpdated = Option(nowMillis))))
 
     val minusRemovals: Map[UniqueArrival, ApiFlightWithSplits] = ArrivalsRemoval.removeArrivals(arrivalsToRemove, updated)
@@ -54,21 +54,21 @@ case class FlightsWithSplitsDiff(flightsToUpdate: Iterable[ApiFlightWithSplits],
     val minutesFromRemovalsInExistingState: Set[Long] = arrivalsToRemove
       .flatMap {
         case r: UniqueArrival =>
-          asMap.get(r).map(_.apiFlight.pcpRange).getOrElse(List())
+          asMap.get(r).map(_.apiFlight.pcpRange(sourceOrderPreference)).getOrElse(List())
         case r: LegacyUniqueArrival =>
-          asMap.collect { case (ua, a) if ua.equalsLegacy(r) => a }.flatMap(_.apiFlight.pcpRange)
+          asMap.collect { case (ua, a) if ua.equalsLegacy(r) => a }.flatMap(_.apiFlight.pcpRange(sourceOrderPreference))
       }.toSet
 
     val minutesFromExistingStateUpdatedFlights = flightsToUpdate
       .flatMap { fws =>
         asMap.get(fws.unique) match {
           case None => Set()
-          case Some(f) => f.apiFlight.pcpRange
+          case Some(f) => f.apiFlight.pcpRange(sourceOrderPreference)
         }
       }.toSet
 
     val updatedMinutesFromFlights = minutesFromRemovalsInExistingState ++
-      updateMinutes ++
+      updateMinutes(sourceOrderPreference) ++
       minutesFromExistingStateUpdatedFlights
 
     (FlightsWithSplits(minusRemovals), updatedMinutesFromFlights)

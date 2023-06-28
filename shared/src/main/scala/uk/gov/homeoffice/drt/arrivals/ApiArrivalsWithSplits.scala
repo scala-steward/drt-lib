@@ -27,10 +27,10 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
       PaxSource(ApiFeedSource, Passengers(Option(splits.totalPax), Option(splits.transPax)))
   }
 
-  def bestPaxSource: PaxSource =
+  def bestPaxSource(sourceOrderPreference: List[FeedSource]): PaxSource =
     paxFromApi match {
       case Some(totalPaxSource) if hasValidApi => totalPaxSource
-      case _ => apiFlight.bestPaxEstimate
+      case _ => apiFlight.bestPaxEstimate(sourceOrderPreference)
     }
 
   def equals(candidate: ApiFlightWithSplits): Boolean =
@@ -80,8 +80,6 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
     val portDirectPax = apiFlight.PassengerSources.get(LiveFeedSource).flatMap(_.getPcpPax).getOrElse(0)
     apiPaxNo != 0 && (Math.abs(apiPaxNo - portDirectPax) / apiPaxNo) < threshold
   }
-
-  def hasPcpPaxIn(start: SDateLike, end: SDateLike): Boolean = apiFlight.hasPcpDuring(start, end)
 
   override val unique: UniqueArrival = apiFlight.unique
 

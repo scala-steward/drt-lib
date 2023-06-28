@@ -45,8 +45,7 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
       "joda-time" % "joda-time" % jodaVersion,
       "com.lihaoyi" %%% "upickle" % upickleVersion,
-      "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion excludeAll ("org.scala-lang.modules", "scala-xml"),
-      "org.scala-lang.modules" %% "scala-xml" % "2.1.0" force(),
+      "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion,
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
       "com.github.dnvriend" %% "akka-persistence-inmemory" % akkaPersistenceInMemoryVersion % "test"
     ),
