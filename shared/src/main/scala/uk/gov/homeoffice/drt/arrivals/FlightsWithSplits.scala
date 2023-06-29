@@ -1,5 +1,6 @@
 package uk.gov.homeoffice.drt.arrivals
 
+import uk.gov.homeoffice.drt.ports.{AclFeedSource, ApiFeedSource, FeedSource, ForecastFeedSource, HistoricApiFeedSource, LiveFeedSource, MlFeedSource, ScenarioSimulationSource}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.SDateLike
 
@@ -15,10 +16,10 @@ case class FlightsWithSplits(flights: Map[UniqueArrival, ApiFlightWithSplits]) {
     case (UniqueArrival(_, _, scheduledMillis, _), _) => scheduledMillis >= sinceMillis
   })
 
-  def scheduledOrPcpWindow(start: SDateLike, end: SDateLike): FlightsWithSplits = {
+  def scheduledOrPcpWindow(start: SDateLike, end: SDateLike, sourceOrderPreference: List[FeedSource]): FlightsWithSplits = {
     val inWindow = flights.filter {
       case (_, fws) =>
-        val pcpMatches = fws.apiFlight.hasPcpDuring(start, end)
+        val pcpMatches = fws.apiFlight.hasPcpDuring(start, end, sourceOrderPreference)
         val scheduledMatches = start <= fws.apiFlight.Scheduled && end >= fws.apiFlight.Scheduled
         scheduledMatches || pcpMatches
     }

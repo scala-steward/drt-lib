@@ -71,7 +71,7 @@ object ArrivalFeatureValuesExtractor {
       for {
         oneToManyValues <- oneToManyFeatureValues(arrival, features)
         singleValues <- singleFeatureValues(arrival, features)
-        paxCount <- arrival.bestPcpPaxEstimate
+        paxCount <- arrival.bestPcpPaxEstimate(List(LiveFeedSource, ApiFeedSource))
         maxPax <- arrival.MaxPax
       } yield {
         val pctFull = 100 * paxCount.toDouble / maxPax

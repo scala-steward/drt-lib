@@ -1,6 +1,7 @@
 package uk.gov.homeoffice.drt.prediction.arrival
 
 import uk.gov.homeoffice.drt.arrivals.Arrival
+import uk.gov.homeoffice.drt.ports.{ApiFeedSource, LiveFeedSource}
 import uk.gov.homeoffice.drt.prediction.ModelAndFeatures
 import uk.gov.homeoffice.drt.time.{LocalDate, SDateLike}
 
@@ -73,7 +74,7 @@ object FeatureColumns {
   case object BestPax extends Single[Arrival] {
     override val label: String = "bestPax"
     override val prefix: String = "bestpax"
-    override val value: Arrival => Option[Double] = _.bestPaxEstimate.passengers.getPcpPax.map(_.toDouble)
+    override val value: Arrival => Option[Double] = _.bestPaxEstimate(List(ApiFeedSource, LiveFeedSource)).passengers.getPcpPax.map(_.toDouble)
   }
 
   trait OneToMany[T] extends Feature[T] {
