@@ -6,7 +6,7 @@ object Dependencies {
   val autowire = "0.3.3"
   val booPickle = "1.3.3"
   val specs2 = "4.10.6"
-  val csvCommons = "1.4"
+  val csvCommons = "1.10.0"
   val catsVersion = "2.9.0"
 
   val libDeps: Seq[ModuleID] = Seq(
