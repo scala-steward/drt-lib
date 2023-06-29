@@ -18,6 +18,6 @@ object Dependencies {
     "org.specs2" %% "specs2-core" % specs2 % Test,
     "org.apache.commons" % "commons-csv" % csvCommons,
     "org.typelevel" %% "cats-core" % catsVersion,
-    "com.outr" %% "scribe-slf4j" % "3.11.1"
+    "com.outr" %% "scribe-slf4j" % "3.11.5"
   )
 }
