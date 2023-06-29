@@ -1,7 +1,7 @@
 import sbt._
 
 object Dependencies {
-  val scalaTest = "3.2.15"
+  val scalaTest = "3.2.16"
   val uPickle = "2.0.0"
   val autowire = "0.3.3"
   val booPickle = "1.3.3"
@@ -18,6 +18,6 @@ object Dependencies {
     "org.specs2" %% "specs2-core" % specs2 % Test,
     "org.apache.commons" % "commons-csv" % csvCommons,
     "org.typelevel" %% "cats-core" % catsVersion,
-    "com.outr" %% "scribe-slf4j" % "3.11.1"
+    "com.outr" %% "scribe-slf4j" % "3.11.5"
   )
 }
