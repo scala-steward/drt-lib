@@ -1,6 +1,5 @@
 package uk.gov.homeoffice.drt.prediction.arrival
 
-import uk.gov.homeoffice.drt.arrivals.Arrival
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, RegressionModel}
 
 object OffScheduleModelAndFeatures {

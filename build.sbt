@@ -1,7 +1,7 @@
 import Dependencies._
 import sbt.Keys.libraryDependencies
 
-lazy val scala = "2.13.10"
+lazy val scala = "2.13.11"
 
 ThisBuild / scalaVersion := scala
 ThisBuild / organization := "uk.gov.homeoffice"
@@ -25,7 +25,8 @@ lazy val akkaVersion = "2.7.0"
 lazy val akkaPersistenceInMemoryVersion = "2.5.15.2"
 lazy val jodaVersion = "2.12.5"
 lazy val upickleVersion = "2.0.0"
-lazy val sparkMlLibVersion = "3.3.2"
+lazy val sparkMlLibVersion = "3.4.1"
+lazy val sslConfigCore = "0.6.1"
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .in(file("."))
@@ -46,9 +47,9 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "joda-time" % "joda-time" % jodaVersion,
       "com.lihaoyi" %%% "upickle" % upickleVersion,
       "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion,
-
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
-      "com.github.dnvriend" %% "akka-persistence-inmemory" % akkaPersistenceInMemoryVersion % "test"
+      "com.github.dnvriend" %% "akka-persistence-inmemory" % akkaPersistenceInMemoryVersion % "test",
+      "com.typesafe" %% "ssl-config-core" % sslConfigCore,
     ),
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
     Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),

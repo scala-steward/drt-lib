@@ -1,5 +1,6 @@
 package uk.gov.homeoffice.drt.actor
 
+import akka.persistence.{RecoveryCompleted, SnapshotOffer}
 import org.apache.spark.ml.regression.LinearRegressionModel
 import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
@@ -8,7 +9,9 @@ import uk.gov.homeoffice.drt.actor.TerminalDateActor.GetState
 import uk.gov.homeoffice.drt.arrivals.Arrival
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, ModelCategory, RegressionModel}
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.{ModelAndFeaturesMessage, ModelsAndFeaturesMessage, RemoveModelMessage}
-import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
+import uk.gov.homeoffice.drt.time.{LocalDate, SDate, SDateLike}
+
+import scala.util.{Failure, Try}
 
 object PredictionModelActor {
   case object Ack
@@ -32,6 +35,15 @@ object PredictionModelActor {
     val id: String
   }
 
+  case class Terminal(terminal: String) extends WithId {
+    val id = s"terminal-$terminal"
+  }
+
+  object Terminal {
+    val fromArrival: Arrival => Option[Terminal] = (arrival: Arrival) =>
+      Option(Terminal(arrival.Terminal.toString))
+  }
+
   case class TerminalCarrier(terminal: String, carrier: String) extends WithId {
     val id = s"terminal-carrier-$terminal-$carrier"
   }
@@ -40,6 +52,7 @@ object PredictionModelActor {
     val fromArrival: Arrival => Option[TerminalCarrier] = (arrival: Arrival) =>
       Option(TerminalCarrier(arrival.Terminal.toString, arrival.CarrierCode.code))
   }
+
   case class TerminalOrigin(terminal: String, origin: String) extends WithId {
     val id = s"terminal-origin-$terminal-$origin"
   }
@@ -88,20 +101,44 @@ class PredictionModelActor(val now: () => SDateLike,
 
   override def persistenceId: String = s"${modelCategory.name}-prediction-${identifier.id}".toLowerCase
 
-  implicit val sdateProvider: Long => SDateLike = (ts: Long) => SDate(ts)
+  implicit val sdateFromLong: Long => SDateLike = (ts: Long) => SDate(ts)
+  implicit val sdateFromLocalDate: LocalDate => SDateLike = (ts: LocalDate) => SDate(ts)
+
+  override def receiveRecover: Receive = {
+    case SnapshotOffer(md, ss) =>
+      logSnapshotOffer(md)
+      playSnapshotMessage(ss)
+
+    case RecoveryCompleted =>
+      postRecoveryComplete()
+
+    case event: GeneratedMessage =>
+      Try {
+        bytesSinceSnapshotCounter += event.serializedSize
+        messagesPersistedSinceSnapshotCounter += 1
+        playRecoveryMessage(event)
+      } match {
+        case Failure(exception) =>
+          log.error(s"Failed to replay recovery message $event", exception)
+        case _ =>
+      }
+  }
 
   override def processRecoveryMessage: PartialFunction[Any, Unit] = {
     case RemoveModelMessage(targetName, _) =>
       targetName.foreach(tn => state = state - tn)
 
     case msg: ModelAndFeaturesMessage =>
-      val modelAndFeatures = modelAndFeaturesFromMessage(msg)
-      state = state.updated(modelAndFeatures.targetName, modelAndFeatures)
+      modelAndFeaturesFromMessage(msg).foreach(modelAndFeatures =>
+        state = state.updated(modelAndFeatures.targetName, modelAndFeatures)
+      )
   }
 
   override def processSnapshotMessage: PartialFunction[Any, Unit] = {
     case msg: ModelsAndFeaturesMessage =>
-      state = modelsAndFeaturesFromMessage(msg).map(maf => maf.targetName -> maf).toMap
+      state = modelsAndFeaturesFromMessage(msg).map { maf =>
+        maf.targetName -> maf
+      }.toMap
   }
 
   override def stateToMessage: GeneratedMessage =
@@ -120,6 +157,8 @@ class PredictionModelActor(val now: () => SDateLike,
         state = state.updated(maf.targetName, maf)
         val replyToAndAck = List((sender(), Ack))
         persistAndMaybeSnapshotWithAck(modelAndFeaturesToMessage(maf, now().millisSinceEpoch), replyToAndAck)
+      } else {
+        sender() ! Ack
       }
 
     case RemoveModel(targetName) =>
@@ -127,6 +166,8 @@ class PredictionModelActor(val now: () => SDateLike,
         state = state - targetName
         val replyToAndAck = List((sender(), Ack))
         persistAndMaybeSnapshotWithAck(RemoveModelMessage(Option(targetName), Option(now().millisSinceEpoch)), replyToAndAck)
+      } else {
+        sender() ! Ack
       }
   }
 }

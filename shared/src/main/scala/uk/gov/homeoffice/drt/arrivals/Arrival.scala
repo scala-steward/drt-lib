@@ -9,6 +9,7 @@ import upickle.default.{ReadWriter, macroRW}
 
 import scala.collection.immutable.{List, NumericRange}
 import scala.concurrent.duration.{DurationLong, FiniteDuration}
+import scala.util.Try
 import scala.util.matching.Regex
 
 
@@ -129,16 +130,17 @@ case class Arrival(Operator: Option[Operator],
   lazy val uniqueId: Int = uniqueStr.hashCode
   lazy val uniqueStr: String = s"$Terminal$Scheduled${VoyageNumber.numeric}"
 
-  def hasPcpDuring(start: SDateLike, end: SDateLike): Boolean = {
+  def hasPcpDuring(start: SDateLike, end: SDateLike, sourceOrderPreference: List[FeedSource]): Boolean = {
     val firstPcpMilli = PcpTime.getOrElse(0L)
-    val lastPcpMilli = firstPcpMilli + millisToDisembark(bestPaxEstimate.passengers.actual.getOrElse(0), 20)
+    val pcpPax = bestPaxEstimate(sourceOrderPreference).passengers.actual.getOrElse(0)
+    val lastPcpMilli = firstPcpMilli + millisToDisembark(pcpPax, 20)
     val firstInRange = start.millisSinceEpoch <= firstPcpMilli && firstPcpMilli <= end.millisSinceEpoch
     val lastInRange = start.millisSinceEpoch <= lastPcpMilli && lastPcpMilli <= end.millisSinceEpoch
     firstInRange || lastInRange
   }
 
-  def isRelevantToPeriod(rangeStart: SDateLike, rangeEnd: SDateLike): Boolean =
-    Arrival.isRelevantToPeriod(rangeStart, rangeEnd)(this)
+  def isRelevantToPeriod(rangeStart: SDateLike, rangeEnd: SDateLike, sourceOrderPreference: List[FeedSource]): Boolean =
+    Arrival.isRelevantToPeriod(rangeStart, rangeEnd, sourceOrderPreference)(this)
 
   def millisToDisembark(pax: Int, paxPerMinute: Int): Long = {
     val minutesToDisembark = (pax.toDouble / paxPerMinute).ceil
@@ -146,24 +148,17 @@ case class Arrival(Operator: Option[Operator],
     (minutesToDisembark * oneMinuteInMillis).toLong
   }
 
-  def bestPaxEstimate: PaxSource = {
-    val preferredSources: List[FeedSource] = List(
-      ScenarioSimulationSource,
-      LiveFeedSource,
-      ApiFeedSource,
-      ForecastFeedSource,
-      HistoricApiFeedSource,
-      AclFeedSource,
-    )
+  def bestPaxEstimate(sourceOrderPreference: List[FeedSource]): PaxSource = {
+    val preferredSources: List[FeedSource] = sourceOrderPreference
 
     preferredSources
-      .find { case source => PassengerSources.get(source).exists(_.actual.isDefined) }
-      .flatMap { case source => PassengerSources.get(source).map(PaxSource(source, _)) }
+      .find(source => PassengerSources.get(source).exists(_.actual.isDefined))
+      .flatMap(source => PassengerSources.get(source).map(PaxSource(source, _)))
       .getOrElse(PaxSource(UnknownFeedSource, Passengers(None, None)))
 
   }
 
-  val bestPcpPaxEstimate: Option[Int] = bestPaxEstimate.getPcpPax
+  def bestPcpPaxEstimate(sourceOrderPreference: List[FeedSource]): Option[Int] = bestPaxEstimate(sourceOrderPreference).getPcpPax
 
   lazy val predictedTouchdown: Option[Long] =
     Predictions.predictions
@@ -187,28 +182,28 @@ case class Arrival(Operator: Option[Operator],
   def walkTime(firstPaxOff: Long, considerPredictions: Boolean): Option[Long] =
     PcpTime.map(pcpTime => pcpTime - (bestArrivalTime(considerPredictions) + firstPaxOff))
 
-  def minutesOfPaxArrivals: Int = {
-    val bestPax = bestPaxEstimate
+  def minutesOfPaxArrivals(sourceOrderPreference: List[FeedSource]): Int = {
+    val bestPax = bestPaxEstimate(sourceOrderPreference)
     if (bestPax.passengers.actual.getOrElse(0) <= 0) 0
     else (bestPax.passengers.actual.getOrElse(0).toDouble / paxOffPerMinute).ceil.toInt - 1
   }
 
-  lazy val pcpRange: NumericRange[Long] = {
+  def pcpRange(sourceOrderPreference: List[FeedSource]): NumericRange[Long] = {
     val pcpStart = MilliTimes.timeToNearestMinute(PcpTime.getOrElse(0L))
 
-    val pcpEnd = pcpStart + oneMinuteMillis * minutesOfPaxArrivals
+    val pcpEnd = pcpStart + oneMinuteMillis * minutesOfPaxArrivals(sourceOrderPreference)
 
     pcpStart to pcpEnd by oneMinuteMillis
   }
 
-  def paxDeparturesByMinute(departRate: Int): Iterable[(Long, Int)] = {
-    val bestPax = bestPaxEstimate.passengers.actual.getOrElse(0)
+  def paxDeparturesByMinute(departRate: Int, sourceOrderPreference: List[FeedSource]): Iterable[(Long, Int)] = {
+    val bestPax = bestPaxEstimate(sourceOrderPreference).passengers.actual.getOrElse(0)
     val maybeRemainingPax = bestPax % departRate match {
       case 0 => None
       case someLeftovers => Option(someLeftovers)
     }
     val paxByMinute = List.fill(bestPax / departRate)(departRate) ::: maybeRemainingPax.toList
-    pcpRange.zip(paxByMinute)
+    pcpRange(sourceOrderPreference).zip(paxByMinute)
   }
 
   lazy val unique: UniqueArrival = UniqueArrival(VoyageNumber.numeric, Terminal, Scheduled, Origin)
@@ -236,10 +231,15 @@ object Arrival {
 
   val flightCodeRegex: Regex = "^([A-Z0-9]{2,3}?)([0-9]{1,4})([A-Z]*)$".r
 
+  def parseFlightNumber(code: String): Option[Int] = code match {
+    case Arrival.flightCodeRegex(_, flightNumber, _) => Try(flightNumber.toInt).toOption
+    case _ => None
+  }
+
   def isInRange(rangeStart: Long, rangeEnd: Long)(needle: Long): Boolean =
     rangeStart < needle && needle < rangeEnd
 
-  def isRelevantToPeriod(rangeStart: SDateLike, rangeEnd: SDateLike)(arrival: Arrival): Boolean = {
+  def isRelevantToPeriod(rangeStart: SDateLike, rangeEnd: SDateLike, sourceOrderPreference: List[FeedSource])(arrival: Arrival): Boolean = {
     val rangeCheck: Long => Boolean = isInRange(rangeStart.millisSinceEpoch, rangeEnd.millisSinceEpoch)
 
     rangeCheck(arrival.Scheduled) ||
@@ -247,14 +247,12 @@ object Arrival {
       rangeCheck(arrival.EstimatedChox.getOrElse(0)) ||
       rangeCheck(arrival.Actual.getOrElse(0)) ||
       rangeCheck(arrival.ActualChox.getOrElse(0)) ||
-      arrival.hasPcpDuring(rangeStart, rangeEnd)
+      arrival.hasPcpDuring(rangeStart, rangeEnd, sourceOrderPreference)
   }
 
   def summaryString(arrival: Arrival): String = arrival.AirportID + "/" + arrival.Terminal + "@" + arrival.Scheduled + "!" + arrival.flightCodeString
 
   def standardiseFlightCode(flightCode: String): String = {
-    val flightCodeRegex = "^([A-Z0-9]{2,3}?)([0-9]{1,4})([A-Z]?)$".r
-
     flightCode match {
       case flightCodeRegex(operator, flightNumber, suffix) =>
         val number = f"${flightNumber.toInt}%04d"
