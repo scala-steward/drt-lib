@@ -4,7 +4,7 @@ object Dependencies {
   val scalaTest = "3.2.16"
   val uPickle = "2.0.0"
   val autowire = "0.3.3"
-  val booPickle = "1.3.3"
+  val booPickle = "1.4.0"
   val specs2 = "4.20.0"
   val csvCommons = "1.10.0"
   val catsVersion = "2.9.0"
