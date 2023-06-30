@@ -17,7 +17,7 @@ steps:
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
-      ARTIFACTORY_USERNAME: drt_optimiser_drone
+      ARTIFACTORY_USERNAME: drt-artifactory-robot
     when:
       event:
         - push
@@ -31,7 +31,7 @@ steps:
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
-      ARTIFACTORY_USERNAME: drt_optimiser_drone
+      ARTIFACTORY_USERNAME: drt-artifactory-robot
     when:
       event:
         - push
@@ -45,9 +45,10 @@ steps:
       - /root/entrypoint.sh
       - sbt --error +test
     environment:
+      JAVA_OPTS: -Xmx2g
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
-      ARTIFACTORY_USERNAME: drt_optimiser_drone
+      ARTIFACTORY_USERNAME: drt-artifactory-robot
     when:
       event:
         - push
@@ -71,4 +72,35 @@ steps:
         - push
     depends_on:
       - Test
+
+  - name: analysis
+    pull: if-not-exists
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.0.0
+    commands:
+      - /root/entrypoint.sh
+      - sbt -ivy ./.ivy2 dependencyCheck
+      - sbt -ivy ./.ivy2 -mem 4096 -J-XX:+UseG1GC clean coverage test coverageReport
+    environment:
+      ARTIFACTORY_PASSWORD:
+        from_secret: ARTIFACTORY_PASSWORD
+      ARTIFACTORY_USERNAME: drt-artifactory-robot
+      ENV_LOG_LEVEL: ERROR
+    when:
+      event:
+        - push
+
+  - name: sonar-scanner
+    pull: if-not-exists
+    image: quay.io/ukhomeofficedigital/sonar-scanner:v4.6
+    commands:
+      - sonar-scanner -Dsonar.projectVersion=B${DRONE_BUILD_NUMBER}
+    environment:
+      DRONE_BUILD_NUMBER: ${DRONE_BUILD_NUMBER}
+    when:
+      branch:
+        - ${DRONE_BRANCH}
+      event:
+        - push
+    depends_on:
+      - analysis
 ...

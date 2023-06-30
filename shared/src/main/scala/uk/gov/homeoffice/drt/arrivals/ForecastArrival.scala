@@ -27,8 +27,6 @@ case class ForecastArrival(carrierCode: CarrierCode,
     Gate = None,
     Stand = None,
     MaxPax = maxPax,
-    ActPax = totalPax,
-    TranPax = transPax,
     RunwayID = None,
     BaggageReclaimId = None,
     AirportID = origin,
@@ -38,9 +36,8 @@ case class ForecastArrival(carrierCode: CarrierCode,
     PcpTime = None,
     FeedSources = Set(ForecastFeedSource),
     CarrierScheduled = None,
-    ApiPax = None,
     ScheduledDeparture = None,
     RedListPax = None,
-    TotalPax = Set(TotalPaxSource(totalPax, ForecastFeedSource))
+    PassengerSources = Map(ForecastFeedSource -> Passengers(totalPax, transPax))
   )
 }
