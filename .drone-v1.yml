@@ -86,6 +86,7 @@ steps:
       ARTIFACTORY_USERNAME: drt-artifactory-robot
       ENV_LOG_LEVEL: ERROR
     when:
+      branch: master
       event:
         - push
 
