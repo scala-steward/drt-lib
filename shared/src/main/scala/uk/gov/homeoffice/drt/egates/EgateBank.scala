@@ -41,8 +41,8 @@ object EgateBanksUpdate {
 }
 
 case class EgateBanksUpdates(updates: List[EgateBanksUpdate]) {
-  private def updatesForDate(atDate: Long): Option[EgateBanksUpdate] =
-    updates.sortBy(_.effectiveFrom).reverse.find(_.effectiveFrom < atDate)
+  def updatesForDate(atDate: Long): Option[EgateBanksUpdate] =
+    updates.sortBy(_.effectiveFrom).findLast(_.effectiveFrom < atDate)
 
   def forPeriod(millis: NumericRange[Long]): IndexedSeq[Seq[EgateBank]] = {
     updatesForDate(millis.min) ++ updates.filter(u => millis.min <= u.effectiveFrom && u.effectiveFrom <= millis.max) match {
