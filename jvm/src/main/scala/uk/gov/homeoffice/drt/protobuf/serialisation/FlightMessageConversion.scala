@@ -285,7 +285,7 @@ object FlightMessageConversion {
   private def passengerSourcesFromV3(flightMessage: FlightMessage): Map[FeedSource, Passengers] = {
     val bestSource = bestFeedSource(getFeedSources(flightMessage.totalPax.map(tp => tp.feedSource.getOrElse(""))).toSeq)
     val paxSources = flightMessage.totalPax.map {
-      case TotalPaxSourceMessage(source, _, paxOLD) if source.getOrElse("") == bestSource.toString =>
+      case TotalPaxSourceMessage(source, _, paxOLD) if source.getOrElse("") == bestSource.toString || source.getOrElse("") == bestSource.name =>
         val feedSource = source.flatMap(FeedSource(_)).getOrElse(UnknownFeedSource)
         (feedSource, Passengers(paxOLD, flightMessage.tranPaxOLD))
       case TotalPaxSourceMessage(source, _, paxOLD) =>
