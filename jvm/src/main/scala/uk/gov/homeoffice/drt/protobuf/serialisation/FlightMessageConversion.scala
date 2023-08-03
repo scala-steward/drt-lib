@@ -1,16 +1,16 @@
 package uk.gov.homeoffice.drt.protobuf.serialisation
 
 import org.slf4j.{Logger, LoggerFactory}
-import uk.gov.homeoffice.drt.{Nationality, ports}
+import uk.gov.homeoffice.drt.Nationality
 import uk.gov.homeoffice.drt.actor.state.ArrivalsState
-import uk.gov.homeoffice.drt.arrivals.{ApiFlightWithSplits, Arrival, ArrivalStatus, ArrivalsRestorer, EventType, FlightsWithSplitsDiff, LegacyUniqueArrival, Operator, Passengers, PaxSource, Prediction, Predictions, SplitStyle, Splits, UniqueArrival, UniqueArrivalLike}
+import uk.gov.homeoffice.drt.arrivals._
 import uk.gov.homeoffice.drt.feeds.{FeedStatus, FeedStatusFailure, FeedStatusSuccess, FeedStatuses}
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitSource, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.ports.{AclFeedSource, ApiFeedSource, ApiPaxTypeAndQueueCount, FeedSource, ForecastFeedSource, HistoricApiFeedSource, LiveFeedSource, PaxAge, PaxType, PortCode, UnknownFeedSource}
-import uk.gov.homeoffice.drt.protobuf.messages.CrunchState.{FlightWithSplitsMessage, FlightsWithSplitsDiffMessage, FlightsWithSplitsMessage, PaxTypeAndQueueCountMessage, SplitMessage}
-import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage.{FeedStatusMessage, FeedStatusesMessage, FlightMessage, FlightStateSnapshotMessage, PassengersMessage, TotalPaxSourceMessage, UniqueArrivalMessage}
+import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.protobuf.messages.CrunchState._
+import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage._
 import uk.gov.homeoffice.drt.protobuf.messages.Prediction.{PredictionIntMessage, PredictionLongMessage, PredictionsMessage}
 import uk.gov.homeoffice.drt.time.SDate
 
@@ -23,6 +23,9 @@ object FlightMessageConversion {
   def uniqueArrivalToMessage(unique: UniqueArrival): UniqueArrivalMessage =
     UniqueArrivalMessage(Option(unique.number), Option(unique.terminal.toString), Option(unique.scheduled), Option(unique.origin.toString))
 
+  def uniqueArrivalFromMessage(unique: UniqueArrivalMessage): UniqueArrival =
+    UniqueArrival(unique.number.getOrElse(0), Terminal(unique.terminalName.getOrElse("")), unique.scheduled.getOrElse(0L), PortCode(unique.origin.getOrElse("")))
+
   def flightWithSplitsDiffToMessage(diff: FlightsWithSplitsDiff): FlightsWithSplitsDiffMessage = {
     FlightsWithSplitsDiffMessage(
       createdAt = Option(SDate.now().millisSinceEpoch),
@@ -34,6 +37,21 @@ object FlightMessageConversion {
       }.toSeq,
       updates = diff.flightsToUpdate.map(flightWithSplitsToMessage).toSeq
     )
+  }
+
+  def arrivalsDiffToMessage(arrivalsDiff: ArrivalsDiff): FlightsDiffMessage = {
+    val updateMessages = arrivalsDiff.toUpdate.values.map(apiFlightToFlightMessage).toSeq
+    val removalMessages = arrivalsDiff.toRemove.map(a => uniqueArrivalToMessage(a)).toSeq
+    FlightsDiffMessage(
+      createdAt = Option(SDate.now().millisSinceEpoch),
+      removals = removalMessages,
+      updates = updateMessages
+    )
+  }
+
+  def arrivalsDiffFromMessage(flightsDiffMessage: FlightsDiffMessage) = {
+    val updates = flightsDiffMessage.updates.map(flightMessageToApiFlight)
+    val removals = flightsDiffMessage.removals.map(uniqueArrivalFromMessage)
   }
 
   def uniqueArrivalsFromMessages(uniqueArrivalMessages: Seq[UniqueArrivalMessage]): Seq[UniqueArrivalLike] =
