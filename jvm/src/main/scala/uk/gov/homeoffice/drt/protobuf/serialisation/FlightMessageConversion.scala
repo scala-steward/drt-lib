@@ -49,10 +49,11 @@ object FlightMessageConversion {
     )
   }
 
-  def arrivalsDiffFromMessage(flightsDiffMessage: FlightsDiffMessage) = {
-    val updates = flightsDiffMessage.updates.map(flightMessageToApiFlight)
-    val removals = flightsDiffMessage.removals.map(uniqueArrivalFromMessage)
-  }
+  def arrivalsDiffFromMessage(flightsDiffMessage: FlightsDiffMessage): ArrivalsDiff =
+    ArrivalsDiff(
+      toUpdate = flightsDiffMessage.updates.map(flightMessageToApiFlight),
+      toRemove = flightsDiffMessage.removals.map(uniqueArrivalFromMessage)
+    )
 
   def uniqueArrivalsFromMessages(uniqueArrivalMessages: Seq[UniqueArrivalMessage]): Seq[UniqueArrivalLike] =
     uniqueArrivalMessages.collect {
