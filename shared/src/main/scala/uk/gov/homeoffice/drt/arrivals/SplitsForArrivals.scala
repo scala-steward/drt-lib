@@ -14,20 +14,14 @@ case class SplitsForArrivals(splits: Map[UniqueArrival, Set[Splits]]) extends Fl
     (existing.map(s => (s.source, s)).toMap ++ incoming.map(s => (s.source, s)).toMap).values.toSet
 
   def diff(other: Map[UniqueArrival, Set[Splits]]): SplitsForArrivals = {
-    val updatedSplits = other
+    val updatedSplits = splits
       .map {
-        case (key, incoming) =>
-          println(s"looking for $key to update splits. keys: ${splits.keys.map(_.toString).mkString(", ")}")
+        case (key, ourSplits) =>
           other.get(key)
-            .map { existing =>
-              println(s"found $key to update splits. existing: ${existing.map(_.toString).mkString(", ")} incoming: ${incoming.map(_.toString).mkString(", ")}")
-              val newIncoming = incoming.diff(existing)
-              println(s"new incoming: ${newIncoming.map(_.toString).mkString(", ")}")
-              (existing, newIncoming)
-            }
+            .map(existing => ourSplits.diff(existing))
             .collect {
-              case (existing, incoming) if incoming.nonEmpty =>
-                (key, updateSplits(existing, incoming))
+              case ourNewSplits if ourNewSplits.nonEmpty =>
+                (key, ourNewSplits)
             }
       }
       .collect { case Some(splits) => splits }
