@@ -26,9 +26,9 @@ object FlightMessageConversion {
   def uniqueArrivalFromMessage(unique: UniqueArrivalMessage): UniqueArrival =
     UniqueArrival(unique.number.getOrElse(0), Terminal(unique.terminalName.getOrElse("")), unique.scheduled.getOrElse(0L), PortCode(unique.origin.getOrElse("")))
 
-  def flightWithSplitsDiffToMessage(diff: FlightsWithSplitsDiff): FlightsWithSplitsDiffMessage = {
+  def flightWithSplitsDiffToMessage(diff: FlightsWithSplitsDiff, nowMillis: Long): FlightsWithSplitsDiffMessage = {
     FlightsWithSplitsDiffMessage(
-      createdAt = Option(SDate.now().millisSinceEpoch),
+      createdAt = Option(nowMillis),
       removals = diff.arrivalsToRemove.map {
         case UniqueArrival(number, terminal, scheduled, origin) =>
           UniqueArrivalMessage(Option(number), Option(terminal.toString), Option(scheduled), Option(origin.toString))
@@ -39,11 +39,11 @@ object FlightMessageConversion {
     )
   }
 
-  def arrivalsDiffToMessage(arrivalsDiff: ArrivalsDiff): FlightsDiffMessage = {
+  def arrivalsDiffToMessage(arrivalsDiff: ArrivalsDiff, nowMillis: Long): FlightsDiffMessage = {
     val updateMessages = arrivalsDiff.toUpdate.values.map(apiFlightToFlightMessage).toSeq
     val removalMessages = arrivalsDiff.toRemove.map(a => uniqueArrivalToMessage(a)).toSeq
     FlightsDiffMessage(
-      createdAt = Option(SDate.now().millisSinceEpoch),
+      createdAt = Option(nowMillis),
       removals = removalMessages,
       updates = updateMessages
     )
