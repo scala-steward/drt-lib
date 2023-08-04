@@ -1,8 +1,6 @@
 package uk.gov.homeoffice.drt.arrivals
 
 import org.specs2.mutable.Specification
-import uk.gov.homeoffice.drt.arrivals.SplitStyle.PaxNumbers
-import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.Historical
 
 class ArrivalsDiffSpec extends Specification {
   val now: Long = 10L
