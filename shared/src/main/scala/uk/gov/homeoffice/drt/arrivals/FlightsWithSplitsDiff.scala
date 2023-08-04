@@ -29,6 +29,14 @@ class ArrivalsRestorer[A <: WithUnique[UniqueArrival] with Updatable[A]] {
     arrivals = arrivals + ((update.unique, updated))
   }
 
+  def applyUpdates[B](updates: Map[UniqueArrival, B], update: (A, B) => A): Unit =
+    updates.foreach {
+      case (key, incoming) =>
+        arrivals.get(key).foreach {
+          a => arrivals = arrivals + ((key, update(a, incoming)))
+        }
+    }
+
   def remove(removals: Iterable[UniqueArrivalLike]): Unit =
     arrivals = ArrivalsRemoval.removeArrivals(removals, arrivals)
 

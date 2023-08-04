@@ -57,6 +57,16 @@ message SplitMessage {
     optional string style = 3;
 }
 
+message SplitsForArrivalsMessage {
+    optional int64 createdAt = 1;
+    repeated SplitsForArrivalMessage splitsForArrivals = 2;
+}
+
+message SplitsForArrivalMessage {
+    optional UniqueArrivalMessage uniqueArrival = 1;
+    repeated SplitMessage splits = 2;
+}
+
 message SplitNationalityCountMessage {
     optional string paxNationality = 1;
     optional double count = 2;

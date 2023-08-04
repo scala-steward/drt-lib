@@ -55,6 +55,24 @@ object FlightMessageConversion {
       toRemove = flightsDiffMessage.removals.map(uniqueArrivalFromMessage)
     )
 
+  def splitsForArrivalsToMessage(splitsForArrivals: SplitsForArrivals, nowMillis: Long): SplitsForArrivalsMessage =
+    SplitsForArrivalsMessage(
+      createdAt = Option(nowMillis),
+      splitsForArrivals = splitsForArrivals.splits.toSeq.map { case (ua, splits) =>
+        SplitsForArrivalMessage(
+          Option(uniqueArrivalToMessage(ua)),
+          splits.map(apiSplitsToMessage).toSeq
+        )
+      }
+    )
+
+  def splitsForArrivalsFromMessage(msg: SplitsForArrivalsMessage): SplitsForArrivals =
+    SplitsForArrivals(
+      msg.splitsForArrivals.map(sfa =>
+        uniqueArrivalFromMessage(sfa.getUniqueArrival) -> sfa.splits.map(splitMessageToApiSplits).toSet
+      ).toMap
+    )
+
   def uniqueArrivalsFromMessages(uniqueArrivalMessages: Seq[UniqueArrivalMessage]): Seq[UniqueArrivalLike] =
     uniqueArrivalMessages.collect {
       case UniqueArrivalMessage(Some(number), Some(terminalName), Some(scheduled), Some(origin)) =>
