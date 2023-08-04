@@ -29,11 +29,11 @@ class ArrivalsRestorer[A <: WithUnique[UniqueArrival] with Updatable[A]] {
     arrivals = arrivals + ((update.unique, updated))
   }
 
-  def applyUpdates[B](updates: Map[UniqueArrival, B], update: (A, B) => A): Unit =
+  def applyUpdates[B](updates: Map[UniqueArrival, B], update: (Option[A], B) => Option[A]): Unit =
     updates.foreach {
       case (key, incoming) =>
-        arrivals.get(key).foreach {
-          a => arrivals = arrivals + ((key, update(a, incoming)))
+        update(arrivals.get(key), incoming).foreach { updated =>
+          arrivals = arrivals + ((key, updated))
         }
     }
 

@@ -17,8 +17,14 @@ case class SplitsForArrivals(splits: Map[UniqueArrival, Set[Splits]]) extends Fl
     val updatedSplits = other
       .map {
         case (key, incoming) =>
+          println(s"looking for $key to update splits. keys: ${splits.keys.map(_.toString).mkString(", ")}")
           other.get(key)
-            .map(existing => (existing, incoming.diff(existing)))
+            .map { existing =>
+              println(s"found $key to update splits. existing: ${existing.map(_.toString).mkString(", ")} incoming: ${incoming.map(_.toString).mkString(", ")}")
+              val newIncoming = incoming.diff(existing)
+              println(s"new incoming: ${newIncoming.map(_.toString).mkString(", ")}")
+              (existing, newIncoming)
+            }
             .collect {
               case (existing, incoming) if incoming.nonEmpty =>
                 (key, updateSplits(existing, incoming))
@@ -39,11 +45,13 @@ case class SplitsForArrivals(splits: Map[UniqueArrival, Set[Splits]]) extends Fl
     }.toSet
     val updatedFlights = splits.foldLeft(flightsWithSplits.flights) {
       case (acc, (key, incoming)) =>
+        println(s"looking for $key to update splits. keys: ${acc.keys.map(_.toString).mkString(", ")}")
         acc.get(key) match {
           case Some(flightWithSplits) =>
             val updatedSplits = updateSplits(flightWithSplits.splits, incoming)
             val updatedFlightWithSplits = flightWithSplits.copy(splits = updatedSplits, lastUpdated = Option(nowMillis))
             acc + (key -> updatedFlightWithSplits)
+          case None => acc
         }
     }
     (FlightsWithSplits(updatedFlights), minutesFromUpdates)

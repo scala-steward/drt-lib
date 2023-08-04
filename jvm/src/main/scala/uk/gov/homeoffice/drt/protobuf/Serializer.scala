@@ -16,7 +16,7 @@ import uk.gov.homeoffice.drt.protobuf.messages.RegisteredArrivalMessage.{Registe
 import uk.gov.homeoffice.drt.protobuf.messages.ShiftMessage.{ShiftMessage, ShiftStateSnapshotMessage, ShiftsMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.StaffMovementMessages.{RemoveStaffMovementMessage, StaffMovementMessage, StaffMovementsMessage, StaffMovementsStateSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.TerminalQueuesSummary.TerminalQueuesSummaryMessage
-import uk.gov.homeoffice.drt.protobuf.messages.VoyageManifest.{ManifestLikeMessage, ManifestPassengerProfileMessage, MaybeManifestLikeMessage, VoyageManifestLatestFileNameMessage, VoyageManifestMessage, VoyageManifestStateSnapshotMessage, VoyageManifestsMessage}
+import uk.gov.homeoffice.drt.protobuf.messages.VoyageManifest._
 
 class Serializer extends SerializerWithStringManifest {
   override def identifier: Int = 9001
@@ -28,6 +28,7 @@ class Serializer extends SerializerWithStringManifest {
   final val CrunchMinutes: String = classOf[CrunchMinutesMessage].getName
   final val FlightsWithSplits: String = classOf[FlightsWithSplitsMessage].getName
   final val FlightsWithSplitsDiff: String = classOf[FlightsWithSplitsDiffMessage].getName
+  final val SplitsForArrivals: String = classOf[SplitsForArrivalsMessage].getName
   final val Shifts: String = classOf[ShiftsMessage].getName
   final val ShiftStateSnapshot: String = classOf[ShiftStateSnapshotMessage].getName
   final val Shift: String = classOf[ShiftMessage].getName
@@ -126,6 +127,7 @@ class Serializer extends SerializerWithStringManifest {
       case RemoveDay => RemoveDayMessage.parseFrom(bytes)
       case FlightsWithSplits => FlightsWithSplitsMessage.parseFrom(bytes)
       case FlightsWithSplitsDiff => FlightsWithSplitsDiffMessage.parseFrom(bytes)
+      case SplitsForArrivals => SplitsForArrivalsMessage.parseFrom(bytes)
       case CrunchRequest => CrunchRequestMessage.parseFrom(bytes)
       case CrunchRequests => CrunchRequestsMessage.parseFrom(bytes)
       case RemoveCrunchRequest => RemoveCrunchRequestMessage.parseFrom(bytes)
