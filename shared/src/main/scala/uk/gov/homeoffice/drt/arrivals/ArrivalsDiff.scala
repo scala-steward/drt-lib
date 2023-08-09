@@ -4,11 +4,14 @@ import uk.gov.homeoffice.drt.DataUpdates.FlightUpdates
 import uk.gov.homeoffice.drt.ports.FeedSource
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.{SDateLike, UtcDate}
+import upickle.default.{macroRW, _}
 
 import scala.collection.immutable.SortedMap
 
 
 object ArrivalsDiff {
+  implicit val rw: ReadWriter[ArrivalsDiff] = macroRW
+
   val empty: ArrivalsDiff = ArrivalsDiff(Seq(), Seq())
 
   def apply(toUpdate: Iterable[Arrival], toRemove: Iterable[UniqueArrival]): ArrivalsDiff = ArrivalsDiff(

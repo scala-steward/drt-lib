@@ -4,9 +4,12 @@ import uk.gov.homeoffice.drt.DataUpdates.FlightUpdates
 import uk.gov.homeoffice.drt.arrivals.SplitsForArrivals.updateFlightWithSplits
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages
 import uk.gov.homeoffice.drt.ports.{ApiFeedSource, FeedSource}
+import upickle.default.{macroRW, _}
 
 
 object SplitsForArrivals {
+  implicit val rw: ReadWriter[SplitsForArrivals] = macroRW
+
   val empty: SplitsForArrivals = SplitsForArrivals(Map())
 
   def updateSplits(existing: Set[Splits], incoming: Set[Splits]): Set[Splits] =
