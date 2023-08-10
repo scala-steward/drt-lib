@@ -42,18 +42,18 @@ object SplitsForArrivals {
 
 case class SplitsForArrivals(splits: Map[UniqueArrival, Set[Splits]]) extends FlightUpdates {
 
-  def diff(other: Map[UniqueArrival, Set[Splits]]): SplitsForArrivals = {
+  def diff(oldOnes: Map[UniqueArrival, Set[Splits]]): SplitsForArrivals = {
     val updatedSplits = splits
-      .map {
-        case (key, ourSplits) =>
-          other.get(key)
-            .map(existing => ourSplits.diff(existing))
-            .collect {
-              case ourNewSplits if ourNewSplits.nonEmpty =>
-                (key, ourNewSplits)
-            }
+      .map { case (ua, split) =>
+        val oldSplits = oldOnes.getOrElse(ua, Set())
+        split.diff(oldSplits) match {
+          case empty if empty.isEmpty => None
+          case newSplits => Option((ua, newSplits))
+        }
       }
-      .collect { case Some(splits) => splits }
+      .collect {
+        case Some(updates) => updates
+      }
       .toMap
 
     SplitsForArrivals(updatedSplits)

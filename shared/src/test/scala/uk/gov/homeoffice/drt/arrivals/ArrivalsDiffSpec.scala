@@ -12,7 +12,7 @@ class ArrivalsDiffSpec extends Specification {
       "No existing flights" >> {
         "Then I should get an empty FlightsWithSplits" >> {
           val updated = arrivalsDiff.diffWith(Map())
-          updated === FlightsWithSplitsDiff.empty
+          updated === ArrivalsDiff.empty
         }
       }
 
@@ -22,7 +22,7 @@ class ArrivalsDiffSpec extends Specification {
 
         "Then I should get an empty FlightsWithSplits" >> {
           val updated = arrivalsDiff.diffWith(flights)
-          updated === FlightsWithSplitsDiff.empty
+          updated === ArrivalsDiff.empty
         }
       }
     }
@@ -34,7 +34,7 @@ class ArrivalsDiffSpec extends Specification {
       "No existing flights" >> {
         "Then I should get a FlightsWithSplits containing the new arrival" >> {
           val updated = arrivalsDiff.diffWith(Map())
-          updated === FlightsWithSplitsDiff(Seq(ApiFlightWithSplits(arrival, Set(), Option(now))), Seq())
+          updated === ArrivalsDiff(Seq(arrival), Seq())
         }
       }
 
@@ -43,7 +43,7 @@ class ArrivalsDiffSpec extends Specification {
 
         "Then I should get an empty FlightsWithSplits" >> {
           val updated = arrivalsDiff.diffWith(flights)
-          updated === FlightsWithSplitsDiff.empty
+          updated === ArrivalsDiff.empty
         }
       }
 
