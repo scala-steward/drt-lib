@@ -20,7 +20,7 @@ object ArrivalsDiff {
 }
 
 case class ArrivalsDiff(toUpdate: SortedMap[UniqueArrival, Arrival], toRemove: Iterable[UniqueArrival]) extends FlightUpdates {
-  def diffWith(arrivals: Map[UniqueArrival, Arrival]): ArrivalsDiff = {
+  def diff(arrivals: Map[UniqueArrival, Arrival]): ArrivalsDiff = {
     val updatedFlights = toUpdate
       .map {
         case (key, incomingArrival) =>
