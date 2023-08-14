@@ -5,7 +5,7 @@ object Ports {
     "ABB", "ABZ", "ADV", "ADX", "AYH",
     "BBP", "BBS", "BEB", "BEQ", "BEX", "BFS", "BHD", "BHX", "BLK", "BLY", "BOH", "BOL", "BQH", "BRF", "BRR", "BRS", "BSH", "BUT", "BWF", "BWY", "BYT", "BZZ",
     "CAL", "CAX", "CBG", "CEG", "CHE", "CLB", "COL", "CRN", "CSA", "CVT", "CWL",
-    "DCS", "DGX", "DND", "DOC", "DSA",
+    "DCS", "DGX", "DND", "DOC",
     "EDI", "EMA", "ENK", "EOI", "ESH", "EWY", "EXT",
     "FAB", "FEA", "FFD", "FIE", "FKH", "FLH", "FOA", "FSS", "FWM", "FZO",
     "GLA", "GLO", "GQJ", "GSY", "GXH",
