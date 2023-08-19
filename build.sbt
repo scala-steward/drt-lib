@@ -30,7 +30,7 @@ lazy val autowireVersion = "0.3.3"
 lazy val booPickleVersion = "1.3.3"
 lazy val specs2 = "4.20.0"
 lazy val csvCommonsVersion = "1.10.0"
-lazy val catsVersion = "2.9.0"
+lazy val catsVersion = "2.10.0"
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .in(file("."))
