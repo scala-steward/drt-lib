@@ -146,7 +146,7 @@ class ApiFlightWithSplitsSpec extends Specification {
 
     "give a pax count from splits when it has API splits which does not include transfer pax" in {
       val flightWithSplits = flightWithPaxAndApiSplits(45, 20, Set(), Map(), scheduledAfterPaxSources)
-      flightWithSplits.apiFlight.bestPaxEstimate(sourceOrderPreference).passengers.getPcpPax mustEqual Option(45)
+      flightWithSplits.apiFlight.bestPaxEstimate(sourceOrderPreference).passengers.actual mustEqual Option(45)
     }
 
     "give a pax count from splits when it has API splits even when it is outside the trusted threshold" in {
@@ -178,7 +178,7 @@ class ApiFlightWithSplitsSpec extends Specification {
                                        ): ApiFlightWithSplits = {
     val flight: Arrival = ArrivalGenerator.arrival(
       feedSources = sources,
-      passengerSources = passengerSources,
+      passengerSources = passengerSources + (ApiFeedSource -> Passengers(Option(splitsDirect), Option(splitsTransfer))),
       sch = scheduled)
 
     ApiFlightWithSplits(flight, Set(splitsForPax(directPax = splitsDirect, transferPax = splitsTransfer, ApiSplitsWithHistoricalEGateAndFTPercentages)))

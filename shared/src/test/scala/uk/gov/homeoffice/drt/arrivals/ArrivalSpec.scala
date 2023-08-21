@@ -118,6 +118,16 @@ class ArrivalSpec extends Specification {
       val arrival = arrivalBase.copy(PassengerSources = Map(AclFeedSource -> Passengers(Option(10), None)), FeedSources = Set(AclFeedSource))
       arrival.bestPaxEstimate(sourceOrderPreference) mustEqual PaxSource(aclFeedPaxSource._1, aclFeedPaxSource._2)
     }
+
+    "When there is a live feed with undefined pax and api with pax" >> {
+      "then bestPcpPaxEstimate should return the api pax" >> {
+        val arrival = arrivalBase.copy(PassengerSources = Map(
+          LiveFeedSource -> Passengers(None, Option(0)),
+          ApiFeedSource -> Passengers(Some(10), None)
+        ))
+        arrival.bestPcpPaxEstimate(sourceOrderPreference) must beSome(10)
+      }
+    }
   }
 
   "isInRange" >> {
