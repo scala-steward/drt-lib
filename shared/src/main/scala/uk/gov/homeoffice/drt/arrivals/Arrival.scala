@@ -157,7 +157,8 @@ case class Arrival(Operator: Option[Operator],
       .getOrElse(PaxSource(UnknownFeedSource, Passengers(None, None)))
   }
 
-  def bestPcpPaxEstimate(sourceOrderPreference: List[FeedSource]): Option[Int] = bestPaxEstimate(sourceOrderPreference).getPcpPax
+  def bestPcpPaxEstimate(sourceOrderPreference: List[FeedSource]): Option[Int] =
+    if (isCancelled) Option(0) else bestPaxEstimate(sourceOrderPreference).getPcpPax
 
   lazy val predictedTouchdown: Option[Long] =
     Predictions.predictions
@@ -184,13 +185,15 @@ case class Arrival(Operator: Option[Operator],
   def minutesOfPaxArrivals(sourceOrderPreference: List[FeedSource]): Int = {
     val bestPax = bestPaxEstimate(sourceOrderPreference)
     if (bestPax.passengers.actual.getOrElse(0) <= 0) 0
-    else (bestPax.passengers.actual.getOrElse(0).toDouble / paxOffPerMinute).ceil.toInt - 1
+    else (bestPax.passengers.actual.getOrElse(0).toDouble / paxOffPerMinute).ceil.toInt
   }
 
   def pcpRange(sourceOrderPreference: List[FeedSource]): NumericRange[Long] = {
     val pcpStart = MilliTimes.timeToNearestMinute(PcpTime.getOrElse(0L))
 
-    val pcpEnd = pcpStart + oneMinuteMillis * minutesOfPaxArrivals(sourceOrderPreference)
+    val minutes = minutesOfPaxArrivals(sourceOrderPreference)
+    val minutesToAdd = if (minutes > 0) minutes - 1 else 0
+    val pcpEnd = pcpStart + minutesToAdd * oneMinuteMillis
 
     pcpStart to pcpEnd by oneMinuteMillis
   }

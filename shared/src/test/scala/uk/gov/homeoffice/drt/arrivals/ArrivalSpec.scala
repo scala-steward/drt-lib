@@ -137,4 +137,34 @@ class ArrivalSpec extends Specification {
       Arrival.isInRange(1, 10)(11) === false
     }
   }
+
+  "minutesOfPaxArrivals" >> {
+    "should return 0 when there are 0 total passengers" >> {
+      ArrivalGenerator.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(0), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 0
+    }
+    "should return 1 when there are 1 total passengers" >> {
+      ArrivalGenerator.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(1), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 1
+    }
+    "should return 1 when there are 20 total passengers" >> {
+      ArrivalGenerator.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(20), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 1
+    }
+    "should return 2 when there are 21 total passengers" >> {
+      ArrivalGenerator.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(21), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 2
+    }
+  }
+
+  "pcpRange" >> {
+    "should return 0L to 0L given an arrival with scheduled time 0L and 0 total passengers" >> {
+      ArrivalGenerator.arrival(sch = 0L,  passengerSources = Map(ApiFeedSource -> Passengers(Option(0), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
+    }
+    "should return 0L to 0L given an arrival with scheduled time 0L and 1 total passengers" >> {
+      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(1), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
+    }
+    "should return 0L to 0L given an arrival with scheduled time 0L and 20 total passengers" >> {
+      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(20), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
+    }
+    "should return 0L to 60000L given an arrival with scheduled time 0L and 21 total passengers" >> {
+      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(21), None))).pcpRange(List(ApiFeedSource)) === (0L to 60000L by 60000)
+    }
+  }
 }
