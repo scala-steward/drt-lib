@@ -155,7 +155,6 @@ case class Arrival(Operator: Option[Operator],
       .find(source => PassengerSources.get(source).exists(_.actual.isDefined))
       .flatMap(source => PassengerSources.get(source).map(PaxSource(source, _)))
       .getOrElse(PaxSource(UnknownFeedSource, Passengers(None, None)))
-
   }
 
   def bestPcpPaxEstimate(sourceOrderPreference: List[FeedSource]): Option[Int] = bestPaxEstimate(sourceOrderPreference).getPcpPax
@@ -237,7 +236,7 @@ object Arrival {
   }
 
   def isInRange(rangeStart: Long, rangeEnd: Long)(needle: Long): Boolean =
-    rangeStart < needle && needle < rangeEnd
+    rangeStart <= needle && needle <= rangeEnd
 
   def isRelevantToPeriod(rangeStart: SDateLike, rangeEnd: SDateLike, sourceOrderPreference: List[FeedSource])(arrival: Arrival): Boolean = {
     val rangeCheck: Long => Boolean = isInRange(rangeStart.millisSinceEpoch, rangeEnd.millisSinceEpoch)

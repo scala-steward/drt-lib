@@ -4,6 +4,8 @@ import org.specs2.mutable.Specification
 import uk.gov.homeoffice.drt.ports._
 
 class ArrivalSpec extends Specification {
+
+
   "An Arrival" should {
     "Know it has no source of passengers when there are no sources" in {
       ArrivalGenerator.arrival(passengerSources = Map()).hasNoPaxSource shouldEqual true
@@ -115,6 +117,24 @@ class ArrivalSpec extends Specification {
       " then bestPcpPaxEstimate fallback to FeedSource " in {
       val arrival = arrivalBase.copy(PassengerSources = Map(AclFeedSource -> Passengers(Option(10), None)), FeedSources = Set(AclFeedSource))
       arrival.bestPaxEstimate(sourceOrderPreference) mustEqual PaxSource(aclFeedPaxSource._1, aclFeedPaxSource._2)
+    }
+  }
+
+  "isInRange" >> {
+    "should return true when the needle is equal to the start of the range" >> {
+      Arrival.isInRange(1, 10)(1) === true
+    }
+    "should return true when the needle is equal to the end of the range" >> {
+      Arrival.isInRange(1, 10)(10) === true
+    }
+    "should return true when the needle is between the start and end of the range" >> {
+      Arrival.isInRange(1, 10)(5) === true
+    }
+    "should return false when the needle is lower than the start of the range" >> {
+      Arrival.isInRange(1, 10)(0) === false
+    }
+    "should return false when the needle is higher than the end of the range" >> {
+      Arrival.isInRange(1, 10)(11) === false
     }
   }
 }
