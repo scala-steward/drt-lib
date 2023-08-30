@@ -6,7 +6,7 @@ sealed trait PortRegion {
 }
 
 object PortRegion {
-  val regions = Set(North, South, Central, Heathrow)
+  val regions: Set[PortRegion] = Set(North, South, Central, Heathrow)
 
   val ports: Set[PortCode] = regions.flatMap(_.ports)
 
@@ -30,4 +30,6 @@ object PortRegion {
     override val name: String = "Heathrow"
     override val ports: Set[PortCode] = Set(PortCode("LHR"))
   }
+
+  def fromPort(portCode: PortCode): PortRegion = regions.find(_.ports.contains(portCode)).getOrElse(throw new Exception(s"Unknown port $portCode"))
 }
