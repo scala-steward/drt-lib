@@ -154,7 +154,7 @@ case class Arrival(Operator: Option[Operator],
       .flatMap(source => PassengerSources.get(source).map(PaxSource(source, _)))
       .getOrElse(PaxSource(UnknownFeedSource, Passengers(None, None)))
 
-  def bestPcpPaxEstimate(sourceOrderPreference: List[FeedSource]): Option[Int] =
+  def bestPcpPaxEstimate(sourceOrderPreference: Seq[FeedSource]): Option[Int] =
     if (isCancelled || Origin.isDomesticOrCta) Option(0) else bestPaxEstimate(sourceOrderPreference).getPcpPax
 
   lazy val predictedTouchdown: Option[Long] =
