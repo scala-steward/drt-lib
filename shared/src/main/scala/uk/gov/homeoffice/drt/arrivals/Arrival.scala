@@ -148,17 +148,14 @@ case class Arrival(Operator: Option[Operator],
     (minutesToDisembark * oneMinuteInMillis).toLong
   }
 
-  def bestPaxEstimate(sourceOrderPreference: List[FeedSource]): PaxSource = {
-    val preferredSources: List[FeedSource] = sourceOrderPreference
-
-    preferredSources
+  def bestPaxEstimate(sourceOrderPreference: Seq[FeedSource]): PaxSource =
+    sourceOrderPreference
       .find(source => PassengerSources.get(source).exists(_.actual.isDefined))
       .flatMap(source => PassengerSources.get(source).map(PaxSource(source, _)))
       .getOrElse(PaxSource(UnknownFeedSource, Passengers(None, None)))
-  }
 
-  def bestPcpPaxEstimate(sourceOrderPreference: List[FeedSource]): Option[Int] =
-    if (isCancelled) Option(0) else bestPaxEstimate(sourceOrderPreference).getPcpPax
+  def bestPcpPaxEstimate(sourceOrderPreference: Seq[FeedSource]): Option[Int] =
+    if (isCancelled || Origin.isDomesticOrCta) Option(0) else bestPaxEstimate(sourceOrderPreference).getPcpPax
 
   lazy val predictedTouchdown: Option[Long] =
     Predictions.predictions

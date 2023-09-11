@@ -4,8 +4,6 @@ import org.specs2.mutable.Specification
 import uk.gov.homeoffice.drt.ports._
 
 class ArrivalSpec extends Specification {
-
-
   "An Arrival" should {
     "Know it has no source of passengers when there are no sources" in {
       ArrivalGenerator.arrival(passengerSources = Map()).hasNoPaxSource shouldEqual true
@@ -119,14 +117,22 @@ class ArrivalSpec extends Specification {
       arrival.bestPaxEstimate(sourceOrderPreference) mustEqual PaxSource(aclFeedPaxSource._1, aclFeedPaxSource._2)
     }
 
-    "When there is a live feed with undefined pax and api with pax" >> {
-      "then bestPcpPaxEstimate should return the api pax" >> {
+    "Give api total pax minus the api transit pax when there is a live feed with undefined pax and api with pax" >> {
         val arrival = arrivalBase.copy(PassengerSources = Map(
           LiveFeedSource -> Passengers(None, Option(0)),
-          ApiFeedSource -> Passengers(Some(10), None)
+          ApiFeedSource -> Passengers(Option(10), Option(3))
         ))
-        arrival.bestPcpPaxEstimate(sourceOrderPreference) must beSome(10)
-      }
+        arrival.bestPcpPaxEstimate(sourceOrderPreference) must beSome(10 - 3)
+    }
+
+    "Give zero pcp when the flight is domestic" >> {
+      val arrival = arrivalBase.copy(Origin = PortCode("LHR"), PassengerSources = Map(LiveFeedSource -> Passengers(Option(10), Option(3))))
+      arrival.bestPcpPaxEstimate(sourceOrderPreference) must beSome(0)
+    }
+
+    "Give zero pcp when the flight has a CTA origin" >> {
+      val arrival = arrivalBase.copy(Origin = PortCode("JER"), PassengerSources = Map(LiveFeedSource -> Passengers(Option(10), Option(3))))
+      arrival.bestPcpPaxEstimate(sourceOrderPreference) must beSome(0)
     }
   }
 
