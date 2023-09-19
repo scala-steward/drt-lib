@@ -14,6 +14,9 @@ object Ema extends AirportConfigLike {
 
   import AirportConfigDefaults._
 
+  private val egateUtilisation = 0.61
+  private val nonEgateUtilisation: Double = 1.0 - egateUtilisation
+  
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("EMA"),
     queuesByTerminal = SortedMap(
@@ -46,10 +49,20 @@ object Ema extends AirportConfigLike {
     eGateBankSizes = Map(T1 -> Iterable(5)),
     role = EMA,
     terminalPaxTypeQueueAllocation = Map(
-      T1 -> (defaultQueueRatios + (EeaMachineReadable -> List(
-        EGate -> 0.6993,
-        EeaDesk -> (1.0 - 0.6993)
-      )))
+      T1 -> (defaultQueueRatios +
+        (EeaMachineReadable -> List(
+          EGate -> egateUtilisation,
+          EeaDesk -> nonEgateUtilisation
+        )) +
+        (GBRNational -> List(
+          EGate -> egateUtilisation,
+          EeaDesk -> nonEgateUtilisation
+        )) +
+        (B5JPlusNational -> List(
+          EGate -> egateUtilisation,
+          EeaDesk -> nonEgateUtilisation
+        ))
+        )
     ),
     flexedQueues = Set(),
     desksByTerminal = Map(T1 -> 5),
