@@ -57,9 +57,9 @@ object AirportConfigDefaults {
     eeaNonMachineReadableToDesk -> 31d / 60,
     gbrNationalToDesk -> 24d / 60,
     gbrNationalChildToDesk -> 24d / 60,
-    b5jsskToEGate -> (46d / 60),
-    eeaMachineReadableToEGate -> 46d / 60,
-    gbrNationalToEgate -> 46d / 60,
+    b5jsskToEGate -> (36d / 60),
+    eeaMachineReadableToEGate -> 36d / 60,
+    gbrNationalToEgate -> 36d / 60,
     visaNationalToDesk -> 119d / 60,
     nonVisaNationalToDesk -> 101d / 60
   )
