@@ -15,7 +15,8 @@ object Ema extends AirportConfigLike {
   import AirportConfigDefaults._
 
   private val egateUtilisation = 0.61
-
+  private val nonEgateUtilisation: Double = 1.0 - egateUtilisation
+  
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("EMA"),
     queuesByTerminal = SortedMap(
@@ -51,15 +52,15 @@ object Ema extends AirportConfigLike {
       T1 -> (defaultQueueRatios +
         (EeaMachineReadable -> List(
           EGate -> egateUtilisation,
-          EeaDesk -> (1.0 - egateUtilisation)
+          EeaDesk -> nonEgateUtilisation
         )) +
         (GBRNational -> List(
           EGate -> egateUtilisation,
-          EeaDesk -> (1.0 - egateUtilisation)
+          EeaDesk -> nonEgateUtilisation
         )) +
         (B5JPlusNational -> List(
           EGate -> egateUtilisation,
-          EeaDesk -> (1.0 - egateUtilisation)
+          EeaDesk -> nonEgateUtilisation
         ))
         )
     ),
