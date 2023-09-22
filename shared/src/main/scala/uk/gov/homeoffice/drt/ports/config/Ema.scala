@@ -16,7 +16,7 @@ object Ema extends AirportConfigLike {
 
   private val egateUtilisation = 0.61
   private val nonEgateUtilisation: Double = 1.0 - egateUtilisation
-  
+
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("EMA"),
     queuesByTerminal = SortedMap(
