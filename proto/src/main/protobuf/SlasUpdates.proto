@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+package uk.gov.homeoffice.drt.protobuf.messages;
+
+
+message SlasMessage {
+    optional string queue = 1;
+    optional int32 minutes = 2;
+}
+
+message SlasUpdateMessage {
+    optional int64 effectiveFrom = 1;
+    repeated SlasMessage queueSlas = 2;
+}
+
+message SlasUpdatesMessage {
+    repeated SlasUpdateMessage updates = 2;
+}
+
+message SetSlasUpdateMessage {
+    optional SlasUpdateMessage update = 1;
+    optional int64 maybeOriginalEffectiveFrom = 2;
+}
+
+message RemoveSlasUpdateMessage {
+    optional int64 effectiveFrom = 1;
+}
