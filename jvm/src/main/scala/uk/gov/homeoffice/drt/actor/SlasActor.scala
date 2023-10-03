@@ -17,7 +17,7 @@ import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.config.slas.{SlaUpdates, SlasUpdate}
 import uk.gov.homeoffice.drt.protobuf.messages.SlasUpdates.{RemoveSlasUpdateMessage, SetSlasUpdateMessage, SlaUpdatesMessage}
 import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch
-import uk.gov.homeoffice.drt.time.{MilliTimes, SDate, SDateLike}
+import uk.gov.homeoffice.drt.time.{LocalDate, MilliTimes, SDate, SDateLike}
 
 import scala.collection.immutable.SortedMap
 import scala.concurrent.duration.DurationInt
@@ -49,11 +49,16 @@ object SlasActor {
   case class RemoveSlasUpdate(effectiveFrom: MillisSinceEpoch) extends Command
 
   def slasProvider(egateBanksUpdatesActor: ActorRef)
-                  (implicit timeout: Timeout, ec: ExecutionContext): MillisSinceEpoch => Future[Map[Queue, Int]] = (at: MillisSinceEpoch) =>
-    egateBanksUpdatesActor
-      .ask(GetState)
-      .mapTo[SlaUpdates]
-      .map(_.updatesForDate(at).getOrElse(throw new Exception(s"No slas found for date $at")))
+                  (implicit timeout: Timeout, ec: ExecutionContext): (LocalDate, Queue) => Future[Int] =
+    (date, queue) =>
+      egateBanksUpdatesActor
+        .ask(GetState)
+        .mapTo[SlaUpdates]
+        .map {
+          _.updatesForDate(SDate(date).millisSinceEpoch)
+            .getOrElse(throw new Exception(s"No slas found for $date"))
+            .getOrElse(queue, throw new Exception("No slas found for queue"))
+        }
 }
 
 class SlasActor(val now: () => SDateLike,
