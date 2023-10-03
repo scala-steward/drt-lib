@@ -1,15 +1,13 @@
 package uk.gov.homeoffice.drt.actor.acking
 
 import akka.actor.ActorRef
+import akka.pattern.StatusReply.Ack
 import akka.pattern.ask
 import akka.util.Timeout
-import uk.gov.homeoffice.drt.actor.acking.AckingReceiver.Ack
 
 import scala.concurrent.ExecutionContext
 
 object AckingReceiver {
-
-  case object Ack
 
   case object StreamInitialized
 
