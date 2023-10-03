@@ -47,13 +47,13 @@ object SlasMessageConversion {
       maybeOriginalEffectiveFrom = message.maybeOriginalEffectiveFrom,
     )
 
-  def slasUpdatesToMessage(updates: SlaUpdates) = SlasUpdatesMessage(
+  def slasUpdatesToMessage(updates: SlaUpdates) = SlaUpdatesMessage(
     updates = updates.updates.map {
       case (effectiveFrom, item) => slasUpdateToMessage(SlasUpdate(effectiveFrom, item))
     }.toSeq
   )
 
-  def slasUpdatesFromMessage(updates: SlasUpdatesMessage) = SlaUpdates(
+  def slasUpdatesFromMessage(updates: SlaUpdatesMessage) = SlaUpdates(
     updates = SortedMap(updates.updates.map { msg =>
       val update = slasUpdateFromMessage(msg)
       (update.effectiveFrom, update.item)

@@ -4,8 +4,9 @@ import akka.persistence.{RecoveryCompleted, SnapshotOffer}
 import org.apache.spark.ml.regression.LinearRegressionModel
 import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
-import uk.gov.homeoffice.drt.actor.PredictionModelActor.{Ack, Models, RemoveModel, WithId}
-import uk.gov.homeoffice.drt.actor.TerminalDateActor.GetState
+import uk.gov.homeoffice.drt.actor.PredictionModelActor.{Models, RemoveModel, WithId}
+import uk.gov.homeoffice.drt.actor.acking.AckingReceiver.Ack
+import uk.gov.homeoffice.drt.actor.commands.Commands.GetState
 import uk.gov.homeoffice.drt.arrivals.Arrival
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, ModelCategory, RegressionModel}
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.{ModelAndFeaturesMessage, ModelsAndFeaturesMessage, RemoveModelMessage}
@@ -14,8 +15,6 @@ import uk.gov.homeoffice.drt.time.{LocalDate, SDate, SDateLike}
 import scala.util.{Failure, Try}
 
 object PredictionModelActor {
-  case object Ack
-
   case class Models(models: Map[String, ModelAndFeatures])
 
   case class ModelUpdate(model: RegressionModel,

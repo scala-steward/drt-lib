@@ -15,7 +15,7 @@ import uk.gov.homeoffice.drt.actor.commands.CrunchRequest
 import uk.gov.homeoffice.drt.actor.serialisation.SlasMessageConversion
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.config.slas.{SlaUpdates, SlasUpdate}
-import uk.gov.homeoffice.drt.protobuf.messages.SlasUpdates.{RemoveSlasUpdateMessage, SetSlasUpdateMessage, SlasUpdatesMessage}
+import uk.gov.homeoffice.drt.protobuf.messages.SlasUpdates.{RemoveSlasUpdateMessage, SetSlasUpdateMessage, SlaUpdatesMessage}
 import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch
 import uk.gov.homeoffice.drt.time.{MilliTimes, SDate, SDateLike}
 
@@ -74,7 +74,7 @@ class SlasActor(val now: () => SDateLike,
   }
 
   override def processSnapshotMessage: PartialFunction[Any, Unit] = {
-    case smm: SlasUpdatesMessage =>
+    case smm: SlaUpdatesMessage =>
       state = SlasMessageConversion.slasUpdatesFromMessage(smm)
   }
 

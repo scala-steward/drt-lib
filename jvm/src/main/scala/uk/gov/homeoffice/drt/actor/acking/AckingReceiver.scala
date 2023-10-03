@@ -1,9 +1,9 @@
 package uk.gov.homeoffice.drt.actor.acking
 
-import actors.acking.AckingReceiver.Ack
 import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
+import uk.gov.homeoffice.drt.actor.acking.AckingReceiver.Ack
 
 import scala.concurrent.ExecutionContext
 
