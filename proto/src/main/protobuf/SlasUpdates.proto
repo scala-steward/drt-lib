@@ -13,7 +13,7 @@ message SlasUpdateMessage {
     repeated SlasMessage queueSlas = 2;
 }
 
-message SlasUpdatesMessage {
+message SlaUpdatesMessage {
     repeated SlasUpdateMessage updates = 2;
 }
 

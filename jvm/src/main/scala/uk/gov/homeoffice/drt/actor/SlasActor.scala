@@ -8,19 +8,16 @@ import akka.stream.scaladsl.SourceQueueWithComplete
 import akka.util.Timeout
 import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
-import uk.gov.homeoffice.drt.actor.SlasActor.{ReceivedSubscriberAck, RemoveSlasUpdate, SendToSubscriber, SetSlasUpdate}
-import uk.gov.homeoffice.drt.actor.commands.Commands.GetState
+import uk.gov.homeoffice.drt.actor.SlasActor._
+import uk.gov.homeoffice.drt.actor.acking.AckingReceiver.StreamCompleted
+import uk.gov.homeoffice.drt.actor.commands.Commands.{AddUpdatesSubscriber, GetState}
 import uk.gov.homeoffice.drt.actor.commands.CrunchRequest
 import uk.gov.homeoffice.drt.actor.serialisation.SlasMessageConversion
-import uk.gov.homeoffice.drt.egates._
 import uk.gov.homeoffice.drt.ports.Queues.Queue
-import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.ports.config.slas.{SlaUpdates, SlasUpdate}
-import uk.gov.homeoffice.drt.ports.config.updates.UpdatesWithHistory
-import uk.gov.homeoffice.drt.protobuf.messages.EgateBanksUpdates.{PortEgateBanksUpdatesMessage, RemoveEgateBanksUpdateMessage, SetEgateBanksUpdateMessage}
+import uk.gov.homeoffice.drt.protobuf.messages.SlasUpdates.{RemoveSlasUpdateMessage, SetSlasUpdateMessage, SlasUpdatesMessage}
 import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch
 import uk.gov.homeoffice.drt.time.{MilliTimes, SDate, SDateLike}
-import upickle.default.macroRW
 
 import scala.collection.immutable.SortedMap
 import scala.concurrent.duration.DurationInt
@@ -45,9 +42,9 @@ object SlasActor {
     }
   }
 
-//  object SetSlasUpdate {
-//    implicit val rw: ReadWriter[SetSlasUpdate] = macroRW
-//  }
+  //  object SetSlasUpdate {
+  //    implicit val rw: ReadWriter[SetSlasUpdate] = macroRW
+  //  }
 
   case class RemoveSlasUpdate(effectiveFrom: MillisSinceEpoch) extends Command
 
@@ -61,7 +58,7 @@ object SlasActor {
 
 class SlasActor(val now: () => SDateLike,
                 crunchRequest: MillisSinceEpoch => CrunchRequest,
-                maxForecastDays: Int) extends RecoveryActorLike with PersistentDrtActor[UpdatesWithHistory[Map[Queue, Int]]] {
+                maxForecastDays: Int) extends RecoveryActorLike with PersistentDrtActor[SlaUpdates] {
   override val log: Logger = LoggerFactory.getLogger(getClass)
 
   override def persistenceId: String = "slas"
@@ -69,37 +66,28 @@ class SlasActor(val now: () => SDateLike,
   override val maybeSnapshotInterval: Option[Int] = None
 
   override def processRecoveryMessage: PartialFunction[Any, Unit] = {
-    case updates: SetSlasUpdate =>
-      SlasMessageConversion.setSlasUpdatesToMessage(updates)
-        //.foreach(update => state = state.update(update))
-    state = updates.maybeOriginalEffectiveFrom match {
-      case None =>
-        val value: UpdatesWithHistory[Map[Queue, Int]] = state.update(updates.update.effectiveFrom, updates.update.item)
-        SlaUpdates(value)
-    }
+    case msg: SetSlasUpdateMessage =>
+      state = stateUpdate(SlasMessageConversion.setSlasUpdatesFromMessage(msg))
 
-    case delete: RemoveSlasUpdate =>
-      SlasMessageConversion
-        .removeEgateBanksUpdateFromMessage(delete)
-        .foreach(d => state = state.remove(d))
+    case msg: RemoveSlasUpdateMessage =>
+      state = state.remove(SlasMessageConversion.removeSlasUpdatesFromMessage(msg).effectiveFrom)
   }
 
   override def processSnapshotMessage: PartialFunction[Any, Unit] = {
-    case smm: PortEgateBanksUpdatesMessage =>
-      state = SlasMessageConversion.portUpdatesFromMessage(smm)
+    case smm: SlasUpdatesMessage =>
+      state = SlasMessageConversion.slasUpdatesFromMessage(smm)
   }
 
   override def stateToMessage: GeneratedMessage =
-    SlasMessageConversion.portUpdatesToMessage(state)
+    SlasMessageConversion.slasUpdatesToMessage(state)
 
-  var state: UpdatesWithHistory[Map[Queue, Int]] = SlaUpdates(SortedMap())
+  var state: SlaUpdates = SlaUpdates(SortedMap())
 
-  var maybeSubscriber: Option[SourceQueueWithComplete[List[EgateBanksUpdateCommand]]] = None
-  var subscriberMessageQueue: List[EgateBanksUpdateCommand] = List()
+  var maybeSubscriber: Option[SourceQueueWithComplete[List[Command]]] = None
+  var subscriberMessageQueue: List[Command] = List()
   var awaitingSubscriberAck = false
 
   var maybeCrunchRequestQueueActor: Option[ActorRef] = None
-  var readyToEmit: Boolean = false
 
   implicit val ec: ExecutionContextExecutor = context.dispatcher
   implicit val timeout: Timeout = new Timeout(60.seconds)
@@ -136,31 +124,31 @@ class SlasActor(val now: () => SDateLike,
       awaitingSubscriberAck = false
       if (subscriberMessageQueue.nonEmpty) self ! SendToSubscriber
 
-    case updates: SetEgateBanksUpdate =>
-      log.info(s"Saving EgateBanksUpdates $updates")
+    case updates: SetSlasUpdate =>
+      log.info(s"Saving updates $updates")
 
       maybeCrunchRequestQueueActor.foreach { requestActor =>
         (updates.firstMinuteAffected to SDate.now().addDays(maxForecastDays).millisSinceEpoch by MilliTimes.oneHourMillis).map { millis =>
-          requestActor ! CrunchRequest(SDate(millis).toLocalDate, offsetMinutes, durationMinutes)
+          requestActor ! crunchRequest(millis)
         }
       }
 
-      state = state.update(updates)
-      persistAndMaybeSnapshot(SlasMessageConversion.setEgateBanksUpdatesToMessage(updates))
+      state = stateUpdate(updates)
+      persistAndMaybeSnapshot(SlasMessageConversion.setSlasUpdatesToMessage(updates))
       subscriberMessageQueue = updates :: subscriberMessageQueue
       self ! SendToSubscriber
       sender() ! updates
 
     case GetState =>
-      log.debug(s"Received GetState request. Sending PortEgateBanksUpdates with ${state.size} update sets")
+      log.debug(s"Received GetState request. Sending updates with ${state.updates.size} update sets")
       sender() ! state
 
-    case delete: DeleteEgateBanksUpdates =>
-      state = state.remove(delete)
-      persistAndMaybeSnapshot(SlasMessageConversion.removeEgateBanksUpdateToMessage(delete))
-      subscriberMessageQueue = delete :: subscriberMessageQueue
+    case remove: RemoveSlasUpdate =>
+      state = state.remove(remove.effectiveFrom)
+      persistAndMaybeSnapshot(SlasMessageConversion.removeSlasUpdateToMessage(remove))
+      subscriberMessageQueue = remove :: subscriberMessageQueue
       self ! SendToSubscriber
-      sender() ! delete
+      sender() ! remove
 
     case SaveSnapshotSuccess(md) =>
       log.info(s"Save snapshot success: $md")
@@ -172,4 +160,13 @@ class SlasActor(val now: () => SDateLike,
 
     case unexpected => log.error(s"Received unexpected message ${unexpected.getClass}")
   }
+
+  private def stateUpdate(updates: SetSlasUpdate): SlaUpdates =
+    updates.maybeOriginalEffectiveFrom match {
+      case None =>
+        state.update(updates.update.effectiveFrom, updates.update.item)
+      case Some(originalEffectiveFrom) =>
+        state.update(updates.update.effectiveFrom, updates.update.item, originalEffectiveFrom)
+    }
+
 }

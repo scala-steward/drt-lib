@@ -16,9 +16,12 @@ case class SlaUpdates(updates: SortedMap[Long, Map[Queue, Int]]) extends Updates
   override def updatesForDate(at: Long): Option[Map[Queue, Int]] =
     updates.toSeq.findLast { case (effectiveFrom, _) => effectiveFrom < at }.map(_._2)
 
-  override def update(newEffectiveFrom: Long, incomingUpdate: Map[Queue, Int]): UpdatesWithHistory[Map[Queue, Int]] =
+  override def update(newEffectiveFrom: Long, incomingUpdate: Map[Queue, Int]): SlaUpdates =
     copy(updates = updates.updated(newEffectiveFrom, incomingUpdate))
 
-  override def remove(effectiveFrom: Long): UpdatesWithHistory[Map[Queue, Int]] =
+  override def remove(effectiveFrom: Long): SlaUpdates =
     copy(updates = updates - effectiveFrom)
+
+  override def update(newEffectiveFrom: Long, item: Map[Queue, Int], originalEffectiveFrom: Long): SlaUpdates =
+    remove(originalEffectiveFrom).update(newEffectiveFrom, item)
 }

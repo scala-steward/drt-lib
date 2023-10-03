@@ -1,12 +1,11 @@
 package uk.gov.homeoffice.drt.actor.serialisation
 
-import uk.gov.homeoffice.drt.actor.SetSlasUpdate
 import uk.gov.homeoffice.drt.actor.SlasActor.{RemoveSlasUpdate, SetSlasUpdate}
 import uk.gov.homeoffice.drt.ports.Queues.Queue
-import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.ports.config.slas.SlasUpdate
+import uk.gov.homeoffice.drt.ports.config.slas.{SlaUpdates, SlasUpdate}
 import uk.gov.homeoffice.drt.protobuf.messages.SlasUpdates._
-import uk.gov.homeoffice.drt.protobuf.messages.SlasUpdates.RemoveSlasUpdateMessage
+
+import scala.collection.immutable.SortedMap
 
 object SlasMessageConversion {
   def removeSlasUpdateToMessage(delete: RemoveSlasUpdate): RemoveSlasUpdateMessage =
@@ -47,4 +46,17 @@ object SlasMessageConversion {
       update = message.update.map(slasUpdateFromMessage).getOrElse(throw new Exception("No update in message")),
       maybeOriginalEffectiveFrom = message.maybeOriginalEffectiveFrom,
     )
+
+  def slasUpdatesToMessage(updates: SlaUpdates) = SlasUpdatesMessage(
+    updates = updates.updates.map {
+      case (effectiveFrom, item) => slasUpdateToMessage(SlasUpdate(effectiveFrom, item))
+    }.toSeq
+  )
+
+  def slasUpdatesFromMessage(updates: SlasUpdatesMessage) = SlaUpdates(
+    updates = SortedMap(updates.updates.map { msg =>
+      val update = slasUpdateFromMessage(msg)
+      (update.effectiveFrom, update.item)
+    }: _*)
+  )
 }
