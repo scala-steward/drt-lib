@@ -14,6 +14,7 @@ import uk.gov.homeoffice.drt.protobuf.messages.PaxMessage.{OriginTerminalPaxCoun
 import uk.gov.homeoffice.drt.protobuf.messages.RedListUpdates._
 import uk.gov.homeoffice.drt.protobuf.messages.RegisteredArrivalMessage.{RegisteredArrivalMessage, RegisteredArrivalsMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.ShiftMessage.{ShiftMessage, ShiftStateSnapshotMessage, ShiftsMessage}
+import uk.gov.homeoffice.drt.protobuf.messages.SlasUpdates.{RemoveSlasUpdateMessage, SetSlasUpdateMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.StaffMovementMessages.{RemoveStaffMovementMessage, StaffMovementMessage, StaffMovementsMessage, StaffMovementsStateSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.TerminalQueuesSummary.TerminalQueuesSummaryMessage
 import uk.gov.homeoffice.drt.protobuf.messages.VoyageManifest._
@@ -80,9 +81,10 @@ class Serializer extends SerializerWithStringManifest {
   final val RemoveModel: String = classOf[RemoveModelMessage].getName
   final val MaybeManifestLike: String = classOf[MaybeManifestLikeMessage].getName
   final val ManifestLike: String = classOf[ManifestLikeMessage].getName
-  final val ManifestPassengerProfile: String = classOf[ManifestPassengerProfileMessage].getName
   final val PassengersMinute: String = classOf[PassengersMinuteMessage].getName
   final val PassengersMinutes: String = classOf[PassengersMinutesMessage].getName
+  final val SetSlasUpdate = classOf[SetSlasUpdateMessage].getName
+  final val RemoveSlasUpdate = classOf[RemoveSlasUpdateMessage].getName
 
   override def toBinary(objectToSerialize: AnyRef): Array[Byte] = objectToSerialize match {
     case m: GeneratedMessage => m.toByteArray
