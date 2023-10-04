@@ -12,5 +12,4 @@ trait UpdatesWithHistory[A] {
   def update(newEffectiveFrom: Long, item: A): UpdatesWithHistory[A]
 
   def update(newEffectiveFrom: Long, item: A, originalEffectiveFrom: Long): UpdatesWithHistory[A]
-
 }

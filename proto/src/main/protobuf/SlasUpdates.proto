@@ -21,7 +21,3 @@ message SetSlasUpdateMessage {
     optional SlasUpdateMessage update = 1;
     optional int64 maybeOriginalEffectiveFrom = 2;
 }
-
-message RemoveSlasUpdateMessage {
-    optional int64 effectiveFrom = 1;
-}
