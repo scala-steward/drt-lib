@@ -82,16 +82,15 @@ class ConfigActor[A, B <: Configs[A]](val persistenceId: String,
 
     case update: SetUpdate[A] =>
       state = stateUpdate(update.update)
-      persistAndMaybeSnapshot(serialiser.setUpdate(update))
+      persistAndMaybeSnapshot(serialiser.setUpdate(update, now().millisSinceEpoch))
       sendCrunchRequests(SDate(update.firstMinuteAffected).toLocalDate)
 
     case GetState =>
-      println(s"got state request")
       sender() ! state
 
     case remove: RemoveConfig =>
       state = state.remove(remove.effectiveFrom).asInstanceOf[B]
-      persistAndMaybeSnapshot(serialiser.removeUpdate(remove))
+      persistAndMaybeSnapshot(serialiser.removeUpdate(remove, now().millisSinceEpoch))
       sendCrunchRequests(SDate(remove.effectiveFrom).toLocalDate)
 
     case SaveSnapshotSuccess(md) =>

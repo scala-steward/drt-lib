@@ -14,7 +14,7 @@ import uk.gov.homeoffice.drt.protobuf.messages.PaxMessage.{OriginTerminalPaxCoun
 import uk.gov.homeoffice.drt.protobuf.messages.RedListUpdates.{AdditionMessage, RedListUpdateMessage, RedListUpdatesMessage, RemovalMessage, SetRedListUpdateMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.RegisteredArrivalMessage.{RegisteredArrivalMessage, RegisteredArrivalsMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.ShiftMessage.{ShiftMessage, ShiftStateSnapshotMessage, ShiftsMessage}
-import uk.gov.homeoffice.drt.protobuf.messages.SlasUpdates.SetSlasUpdateMessage
+import uk.gov.homeoffice.drt.protobuf.messages.SlasUpdates.SetSlaConfigMessage
 import uk.gov.homeoffice.drt.protobuf.messages.StaffMovementMessages.{RemoveStaffMovementMessage, StaffMovementMessage, StaffMovementsMessage, StaffMovementsStateSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.TerminalQueuesSummary.TerminalQueuesSummaryMessage
 import uk.gov.homeoffice.drt.protobuf.messages.VoyageManifest._
@@ -84,7 +84,7 @@ class Serializer extends SerializerWithStringManifest {
   final val ManifestLike: String = classOf[ManifestLikeMessage].getName
   final val PassengersMinute: String = classOf[PassengersMinuteMessage].getName
   final val PassengersMinutes: String = classOf[PassengersMinutesMessage].getName
-  final val SetSlasUpdate = classOf[SetSlasUpdateMessage].getName
+  final val SetSlasUpdate = classOf[SetSlaConfigMessage].getName
   final val RemoveSlasUpdate = classOf[Configs.RemoveConfigMessage].getName
 
   override def toBinary(objectToSerialize: AnyRef): Array[Byte] = objectToSerialize match {
@@ -152,7 +152,7 @@ class Serializer extends SerializerWithStringManifest {
       case ManifestLike => ManifestLikeMessage.parseFrom(bytes)
       case PassengersMinute => PassengersMinuteMessage.parseFrom(bytes)
       case PassengersMinutes => PassengersMinutesMessage.parseFrom(bytes)
-      case SetSlasUpdate => SetSlasUpdateMessage.parseFrom(bytes)
+      case SetSlasUpdate => SetSlaConfigMessage.parseFrom(bytes)
       case RemoveSlasUpdate => Configs.RemoveConfigMessage.parseFrom(bytes)
     }
   }

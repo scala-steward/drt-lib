@@ -23,7 +23,7 @@ trait ConfigDeserialiser[B, A <: Configs[B]] {
 object ConfigDeserialiser {
   implicit val slaConfigsDeserialiser: ConfigDeserialiser[Map[Queue, Int], SlaConfigs] = new ConfigDeserialiser[Map[Queue, Int], SlaConfigs] {
     override def deserialiseCommand(a: GeneratedMessage): ConfigActor.Command = a match {
-      case msg: SetSlasUpdateMessage => setSlasUpdatesFromMessage(msg).asInstanceOf[SetUpdate[Map[Queue, Int]]]
+      case msg: SetSlaConfigMessage => setSlasUpdatesFromMessage(msg).asInstanceOf[SetUpdate[Map[Queue, Int]]]
     }
 
     override def deserialiseState(a: GeneratedMessage): SlaConfigs = a match {

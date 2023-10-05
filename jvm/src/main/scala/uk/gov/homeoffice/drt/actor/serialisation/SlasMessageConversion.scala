@@ -9,16 +9,8 @@ import uk.gov.homeoffice.drt.protobuf.messages.SlasUpdates._
 import scala.collection.immutable.SortedMap
 
 object SlasMessageConversion {
-  private def slasUpdateToMessage(slasUpdate: ConfigUpdate[Map[Queue, Int]]): SlasUpdateMessage =
-    SlasUpdateMessage(
-      effectiveFrom = Option(slasUpdate.effectiveFrom),
-      queueSlas = slasUpdate.configItem.map {
-        case (queue, slas) => SlasMessage(Option(queue.toString), Option(slas))
-      }.toSeq,
-      maybeOriginalEffectiveFrom = slasUpdate.maybeOriginalEffectiveFrom,
-    )
 
-  private def slasUpdateFromMessage[A](message: SlasUpdateMessage): ConfigUpdate[A] =
+  private def slasUpdateFromMessage[A](message: SetSlaConfigMessage): ConfigUpdate[A] =
     SlasUpdate(
       effectiveFrom = message.effectiveFrom.getOrElse(throw new Exception("No effectiveFrom in message")),
       configItem = queueSlasFromMessage(message.queueSlas),
@@ -47,14 +39,18 @@ object SlasMessageConversion {
     (effectiveFrom, configItem)
   }
 
-  def setSlasUpdatesToMessage(updates: SetUpdate[Map[Queue, Int]]): SetSlasUpdateMessage =
-    SetSlasUpdateMessage(
-      update = Option(slasUpdateToMessage(updates.update)),
-    )
+  def setSlasUpdatesToMessage(updates: SetUpdate[Map[Queue, Int]], createdAt: Long): SetSlaConfigMessage = SetSlaConfigMessage(
+    effectiveFrom = Option(updates.update.effectiveFrom),
+    queueSlas = updates.update.configItem.map {
+      case (queue, slas) => SlasMessage(Option(queue.toString), Option(slas))
+    }.toSeq,
+    maybeOriginalEffectiveFrom = updates.update.maybeOriginalEffectiveFrom,
+    createdAt = Option(createdAt),
+  )
 
-  def setSlasUpdatesFromMessage[A](message: SetSlasUpdateMessage): SetUpdate[A] =
+  def setSlasUpdatesFromMessage[A](message: SetSlaConfigMessage): SetUpdate[A] =
     SetUpdate(
-      update = message.update.map(slasUpdateFromMessage[A]).getOrElse(throw new Exception("No update in message")),
+      update = slasUpdateFromMessage[A](message)
     )
 
   def slaConfigsToMessage(configs: Configs[Map[Queue, Int]]): SlaConfigsMessage = SlaConfigsMessage(

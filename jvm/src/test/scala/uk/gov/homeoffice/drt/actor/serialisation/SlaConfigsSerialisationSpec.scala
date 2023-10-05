@@ -31,7 +31,7 @@ class SlaConfigsSerialisationSpec extends AnyWordSpec {
         configItem = Map(EeaDesk -> 1, NonEeaDesk -> 10),
         maybeOriginalEffectiveFrom = Option(2L),
       ))
-      val serialised = serialiser.setUpdate(setUpdate)
+      val serialised = serialiser.setUpdate(setUpdate, 1L)
       val deserialised = deserialiser.deserialiseCommand(serialised)
       assert(deserialised == setUpdate)
     }

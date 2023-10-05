@@ -11,7 +11,7 @@ class RemoveConfigSerialisationSpec extends AnyWordSpec {
   val serialiser = new ConfigSerialiser[Map[Queue, Int], SlaConfigs] {
     override def updatesWithHistory(a: SlaConfigs): GeneratedMessage = ???
 
-    override def setUpdate(a: SetUpdate[Map[Queue, Int]]): GeneratedMessage = ???
+    override def setUpdate(a: SetUpdate[Map[Queue, Int]], createdAt: Long): GeneratedMessage = ???
   }
 
   val deserialiser = new ConfigDeserialiser[Map[Queue, Int], SlaConfigs] {
@@ -24,7 +24,7 @@ class RemoveConfigSerialisationSpec extends AnyWordSpec {
   "RemoveUpdate" should {
     "serialise and deserialise without loss" in {
       val removeUpdate = RemoveConfig(1L)
-      val serialised = serialiser.removeUpdate(removeUpdate)
+      val serialised = serialiser.removeUpdate(removeUpdate, 1L)
       val deserialised = deserialiser.removeUpdate(serialised)
       assert(deserialised == removeUpdate)
     }
