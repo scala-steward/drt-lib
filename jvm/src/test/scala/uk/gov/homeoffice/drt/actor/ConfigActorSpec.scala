@@ -7,7 +7,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.homeoffice.drt.actor.commands.Commands.GetState
 import uk.gov.homeoffice.drt.actor.commands.CrunchRequest
-import uk.gov.homeoffice.drt.ports.Queues.EGate
+import uk.gov.homeoffice.drt.ports.Queues.{EGate, EeaDesk}
 import uk.gov.homeoffice.drt.ports.config.slas.{SlaConfigs, SlasUpdate}
 import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch
 import uk.gov.homeoffice.drt.time.SDate
@@ -34,7 +34,8 @@ class ConfigActorSpec
       actor ! GetState
       expectMsg(SlaConfigs.empty)
     }
-    "contain an update after a SetUpdate command" in {
+
+    "contain a config after a SetUpdate command, and be empty after a RemoveConfig command" in {
       val actor = system.actorOf(Props(new ConfigActor("test-id", myNow, crunchRequest, 1)))
       val update = SlasUpdate(1L, Map(EGate -> 1), Option(2L))
       actor ! ConfigActor.SetUpdate(update)
@@ -42,6 +43,34 @@ class ConfigActorSpec
       expectMsg(SlaConfigs(SortedMap(1L -> Map(EGate -> 1))))
 
       actor ! ConfigActor.RemoveConfig(1L)
+      actor ! GetState
+      expectMsg(SlaConfigs.empty)
+    }
+
+    "replace a config after a SetUpdate command" in {
+      val actor = system.actorOf(Props(new ConfigActor("test-id", myNow, crunchRequest, 1)))
+      val update = SlasUpdate(1L, Map(EGate -> 1), None)
+      val update2 = SlasUpdate(2L, Map(EeaDesk -> 10), Option(1L))
+      actor ! ConfigActor.SetUpdate(update)
+      actor ! GetState
+      expectMsg(SlaConfigs(SortedMap(1L -> Map(EGate -> 1))))
+
+      actor ! ConfigActor.SetUpdate(update2)
+      actor ! GetState
+      expectMsg(SlaConfigs(SortedMap(2L -> Map(EeaDesk -> 10))))
+    }
+
+    "contain two configs after 2 SetUpdate commands" in {
+      val actor = system.actorOf(Props(new ConfigActor("test-id", myNow, crunchRequest, 1)))
+      val update = SlasUpdate(1L, Map(EGate -> 1), None)
+      val update2 = SlasUpdate(2L, Map(EeaDesk -> 10), None)
+      actor ! ConfigActor.SetUpdate(update)
+      actor ! ConfigActor.SetUpdate(update2)
+      actor ! GetState
+      expectMsg(SlaConfigs(SortedMap(
+        1L -> Map(EGate -> 1),
+        2L -> Map(EeaDesk -> 10),
+      )))
     }
   }
 }
