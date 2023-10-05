@@ -11,13 +11,20 @@ message SlasMessage {
 message SlasUpdateMessage {
     optional int64 effectiveFrom = 1;
     repeated SlasMessage queueSlas = 2;
+    optional int64 maybeOriginalEffectiveFrom = 3;
 }
 
-message SlaUpdatesMessage {
-    repeated SlasUpdateMessage updates = 2;
+message SlasConfigMessage {
+    optional int64 effectiveFrom = 1;
+    repeated SlasMessage queueSlas = 2;
+}
+
+message SlaConfigsMessage {
+    repeated SlasConfigMessage config = 1;
+    optional int64 createdAt = 2;
 }
 
 message SetSlasUpdateMessage {
     optional SlasUpdateMessage update = 1;
-    optional int64 maybeOriginalEffectiveFrom = 2;
+    optional int64 createdAt = 2;
 }

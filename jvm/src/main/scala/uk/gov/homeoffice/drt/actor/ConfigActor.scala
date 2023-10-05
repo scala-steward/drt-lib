@@ -10,19 +10,19 @@ import uk.gov.homeoffice.drt.actor.acking.AckingReceiver.StreamCompleted
 import uk.gov.homeoffice.drt.actor.commands.Commands.{AddUpdatesSubscriber, GetState}
 import uk.gov.homeoffice.drt.actor.commands.CrunchRequest
 import uk.gov.homeoffice.drt.actor.serialisation.{ConfigDeserialiser, ConfigSerialiser, EmptyConfig}
-import uk.gov.homeoffice.drt.ports.config.updates.{ConfigUpdate, UpdatesWithHistory}
+import uk.gov.homeoffice.drt.ports.config.updates.{ConfigUpdate, Configs}
+import uk.gov.homeoffice.drt.protobuf.messages.config.Configs.RemoveConfigMessage
 import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch
 import uk.gov.homeoffice.drt.time.{LocalDate, MilliTimes, SDate, SDateLike}
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.DurationInt
 
-
 object ConfigActor {
   sealed trait Command
 
-  case class SetUpdate[A](update: ConfigUpdate[A], maybeOriginalEffectiveFrom: Option[Long]) extends Command {
-    lazy val firstMinuteAffected: Long = maybeOriginalEffectiveFrom match {
+  case class SetUpdate[A](update: ConfigUpdate[A]) extends Command {
+    lazy val firstMinuteAffected: Long = update.maybeOriginalEffectiveFrom match {
       case None => update.effectiveFrom
       case Some(originalEffectiveFrom) =>
         if (update.effectiveFrom < originalEffectiveFrom)
@@ -31,28 +31,30 @@ object ConfigActor {
     }
   }
 
-  case class RemoveUpdate(effectiveFrom: MillisSinceEpoch) extends Command
+  case class RemoveConfig(effectiveFrom: MillisSinceEpoch) extends Command
 }
 
-class ConfigActor[B, A <: UpdatesWithHistory[B]](val persistenceId: String,
-                                                 val now: () => SDateLike,
-                                                 crunchRequest: MillisSinceEpoch => CrunchRequest,
-                                                 maxForecastDays: Int,
-                                                )
-                                                (implicit
-                                                 emptyProvider: EmptyConfig[B, A],
-                                                 serialiser: ConfigSerialiser[B, A],
-                                                 deserialiser: ConfigDeserialiser[B, A],
-                                                ) extends RecoveryActorLike with PersistentDrtActor[A] {
+class ConfigActor[A, B <: Configs[A]](val persistenceId: String,
+                                      val now: () => SDateLike,
+                                      crunchRequest: MillisSinceEpoch => CrunchRequest,
+                                      maxForecastDays: Int,
+                                     )
+                                     (implicit
+                                      emptyProvider: EmptyConfig[A, B],
+                                      serialiser: ConfigSerialiser[A, B],
+                                      deserialiser: ConfigDeserialiser[A, B],
+                                     ) extends RecoveryActorLike with PersistentDrtActor[B] {
   override val log: Logger = LoggerFactory.getLogger(getClass)
 
   override val maybeSnapshotInterval: Option[Int] = None
 
   override def processRecoveryMessage: PartialFunction[Any, Unit] = {
+    case msg: RemoveConfigMessage =>
+      state = state.remove(deserialiser.removeUpdate(msg).effectiveFrom).asInstanceOf[B]
+
     case msg: GeneratedMessage =>
       state = deserialiser.deserialiseCommand(msg) match {
-        case set: SetUpdate[B] => stateUpdate(set)
-        case remove: RemoveUpdate => state.remove(remove.effectiveFrom).asInstanceOf[A]
+        case update: SetUpdate[A] => stateUpdate(update.update)
       }
   }
 
@@ -64,36 +66,33 @@ class ConfigActor[B, A <: UpdatesWithHistory[B]](val persistenceId: String,
   override def stateToMessage: GeneratedMessage =
     serialiser.updatesWithHistory(state)
 
-  var state: A = emptyProvider.empty
+  var state: B = emptyProvider.empty
 
   private var maybeCrunchRequestQueueActor: Option[ActorRef] = None
 
   implicit val ec: ExecutionContextExecutor = context.dispatcher
   implicit val timeout: Timeout = new Timeout(60.seconds)
 
-  override def initialState: A = emptyProvider.empty
+  override def initialState: B = emptyProvider.empty
 
   override def receiveCommand: Receive = {
     case AddUpdatesSubscriber(crunchRequestQueue) =>
       log.info("Received crunch request actor")
       maybeCrunchRequestQueueActor = Option(crunchRequestQueue)
 
-    case updates: SetUpdate[B] =>
-      state = stateUpdate(updates)
-      persistAndMaybeSnapshot(serialiser.setUpdate(updates))
-      sendCrunchRequests(SDate(updates.firstMinuteAffected).toLocalDate)
-
-      sender() ! updates
+    case update: SetUpdate[A] =>
+      state = stateUpdate(update.update)
+      persistAndMaybeSnapshot(serialiser.setUpdate(update))
+      sendCrunchRequests(SDate(update.firstMinuteAffected).toLocalDate)
 
     case GetState =>
+      println(s"got state request")
       sender() ! state
 
-    case remove: RemoveUpdate =>
-      state = state.remove(remove.effectiveFrom).asInstanceOf[A]
+    case remove: RemoveConfig =>
+      state = state.remove(remove.effectiveFrom).asInstanceOf[B]
       persistAndMaybeSnapshot(serialiser.removeUpdate(remove))
       sendCrunchRequests(SDate(remove.effectiveFrom).toLocalDate)
-
-      sender() ! remove
 
     case SaveSnapshotSuccess(md) =>
       log.debug(s"Save snapshot success: $md")
@@ -113,13 +112,5 @@ class ConfigActor[B, A <: UpdatesWithHistory[B]](val persistenceId: String,
       }
     }
 
-  private def stateUpdate(updates: SetUpdate[B]): A = {
-    val updated = updates.maybeOriginalEffectiveFrom match {
-      case None =>
-        state.update(updates.update.effectiveFrom, updates.update.item)
-      case Some(originalEffectiveFrom) =>
-        state.update(updates.update.effectiveFrom, updates.update.item, originalEffectiveFrom)
-    }
-    updated.asInstanceOf[A]
-  }
+  private def stateUpdate(update: ConfigUpdate[A]): B = state.update(update).asInstanceOf[B]
 }

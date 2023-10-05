@@ -3,6 +3,7 @@ syntax = "proto2";
 package uk.gov.homeoffice.drt.protobuf.messages.config;
 
 
-message RemoveUpdateMessage {
+message RemoveConfigMessage {
     optional int64 effectiveFrom = 1;
+    optional int64 createdAt = 2;
 }

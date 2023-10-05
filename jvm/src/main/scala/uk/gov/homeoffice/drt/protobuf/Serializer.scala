@@ -18,7 +18,7 @@ import uk.gov.homeoffice.drt.protobuf.messages.SlasUpdates.SetSlasUpdateMessage
 import uk.gov.homeoffice.drt.protobuf.messages.StaffMovementMessages.{RemoveStaffMovementMessage, StaffMovementMessage, StaffMovementsMessage, StaffMovementsStateSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.TerminalQueuesSummary.TerminalQueuesSummaryMessage
 import uk.gov.homeoffice.drt.protobuf.messages.VoyageManifest._
-import uk.gov.homeoffice.drt.protobuf.messages.config.ConfigUpdates
+import uk.gov.homeoffice.drt.protobuf.messages.config.Configs
 
 class Serializer extends SerializerWithStringManifest {
   override def identifier: Int = 9001
@@ -85,7 +85,7 @@ class Serializer extends SerializerWithStringManifest {
   final val PassengersMinute: String = classOf[PassengersMinuteMessage].getName
   final val PassengersMinutes: String = classOf[PassengersMinutesMessage].getName
   final val SetSlasUpdate = classOf[SetSlasUpdateMessage].getName
-  final val RemoveSlasUpdate = classOf[ConfigUpdates.RemoveUpdateMessage].getName
+  final val RemoveSlasUpdate = classOf[Configs.RemoveConfigMessage].getName
 
   override def toBinary(objectToSerialize: AnyRef): Array[Byte] = objectToSerialize match {
     case m: GeneratedMessage => m.toByteArray
@@ -153,7 +153,7 @@ class Serializer extends SerializerWithStringManifest {
       case PassengersMinute => PassengersMinuteMessage.parseFrom(bytes)
       case PassengersMinutes => PassengersMinutesMessage.parseFrom(bytes)
       case SetSlasUpdate => SetSlasUpdateMessage.parseFrom(bytes)
-      case RemoveSlasUpdate => ConfigUpdates.RemoveUpdateMessage.parseFrom(bytes)
+      case RemoveSlasUpdate => Configs.RemoveConfigMessage.parseFrom(bytes)
     }
   }
 }
