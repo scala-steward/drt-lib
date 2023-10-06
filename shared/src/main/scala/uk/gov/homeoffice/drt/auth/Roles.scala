@@ -21,6 +21,7 @@ object Roles {
     Debug,
     DesksAndQueuesView,
     EgateBanksEdit,
+    SlaConfigsEdit,
     EnhancedApiView,
     FaqView,
     FixedPointsEdit,
