@@ -25,6 +25,7 @@ case class SlaConfigs(configs: SortedMap[Long, Map[Queue, Int]]) extends Configs
 }
 
 object SlaConfigs {
+  implicit val rw: upickle.default.ReadWriter[SlaConfigs] = upickle.default.macroRW
   val empty: SlaConfigs = SlaConfigs(SortedMap())
 }
 
