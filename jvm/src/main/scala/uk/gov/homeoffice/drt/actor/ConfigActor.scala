@@ -13,7 +13,7 @@ import uk.gov.homeoffice.drt.actor.serialisation.{ConfigDeserialiser, ConfigSeri
 import uk.gov.homeoffice.drt.ports.config.updates.{ConfigUpdate, Configs}
 import uk.gov.homeoffice.drt.protobuf.messages.config.Configs.RemoveConfigMessage
 import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch
-import uk.gov.homeoffice.drt.time.{LocalDate, MilliTimes, SDate, SDateLike}
+import uk.gov.homeoffice.drt.time.{LocalDate, SDate, SDateLike}
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.concurrent.duration.DurationInt
@@ -36,7 +36,7 @@ object ConfigActor {
 
 class ConfigActor[A, B <: Configs[A]](val persistenceId: String,
                                       val now: () => SDateLike,
-                                      crunchRequest: MillisSinceEpoch => CrunchRequest,
+                                      crunchRequest: LocalDate => CrunchRequest,
                                       maxForecastDays: Int,
                                      )
                                      (implicit
@@ -106,9 +106,11 @@ class ConfigActor[A, B <: Configs[A]](val persistenceId: String,
 
   private def sendCrunchRequests(firstDay: LocalDate): Unit =
     maybeCrunchRequestQueueActor.foreach { requestActor =>
-      (SDate(firstDay).millisSinceEpoch to SDate.now().addDays(maxForecastDays).millisSinceEpoch by MilliTimes.oneHourMillis).map { millis =>
-        requestActor ! crunchRequest(millis)
-      }
+      val today = SDate.now().toLocalDate
+      val firstNonHistoricDate = if (firstDay < today) today else firstDay
+      val end = SDate(today).addDays(maxForecastDays).toLocalDate
+      val range = firstNonHistoricDate.to(end)(SDate(_))
+      range.foreach(requestActor ! crunchRequest(_))
     }
 
   private def stateUpdate(update: ConfigUpdate[A]): B = state.update(update).asInstanceOf[B]

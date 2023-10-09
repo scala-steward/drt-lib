@@ -9,8 +9,7 @@ import uk.gov.homeoffice.drt.actor.commands.Commands.GetState
 import uk.gov.homeoffice.drt.actor.commands.CrunchRequest
 import uk.gov.homeoffice.drt.ports.Queues.{EGate, EeaDesk}
 import uk.gov.homeoffice.drt.ports.config.slas.{SlaConfigs, SlasUpdate}
-import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch
-import uk.gov.homeoffice.drt.time.SDate
+import uk.gov.homeoffice.drt.time.{LocalDate, SDate}
 
 import scala.collection.immutable.SortedMap
 
@@ -26,7 +25,7 @@ class ConfigActorSpec
   }
 
   val myNow: () => SDate.JodaSDate = () => SDate.now()
-  val crunchRequest: MillisSinceEpoch => CrunchRequest = ts => CrunchRequest(SDate(ts).toLocalDate, 0, 1440)
+  val crunchRequest: LocalDate => CrunchRequest = date => CrunchRequest(SDate(date).toLocalDate, 0, 1440)
 
   "A new config actor" must {
     "have empty state" in {
