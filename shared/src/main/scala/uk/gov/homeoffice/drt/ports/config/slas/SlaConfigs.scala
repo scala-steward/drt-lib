@@ -8,7 +8,7 @@ import scala.collection.immutable.SortedMap
 
 case class SlaConfigs(configs: SortedMap[Long, Map[Queue, Int]]) extends Configs[Map[Queue, Int]] {
   override def configForDate(at: Long): Option[Map[Queue, Int]] = {
-    configs.toSeq.findLast { case (effectiveFrom, _) => effectiveFrom < at }.map(_._2)
+    configs.toSeq.findLast { case (effectiveFrom, _) => effectiveFrom <= at }.map(_._2)
   }
 
   override def remove(effectiveFrom: Long): SlaConfigs =

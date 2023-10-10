@@ -1,14 +1,15 @@
 package uk.gov.homeoffice.drt.actor
 
 import akka.actor.{ActorSystem, Props}
-import akka.testkit.{ImplicitSender, TestKit}
+import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.homeoffice.drt.actor.commands.Commands.GetState
-import uk.gov.homeoffice.drt.actor.commands.CrunchRequest
+import uk.gov.homeoffice.drt.actor.commands.{Commands, CrunchRequest}
 import uk.gov.homeoffice.drt.ports.Queues.{EGate, EeaDesk}
 import uk.gov.homeoffice.drt.ports.config.slas.{SlaConfigs, SlasUpdate}
+import uk.gov.homeoffice.drt.time.TimeZoneHelper.europeLondonTimeZone
 import uk.gov.homeoffice.drt.time.{LocalDate, SDate}
 
 import scala.collection.immutable.SortedMap
@@ -70,6 +71,17 @@ class ConfigActorSpec
         1L -> Map(EGate -> 1),
         2L -> Map(EeaDesk -> 10),
       )))
+    }
+
+    "send the updates subscriber a crunch request starting at the first date effected" in {
+      val actor = system.actorOf(Props(new ConfigActor("test-id", myNow, crunchRequest, 1)))
+      val updateDate = SDate("2023-10-10T00:00", europeLondonTimeZone)
+      val update = SlasUpdate(updateDate.millisSinceEpoch, Map(EGate -> 1), None)
+      val testProbe = TestProbe()
+      actor ! Commands.AddUpdatesSubscriber(testProbe.ref)
+      actor ! ConfigActor.SetUpdate(update)
+      testProbe.expectMsg(CrunchRequest(LocalDate(2023, 10, 10), 0, 1440))
+      testProbe.expectMsg(CrunchRequest(LocalDate(2023, 10, 11), 0, 1440))
     }
   }
 }
