@@ -106,7 +106,7 @@ class ConfigActor[A, B <: Configs[A]](val persistenceId: String,
 
   private def sendCrunchRequests(firstDay: LocalDate): Unit =
     maybeCrunchRequestQueueActor.foreach { requestActor =>
-      val today = SDate.now().toLocalDate
+      val today = now().toLocalDate
       val firstNonHistoricDate = if (firstDay < today) today else firstDay
       val end = SDate(today).addDays(maxForecastDays).toLocalDate
       val range = firstNonHistoricDate.to(end)(SDate(_))
