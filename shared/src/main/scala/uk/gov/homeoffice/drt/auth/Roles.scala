@@ -21,6 +21,7 @@ object Roles {
     Debug,
     DesksAndQueuesView,
     EgateBanksEdit,
+    SlaConfigsEdit,
     EnhancedApiView,
     FaqView,
     FixedPointsEdit,
@@ -249,6 +250,10 @@ object Roles {
 
   case object EgateBanksEdit extends Role {
     override val name: String = "egate-banks:edit"
+  }
+
+  case object SlaConfigsEdit extends Role {
+    override val name: String = "sla-configs:edit"
   }
 
   case object ForecastView extends Role {
