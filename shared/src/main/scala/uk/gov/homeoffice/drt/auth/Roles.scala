@@ -35,8 +35,7 @@ object Roles {
     RccHeathrow,
     RccNorth,
     RccSouth,
-    RedListFeature,
-    RedListsEdit,
+    HealthChecksEdit,
     StaffMovementsEdit,
     StaffMovementsExport,
     StaffEdit,
@@ -244,8 +243,8 @@ object Roles {
     override val name: String = "arrivals-and-splits:view"
   }
 
-  case object RedListsEdit extends Role {
-    override val name: String = "red-lists:edit"
+  case object HealthChecksEdit extends Role {
+    override val name: String = "health-checks:edit"
   }
 
   case object EgateBanksEdit extends Role {
@@ -307,9 +306,9 @@ object Roles {
   }
 
 
-  case object RedListFeature extends Role {
-    override val name: String = "red-list-feature"
-  }
+//  case object RedListFeature extends Role {
+//    override val name: String = "red-list-feature"
+//  }
 
   case object NeboUpload extends Role {
     override val name: String = "nebo:upload"
