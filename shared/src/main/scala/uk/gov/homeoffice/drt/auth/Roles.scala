@@ -305,11 +305,6 @@ object Roles {
     override val name: String = "rcc:south"
   }
 
-
-//  case object RedListFeature extends Role {
-//    override val name: String = "red-list-feature"
-//  }
-
   case object NeboUpload extends Role {
     override val name: String = "nebo:upload"
   }
