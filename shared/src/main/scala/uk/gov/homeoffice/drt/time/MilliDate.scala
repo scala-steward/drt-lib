@@ -1,14 +1,12 @@
 package uk.gov.homeoffice.drt.time
 
-import org.joda.time.DateTimeZone
 import uk.gov.homeoffice.drt.arrivals.WithTimeAccessor
 import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch
 import upickle.default._
 
 
-
 case class MilliDate(_millisSinceEpoch: MillisSinceEpoch) extends Ordered[MilliDate] with WithTimeAccessor {
-  lazy val secondsOffset: MillisSinceEpoch = _millisSinceEpoch % 60000
+  private lazy val secondsOffset: MillisSinceEpoch = _millisSinceEpoch % 60000
 
   lazy val millisSinceEpoch: MillisSinceEpoch = _millisSinceEpoch - secondsOffset
 
