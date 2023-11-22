@@ -89,6 +89,8 @@ steps:
       branch: master
       event:
         - push
+    depends_on:
+      - Test
 
   - name: sonar-scanner
     pull: if-not-exists
