@@ -81,6 +81,7 @@ steps:
       - sbt -ivy ./.ivy2 dependencyCheck
       - sbt -ivy ./.ivy2 -mem 4096 -J-XX:+UseG1GC coverage test coverageReport
     environment:
+      NVD_BASE_URL: http://nvdmirror:8008
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
       ARTIFACTORY_USERNAME: drt-artifactory-robot
@@ -106,4 +107,10 @@ steps:
         - push
     depends_on:
       - analysis
+
+services:
+  - name: nvdmirror
+    image: sspringett/nvdmirror
+    ports:
+      - 8008
 ...
