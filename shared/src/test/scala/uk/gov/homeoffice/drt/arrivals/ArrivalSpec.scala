@@ -116,5 +116,71 @@ class ArrivalSpec extends Specification {
       val arrival = arrivalBase.copy(PassengerSources = Map(AclFeedSource -> Passengers(Option(10), None)), FeedSources = Set(AclFeedSource))
       arrival.bestPaxEstimate(sourceOrderPreference) mustEqual PaxSource(aclFeedPaxSource._1, aclFeedPaxSource._2)
     }
+
+    "Give api total pax minus the api transit pax when there is a live feed with undefined pax and api with pax" >> {
+        val arrival = arrivalBase.copy(PassengerSources = Map(
+          LiveFeedSource -> Passengers(None, Option(0)),
+          ApiFeedSource -> Passengers(Option(10), Option(3))
+        ))
+        arrival.bestPcpPaxEstimate(sourceOrderPreference) must beSome(10 - 3)
+    }
+
+    "Give zero pcp when the flight is domestic" >> {
+      val arrival = arrivalBase.copy(Origin = PortCode("LHR"), PassengerSources = Map(LiveFeedSource -> Passengers(Option(10), Option(3))))
+      arrival.bestPcpPaxEstimate(sourceOrderPreference) must beSome(0)
+    }
+
+    "Give zero pcp when the flight has a CTA origin" >> {
+      val arrival = arrivalBase.copy(Origin = PortCode("JER"), PassengerSources = Map(LiveFeedSource -> Passengers(Option(10), Option(3))))
+      arrival.bestPcpPaxEstimate(sourceOrderPreference) must beSome(0)
+    }
+  }
+
+  "isInRange" >> {
+    "should return true when the needle is equal to the start of the range" >> {
+      Arrival.isInRange(1, 10)(1) === true
+    }
+    "should return true when the needle is equal to the end of the range" >> {
+      Arrival.isInRange(1, 10)(10) === true
+    }
+    "should return true when the needle is between the start and end of the range" >> {
+      Arrival.isInRange(1, 10)(5) === true
+    }
+    "should return false when the needle is lower than the start of the range" >> {
+      Arrival.isInRange(1, 10)(0) === false
+    }
+    "should return false when the needle is higher than the end of the range" >> {
+      Arrival.isInRange(1, 10)(11) === false
+    }
+  }
+
+  "minutesOfPaxArrivals" >> {
+    "should return 0 when there are 0 total passengers" >> {
+      ArrivalGenerator.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(0), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 0
+    }
+    "should return 1 when there are 1 total passengers" >> {
+      ArrivalGenerator.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(1), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 1
+    }
+    "should return 1 when there are 20 total passengers" >> {
+      ArrivalGenerator.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(20), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 1
+    }
+    "should return 2 when there are 21 total passengers" >> {
+      ArrivalGenerator.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(21), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 2
+    }
+  }
+
+  "pcpRange" >> {
+    "should return 0L to 0L given an arrival with scheduled time 0L and 0 total passengers" >> {
+      ArrivalGenerator.arrival(sch = 0L,  passengerSources = Map(ApiFeedSource -> Passengers(Option(0), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
+    }
+    "should return 0L to 0L given an arrival with scheduled time 0L and 1 total passengers" >> {
+      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(1), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
+    }
+    "should return 0L to 0L given an arrival with scheduled time 0L and 20 total passengers" >> {
+      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(20), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
+    }
+    "should return 0L to 60000L given an arrival with scheduled time 0L and 21 total passengers" >> {
+      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(21), None))).pcpRange(List(ApiFeedSource)) === (0L to 60000L by 60000)
+    }
   }
 }

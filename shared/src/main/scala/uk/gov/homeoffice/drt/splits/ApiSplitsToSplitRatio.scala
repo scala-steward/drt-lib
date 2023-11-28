@@ -2,7 +2,7 @@ package uk.gov.homeoffice.drt.splits
 
 import uk.gov.homeoffice.drt.arrivals.{ApiFlightWithSplits, SplitStyle, Splits}
 import uk.gov.homeoffice.drt.ports.Queues.Queue
-import uk.gov.homeoffice.drt.ports.{AclFeedSource, ApiFeedSource, ApiPaxTypeAndQueueCount, FeedSource, ForecastFeedSource, HistoricApiFeedSource, LiveFeedSource, MlFeedSource, PaxTypeAndQueue, Queues, ScenarioSimulationSource}
+import uk.gov.homeoffice.drt.ports.{ApiPaxTypeAndQueueCount, FeedSource, PaxTypeAndQueue, Queues}
 
 object ApiSplitsToSplitRatio {
 
@@ -19,11 +19,11 @@ object ApiSplitsToSplitRatio {
     })
 
   def paxPerQueueUsingBestSplitsAsRatio(flightWithSplits: ApiFlightWithSplits, sourceOrderPreference: List[FeedSource]): Option[Map[Queue, Int]] =
-    flightWithSplits.bestSplits.map((splits: Splits) => flightPaxPerQueueUsingSplitsAsRatio(splits, flightWithSplits, sourceOrderPreference))
+    flightWithSplits.bestSplits.map(flightPaxPerQueueUsingSplitsAsRatio(_, flightWithSplits, sourceOrderPreference))
 
   def flightPaxPerQueueUsingSplitsAsRatio(splits: Splits, fws: ApiFlightWithSplits, sourceOrderPreference: List[FeedSource]): Map[Queue, Int] =
     queueTotals(
-      applyPaxSplitsToFlightPax(splits, fws.bestPaxSource(sourceOrderPreference).passengers.getPcpPax.getOrElse(0))
+      applyPaxSplitsToFlightPax(splits, fws.apiFlight.bestPcpPaxEstimate(sourceOrderPreference).getOrElse(0))
         .splits
         .map(ptqc => PaxTypeAndQueue(ptqc.passengerType, ptqc.queueType) -> ptqc.paxCount.toInt)
         .toMap

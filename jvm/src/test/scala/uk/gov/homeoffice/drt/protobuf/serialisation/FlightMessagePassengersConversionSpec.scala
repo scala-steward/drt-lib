@@ -85,7 +85,7 @@ class FlightMessagePassengersConversionSpec extends Specification {
   "V3 messages - pax sources without tran pax" >> {
     "ForecastFeedSource & AclFeedSource" >> {
       "old tran pax should be assigned to the best source, ie ForecastFeedSource" >> {
-        val v1Message = FlightMessage(
+        val v3Message = FlightMessage(
           actPaxOLD = Option(50),
           tranPaxOLD = Option(10),
           totalPax = Seq(
@@ -93,7 +93,22 @@ class FlightMessagePassengersConversionSpec extends Specification {
             TotalPaxSourceMessage(Option(AclFeedSource.toString), None, Option(120)),
           ),
         )
-        val arrival = FlightMessageConversion.flightMessageToApiFlight(v1Message)
+        val arrival = FlightMessageConversion.flightMessageToApiFlight(v3Message)
+        arrival.PassengerSources === Map(
+          ForecastFeedSource -> Passengers(Option(95), Option(10)),
+          AclFeedSource -> Passengers(Option(120), None),
+        )
+      }
+      "FeedSource persisted as its name from 13/06/2022 to 17/05/2023 (than changed to the class 'toString')" >> {
+        val v3Message = FlightMessage(
+          actPaxOLD = Option(50),
+          tranPaxOLD = Option(10),
+          totalPax = Seq(
+            TotalPaxSourceMessage(Option(ForecastFeedSource.name), None, Option(95)),
+            TotalPaxSourceMessage(Option(AclFeedSource.name), None, Option(120)),
+          ),
+        )
+        val arrival = FlightMessageConversion.flightMessageToApiFlight(v3Message)
         arrival.PassengerSources === Map(
           ForecastFeedSource -> Passengers(Option(95), Option(10)),
           AclFeedSource -> Passengers(Option(120), None),
@@ -102,7 +117,7 @@ class FlightMessagePassengersConversionSpec extends Specification {
     }
     "ForecastFeedSource & AclFeedSource, and api pax" >> {
       "old tran pax should be assigned to the best source, ie ForecastFeedSource, and api to api with trans from ForecastFeedSource" >> {
-        val v1Message = FlightMessage(
+        val v3Message = FlightMessage(
           actPaxOLD = Option(50),
           tranPaxOLD = Option(10),
           totalPax = Seq(
@@ -111,7 +126,7 @@ class FlightMessagePassengersConversionSpec extends Specification {
           ),
           apiPaxOLD = Option(101),
         )
-        val arrival = FlightMessageConversion.flightMessageToApiFlight(v1Message)
+        val arrival = FlightMessageConversion.flightMessageToApiFlight(v3Message)
         arrival.PassengerSources === Map(
           ForecastFeedSource -> Passengers(Option(95), Option(10)),
           AclFeedSource -> Passengers(Option(120), None),
@@ -123,7 +138,7 @@ class FlightMessagePassengersConversionSpec extends Specification {
 
   "V4 messages - pax sources with tran pax" >> {
     "ForecastFeedSource & AclFeedSource" >> {
-      val v1Message = FlightMessage(
+      val v4Message = FlightMessage(
         actPaxOLD = Option(50),
         tranPaxOLD = Option(5),
         totalPax = Seq(
@@ -132,7 +147,7 @@ class FlightMessagePassengersConversionSpec extends Specification {
           TotalPaxSourceMessage(Option(ApiFeedSource.toString), Option(PassengersMessage(Option(99), Option(11))), None),
         ),
       )
-      val arrival = FlightMessageConversion.flightMessageToApiFlight(v1Message)
+      val arrival = FlightMessageConversion.flightMessageToApiFlight(v4Message)
       arrival.PassengerSources === Map(
         ForecastFeedSource -> Passengers(Option(100), Option(10)),
         AclFeedSource -> Passengers(Option(120), None),

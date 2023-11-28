@@ -27,12 +27,6 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
       PaxSource(ApiFeedSource, Passengers(Option(splits.totalPax), Option(splits.transPax)))
   }
 
-  def bestPaxSource(sourceOrderPreference: List[FeedSource]): PaxSource =
-    paxFromApi match {
-      case Some(totalPaxSource) if hasValidApi => totalPaxSource
-      case _ => apiFlight.bestPaxEstimate(sourceOrderPreference)
-    }
-
   def equals(candidate: ApiFlightWithSplits): Boolean =
     this.copy(lastUpdated = None) == candidate.copy(lastUpdated = None)
 

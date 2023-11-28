@@ -14,7 +14,6 @@ trait TerminalDateActor[T] extends Actor {
 }
 
 object TerminalDateActor {
-  case object GetState
 
   case class ArrivalKey(scheduled: Long, terminal: String, number: Int)
 

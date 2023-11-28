@@ -11,10 +11,10 @@ trait RecoveryLogging {
 
   def snapshotOfferLogMessage(md: SnapshotMetadata): String = s"$prefix received SnapshotOffer from ${SDate(md.timestamp).toISOString}, sequence number ${md.sequenceNr}"
 
-  def logSnapshotOffer(md: SnapshotMetadata): Unit = log.info(snapshotOfferLogMessage(md))
+  def logSnapshotOffer(md: SnapshotMetadata): Unit = log.debug(snapshotOfferLogMessage(md))
 
   def logSnapshotOffer(md: SnapshotMetadata,
-                       additionalInfo: String): Unit = log.info(s"${snapshotOfferLogMessage(md)} - $additionalInfo")
+                       additionalInfo: String): Unit = log.debug(s"${snapshotOfferLogMessage(md)} - $additionalInfo")
 
   def logRecoveryMessage(message: String): Unit = log.info(s"$prefix - $message")
 
@@ -25,6 +25,6 @@ trait RecoveryLogging {
   def logCounters(bytes: Int, messages: Int, bytesThreshold: Int, maybeMessageThreshold: Option[Int]): Unit = {
     val megaBytes = bytes.toDouble / (1024 * 1024)
     val megaBytesThreshold = bytesThreshold.toDouble / (1024 * 1024)
-    log.info(f"$megaBytes%.2fMB persisted in $messages messages since last snapshot. Thresholds: $megaBytesThreshold%.2fMB, $maybeMessageThreshold messages")
+    log.debug(f"$megaBytes%.2fMB persisted in $messages messages since last snapshot. Thresholds: $megaBytesThreshold%.2fMB, $maybeMessageThreshold messages")
   }
 }
