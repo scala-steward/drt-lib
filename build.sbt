@@ -27,7 +27,7 @@ lazy val sslConfigCore = "0.6.1"
 lazy val scalaTestVersion = "3.2.16"
 lazy val autowireVersion = "0.3.3"
 lazy val booPickleVersion = "1.3.3"
-lazy val specs2 = "4.20.0"
+lazy val specs2 = "4.20.3"
 lazy val csvCommonsVersion = "1.10.0"
 lazy val catsVersion = "2.9.0"
 
