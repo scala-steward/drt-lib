@@ -11,12 +11,14 @@ import uk.gov.homeoffice.drt.protobuf.messages.FlightsSummary.FlightsSummaryMess
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.{ModelAndFeaturesMessage, ModelsAndFeaturesMessage, RemoveModelMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.NeboPassengersMessage.{NeboArrivalMessage, NeboArrivalSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.PaxMessage.{OriginTerminalPaxCountsMessage, OriginTerminalPaxCountsMessages, PaxCountMessage}
-import uk.gov.homeoffice.drt.protobuf.messages.RedListUpdates._
+import uk.gov.homeoffice.drt.protobuf.messages.RedListUpdates.{AdditionMessage, RedListUpdateMessage, RedListUpdatesMessage, RemovalMessage, SetRedListUpdateMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.RegisteredArrivalMessage.{RegisteredArrivalMessage, RegisteredArrivalsMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.ShiftMessage.{ShiftMessage, ShiftStateSnapshotMessage, ShiftsMessage}
+import uk.gov.homeoffice.drt.protobuf.messages.SlasUpdates.SetSlaConfigMessage
 import uk.gov.homeoffice.drt.protobuf.messages.StaffMovementMessages.{RemoveStaffMovementMessage, StaffMovementMessage, StaffMovementsMessage, StaffMovementsStateSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.TerminalQueuesSummary.TerminalQueuesSummaryMessage
-import uk.gov.homeoffice.drt.protobuf.messages.VoyageManifest.{ManifestLikeMessage, ManifestPassengerProfileMessage, MaybeManifestLikeMessage, VoyageManifestLatestFileNameMessage, VoyageManifestMessage, VoyageManifestStateSnapshotMessage, VoyageManifestsMessage}
+import uk.gov.homeoffice.drt.protobuf.messages.VoyageManifest._
+import uk.gov.homeoffice.drt.protobuf.messages.config.Configs
 
 class Serializer extends SerializerWithStringManifest {
   override def identifier: Int = 9001
@@ -28,6 +30,7 @@ class Serializer extends SerializerWithStringManifest {
   final val CrunchMinutes: String = classOf[CrunchMinutesMessage].getName
   final val FlightsWithSplits: String = classOf[FlightsWithSplitsMessage].getName
   final val FlightsWithSplitsDiff: String = classOf[FlightsWithSplitsDiffMessage].getName
+  final val SplitsForArrivals: String = classOf[SplitsForArrivalsMessage].getName
   final val Shifts: String = classOf[ShiftsMessage].getName
   final val ShiftStateSnapshot: String = classOf[ShiftStateSnapshotMessage].getName
   final val Shift: String = classOf[ShiftMessage].getName
@@ -68,7 +71,7 @@ class Serializer extends SerializerWithStringManifest {
   final val RedListUpdate: String = classOf[RedListUpdateMessage].getName
   final val Addition: String = classOf[AdditionMessage].getName
   final val Removal: String = classOf[RemovalMessage].getName
-  final val RemoveUpdate: String = classOf[RemoveUpdateMessage].getName
+  final val RemoveUpdate: String = classOf[messages.RedListUpdates.RemoveUpdateMessage].getName
   final val SetEgateBanksUpdate: String = classOf[SetEgateBanksUpdateMessage].getName
   final val RemoveEgateBanksUpdate: String = classOf[RemoveEgateBanksUpdateMessage].getName
   final val PortEgateBanksUpdates: String = classOf[PortEgateBanksUpdatesMessage].getName
@@ -79,9 +82,10 @@ class Serializer extends SerializerWithStringManifest {
   final val RemoveModel: String = classOf[RemoveModelMessage].getName
   final val MaybeManifestLike: String = classOf[MaybeManifestLikeMessage].getName
   final val ManifestLike: String = classOf[ManifestLikeMessage].getName
-  final val ManifestPassengerProfile: String = classOf[ManifestPassengerProfileMessage].getName
   final val PassengersMinute: String = classOf[PassengersMinuteMessage].getName
   final val PassengersMinutes: String = classOf[PassengersMinutesMessage].getName
+  final val SetSlasUpdate = classOf[SetSlaConfigMessage].getName
+  final val RemoveSlasUpdate = classOf[Configs.RemoveConfigMessage].getName
 
   override def toBinary(objectToSerialize: AnyRef): Array[Byte] = objectToSerialize match {
     case m: GeneratedMessage => m.toByteArray
@@ -126,6 +130,7 @@ class Serializer extends SerializerWithStringManifest {
       case RemoveDay => RemoveDayMessage.parseFrom(bytes)
       case FlightsWithSplits => FlightsWithSplitsMessage.parseFrom(bytes)
       case FlightsWithSplitsDiff => FlightsWithSplitsDiffMessage.parseFrom(bytes)
+      case SplitsForArrivals => SplitsForArrivalsMessage.parseFrom(bytes)
       case CrunchRequest => CrunchRequestMessage.parseFrom(bytes)
       case CrunchRequests => CrunchRequestsMessage.parseFrom(bytes)
       case RemoveCrunchRequest => RemoveCrunchRequestMessage.parseFrom(bytes)
@@ -134,7 +139,7 @@ class Serializer extends SerializerWithStringManifest {
       case RedListUpdate => RedListUpdateMessage.parseFrom(bytes)
       case Addition => AdditionMessage.parseFrom(bytes)
       case Removal => RemovalMessage.parseFrom(bytes)
-      case RemoveUpdate => RemoveUpdateMessage.parseFrom(bytes)
+      case RemoveUpdate => messages.RedListUpdates.RemoveUpdateMessage.parseFrom(bytes)
       case SetEgateBanksUpdate => SetEgateBanksUpdateMessage.parseFrom(bytes)
       case RemoveEgateBanksUpdate => RemoveEgateBanksUpdateMessage.parseFrom(bytes)
       case PortEgateBanksUpdates => PortEgateBanksUpdatesMessage.parseFrom(bytes)
@@ -147,6 +152,8 @@ class Serializer extends SerializerWithStringManifest {
       case ManifestLike => ManifestLikeMessage.parseFrom(bytes)
       case PassengersMinute => PassengersMinuteMessage.parseFrom(bytes)
       case PassengersMinutes => PassengersMinutesMessage.parseFrom(bytes)
+      case SetSlasUpdate => SetSlaConfigMessage.parseFrom(bytes)
+      case RemoveSlasUpdate => Configs.RemoveConfigMessage.parseFrom(bytes)
     }
   }
 }

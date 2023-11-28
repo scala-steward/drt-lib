@@ -8,7 +8,7 @@ import upickle.default.{readwriter, _}
 
 
 object Roles {
-  val portRoles: Set[Role] = Set(ABZ, BFS, BHD, BHX, BRS, BOH, CWL, DSA, EDI, EMA, EXT, GLA, HUY, INV, LBA, LCY, LGW, LHR, LPL, LTN, MAN, MME, NCL, NQY, NWI, PIK, SEN, SOU, STN)
+  val portRoles: Set[Role] = Set(ABZ, BFS, BHD, BHX, BRS, BOH, CWL, EDI, EMA, EXT, GLA, HUY, INV, LBA, LCY, LGW, LHR, LPL, LTN, MAN, MME, NCL, NQY, NWI, PIK, SEN, SOU, STN)
 
   val availableRoles: Set[Role] = Set(
     ApiView,
@@ -21,6 +21,7 @@ object Roles {
     Debug,
     DesksAndQueuesView,
     EgateBanksEdit,
+    SlaConfigsEdit,
     EnhancedApiView,
     FaqView,
     FixedPointsEdit,
@@ -34,8 +35,7 @@ object Roles {
     RccHeathrow,
     RccNorth,
     RccSouth,
-    RedListFeature,
-    RedListsEdit,
+    HealthChecksEdit,
     StaffMovementsEdit,
     StaffMovementsExport,
     StaffEdit,
@@ -132,10 +132,6 @@ object Roles {
 
   case object CWL extends PortAccess {
     override val name: String = "CWL"
-  }
-
-  case object DSA extends PortAccess {
-    override val name: String = "DSA"
   }
 
   case object EDI extends PortAccess {
@@ -247,12 +243,16 @@ object Roles {
     override val name: String = "arrivals-and-splits:view"
   }
 
-  case object RedListsEdit extends Role {
-    override val name: String = "red-lists:edit"
+  case object HealthChecksEdit extends Role {
+    override val name: String = "health-checks:edit"
   }
 
   case object EgateBanksEdit extends Role {
     override val name: String = "egate-banks:edit"
+  }
+
+  case object SlaConfigsEdit extends Role {
+    override val name: String = "sla-configs:edit"
   }
 
   case object ForecastView extends Role {
@@ -303,11 +303,6 @@ object Roles {
 
   case object RccSouth extends Role {
     override val name: String = "rcc:south"
-  }
-
-
-  case object RedListFeature extends Role {
-    override val name: String = "red-list-feature"
   }
 
   case object NeboUpload extends Role {

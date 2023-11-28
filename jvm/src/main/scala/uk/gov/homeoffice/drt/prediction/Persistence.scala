@@ -5,7 +5,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import uk.gov.homeoffice.drt.actor.PredictionModelActor
 import uk.gov.homeoffice.drt.actor.PredictionModelActor.{ModelUpdate, Models, RemoveModel, WithId}
-import uk.gov.homeoffice.drt.actor.TerminalDateActor.GetState
+import uk.gov.homeoffice.drt.actor.commands.Commands.GetState
 import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,14 +29,14 @@ trait Persistence {
       actor.ask(msg).map(_ => actor ! PoisonPill)
     }
 
-  val getModels: WithId => Future[Models] =
+  def getModels(validModelNames: Seq[String]): WithId => Future[Models] =
     identifier => {
       val actor = actorProvider(modelCategory, identifier)
       actor
         .ask(GetState).mapTo[Models]
-        .map { state =>
+        .map { models =>
           actor ! PoisonPill
-          state
+          Models(models.models.view.filterKeys(validModelNames.contains).toMap)
         }
     }
 }

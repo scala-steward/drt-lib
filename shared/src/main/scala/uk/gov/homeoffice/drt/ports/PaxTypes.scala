@@ -85,16 +85,16 @@ object PaxTypes {
     case other => other.name
   }
 
-  def displayNameShort(pt: PaxType): String = pt match {
+  def displayNameShort(pt: PaxType, isBeforeAgeEligibilityChangeDate: Boolean): String = pt match {
     case GBRNational => "GBR"
-    case GBRNationalBelowEgateAge => "GBR U12"
+    case GBRNationalBelowEgateAge => if (isBeforeAgeEligibilityChangeDate) "GBR U12" else "GBR U10"
     case EeaMachineReadable => "EEA MR"
     case EeaNonMachineReadable => "EEA NMR"
-    case EeaBelowEGateAge => "EEA U12"
+    case EeaBelowEGateAge => if (isBeforeAgeEligibilityChangeDate) "EEA U12" else "EEA U10"
     case VisaNational => "VN"
     case NonVisaNational => "NVN"
     case B5JPlusNational => "B5J+"
-    case B5JPlusNationalBelowEGateAge => "B5J+ U12"
+    case B5JPlusNationalBelowEGateAge => if (isBeforeAgeEligibilityChangeDate) "B5J+ U12" else "B5J+ U10"
     case Transit => "Transit"
     case other => other.name
   }

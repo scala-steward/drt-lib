@@ -1,10 +1,20 @@
 package uk.gov.homeoffice.drt.arrivals
 
 import org.specs2.mutable.Specification
+import uk.gov.homeoffice.drt.ports.{AclFeedSource, ApiFeedSource, ForecastFeedSource, HistoricApiFeedSource, LiveFeedSource, MlFeedSource, ScenarioSimulationSource}
 import uk.gov.homeoffice.drt.time.SDate
 
 class FlightsWithSplitsSpec extends Specification{
   "When filtering flights by Scheduled date" >> {
+    val sourceOrderPreference = List(
+      ScenarioSimulationSource,
+      LiveFeedSource,
+      ApiFeedSource,
+      ForecastFeedSource,
+      MlFeedSource,
+      HistoricApiFeedSource,
+      AclFeedSource,
+    )
     "Given a flight with Splits containing flights inside and outside the range" >> {
       "Then I should only get flights scheduled inside the range" >> {
         val fws1 = ArrivalGenerator.flightWithSplitsForDayAndTerminal(SDate("2020-09-22T10:00"))
@@ -18,7 +28,7 @@ class FlightsWithSplitsSpec extends Specification{
 
         val start = SDate("2020-09-21T10:00").getUtcLastMidnight
         val end = start.addDays(1)
-        val result = flightsWithSplits.scheduledOrPcpWindow(start, end)
+        val result = flightsWithSplits.scheduledOrPcpWindow(start, end, sourceOrderPreference)
 
         val expected = FlightsWithSplits(Map(fws2.unique -> fws2))
 

@@ -1,7 +1,6 @@
-import Dependencies._
 import sbt.Keys.libraryDependencies
 
-lazy val scala = "2.13.10"
+lazy val scala = "2.13.11"
 
 ThisBuild / scalaVersion := scala
 ThisBuild / organization := "uk.gov.homeoffice"
@@ -16,22 +15,36 @@ lazy val root = project.in(file(".")).
     name := "drt-lib",
     publish := {},
     publishLocal := {},
-    libraryDependencies ++= libDeps,
     crossScalaVersions := Nil,
     logLevel := Level.Debug
   )
 
-lazy val akkaVersion = "2.7.0"
-lazy val akkaPersistenceInMemoryVersion = "2.5.15.2"
+lazy val akkaVersion = "2.8.5"
 lazy val jodaVersion = "2.12.5"
-lazy val upickleVersion = "2.0.0"
-lazy val sparkMlLibVersion = "3.3.2"
+lazy val upickleVersion = "3.1.0"
+lazy val sparkMlLibVersion = "3.4.1"
+lazy val sslConfigCore = "0.6.1"
+lazy val scalaTestVersion = "3.2.16"
+lazy val autowireVersion = "0.3.3"
+lazy val booPickleVersion = "1.3.3"
+lazy val specs2 = "4.20.3"
+lazy val csvCommonsVersion = "1.10.0"
+lazy val catsVersion = "2.9.0"
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .in(file("."))
   .settings(
     name := "drt-lib",
-    libraryDependencies ++= libDeps,
+    libraryDependencies ++= Seq(
+      "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
+      "com.lihaoyi" %% "upickle" % upickleVersion,
+      "com.lihaoyi" %% "autowire" % autowireVersion,
+      "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf",
+      "org.specs2" %% "specs2-core" % specs2 % Test,
+      "org.apache.commons" % "commons-csv" % csvCommonsVersion,
+      "org.typelevel" %% "cats-core" % catsVersion,
+      "com.outr" %% "scribe-slf4j" % "3.11.5"
+    ),
     resolvers ++= Seq(
       "Artifactory Snapshot Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-snapshot/",
       "Artifactory Release Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-release/"
@@ -44,11 +57,9 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "com.typesafe.akka" %% "akka-persistence-query" % akkaVersion,
       "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
       "joda-time" % "joda-time" % jodaVersion,
-      "com.lihaoyi" %%% "upickle" % upickleVersion,
       "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion,
-
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
-      "com.github.dnvriend" %% "akka-persistence-inmemory" % akkaPersistenceInMemoryVersion % "test"
+      "com.typesafe" %% "ssl-config-core" % sslConfigCore,
     ),
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
     Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),

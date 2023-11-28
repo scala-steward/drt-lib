@@ -108,12 +108,22 @@ class ApiFlightWithSplitsSpec extends Specification {
       }
     }
 
+    val sourceOrderPreference = List(
+      ScenarioSimulationSource,
+      LiveFeedSource,
+      ApiFeedSource,
+      ForecastFeedSource,
+      MlFeedSource,
+      HistoricApiFeedSource,
+      AclFeedSource,
+    )
+
     "when there no actual pax number in liveFeed" in {
       "and api splits has pax number and hasValidApi is true" in {
         val flightWithSplits = flightWithPaxAndApiSplits(100, 0, Set(LiveFeedSource), Map(LiveFeedSource -> Passengers(None,Option(0))), scheduledAfterPaxSources)
         flightWithSplits.hasValidApi mustEqual true
-        flightWithSplits.bestPaxSource.getPcpPax must beSome(100)
-        val paxPerQueue: Option[Map[Queues.Queue, Int]] = ApiSplitsToSplitRatio.paxPerQueueUsingBestSplitsAsRatio(flightWithSplits)
+        flightWithSplits.apiFlight.bestPcpPaxEstimate(sourceOrderPreference) must beSome(100)
+        val paxPerQueue: Option[Map[Queues.Queue, Int]] = ApiSplitsToSplitRatio.paxPerQueueUsingBestSplitsAsRatio(flightWithSplits, sourceOrderPreference)
         paxPerQueue must beSome(collection.Map(Queues.NonEeaDesk -> 100))
       }
     }
@@ -122,41 +132,41 @@ class ApiFlightWithSplitsSpec extends Specification {
       "and api splits has pax number and hasValidApi is false" in {
         val flightWithSplits = flightWithPaxAndApiSplits(100, 0, Set(LiveFeedSource), Map(LiveFeedSource -> Passengers(Option(95), Option(0))), scheduledAfterPaxSources)
         flightWithSplits.hasValidApi mustEqual false
-        flightWithSplits.bestPaxSource.getPcpPax must beSome(95)
-        flightWithSplits.bestPaxSource.feedSource === LiveFeedSource
-        val paxPerQueue: Option[Map[Queues.Queue, Int]] = ApiSplitsToSplitRatio.paxPerQueueUsingBestSplitsAsRatio(flightWithSplits)
+        flightWithSplits.apiFlight.bestPcpPaxEstimate(sourceOrderPreference) must beSome(95)
+        flightWithSplits.apiFlight.bestPaxEstimate(sourceOrderPreference).feedSource === LiveFeedSource
+        val paxPerQueue: Option[Map[Queues.Queue, Int]] = ApiSplitsToSplitRatio.paxPerQueueUsingBestSplitsAsRatio(flightWithSplits, sourceOrderPreference)
         paxPerQueue must beNone
       }
     }
 
     "give a pax count from splits when it has API splits" in {
       val flightWithSplits = flightWithPaxAndApiSplits( 45, 0, Set(), Map(), scheduledAfterPaxSources)
-      flightWithSplits.bestPaxSource.passengers.actual mustEqual Option(45)
+      flightWithSplits.apiFlight.bestPaxEstimate(sourceOrderPreference).passengers.actual mustEqual Option(45)
     }
 
     "give a pax count from splits when it has API splits which does not include transfer pax" in {
       val flightWithSplits = flightWithPaxAndApiSplits(45, 20, Set(), Map(), scheduledAfterPaxSources)
-      flightWithSplits.bestPaxSource.passengers.getPcpPax mustEqual Option(45)
+      flightWithSplits.apiFlight.bestPaxEstimate(sourceOrderPreference).passengers.actual mustEqual Option(45)
     }
 
     "give a pax count from splits when it has API splits even when it is outside the trusted threshold" in {
       val flightWithSplits = flightWithPaxAndApiSplits( 150, 0, Set(LiveFeedSource), Map(), scheduledAfterPaxSources)
-      flightWithSplits.bestPaxSource.passengers.actual mustEqual Option(150)
+      flightWithSplits.apiFlight.bestPaxEstimate(sourceOrderPreference).passengers.actual mustEqual Option(150)
     }
 
     "give no pax count from splits it has no API splits" in {
       val flightWithSplits = flightWithPaxAndHistoricSplits( 45, 20, Set(),Map())
-      flightWithSplits.bestPaxSource.passengers.actual must beNone
+      flightWithSplits.apiFlight.bestPaxEstimate(sourceOrderPreference).passengers.actual must beNone
     }
 
     "give None for totalPaxFromApiExcludingTransfer when it doesn't have live API splits" in {
       val fws = flightWithPaxAndHistoricSplits( 100, 0, Set(),Map())
-      fws.bestPaxSource.passengers.actual === None
+      fws.apiFlight.bestPaxEstimate(sourceOrderPreference).passengers.actual === None
     }
 
     "give None for totalPaxFromApi when it doesn't have live API splits" in {
       val fws = flightWithPaxAndHistoricSplits(100, 0, Set(),Map())
-      fws.bestPaxSource.passengers.actual === None
+      fws.apiFlight.bestPaxEstimate(sourceOrderPreference).passengers.actual === None
     }
   }
 
@@ -168,7 +178,7 @@ class ApiFlightWithSplitsSpec extends Specification {
                                        ): ApiFlightWithSplits = {
     val flight: Arrival = ArrivalGenerator.arrival(
       feedSources = sources,
-      passengerSources = passengerSources,
+      passengerSources = passengerSources + (ApiFeedSource -> Passengers(Option(splitsDirect), Option(splitsTransfer))),
       sch = scheduled)
 
     ApiFlightWithSplits(flight, Set(splitsForPax(directPax = splitsDirect, transferPax = splitsTransfer, ApiSplitsWithHistoricalEGateAndFTPercentages)))

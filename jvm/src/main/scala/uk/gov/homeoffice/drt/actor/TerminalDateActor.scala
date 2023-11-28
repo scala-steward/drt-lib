@@ -1,6 +1,7 @@
 package uk.gov.homeoffice.drt.actor
 
 import akka.actor.Actor
+import uk.gov.homeoffice.drt.arrivals.Arrival
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.protobuf.messages.CrunchState.FlightWithSplitsMessage
 import uk.gov.homeoffice.drt.time.UtcDate
@@ -13,9 +14,16 @@ trait TerminalDateActor[T] extends Actor {
 }
 
 object TerminalDateActor {
-  case object GetState
 
   case class ArrivalKey(scheduled: Long, terminal: String, number: Int)
 
+  object ArrivalKey {
+    def apply(arrival: Arrival): ArrivalKey = ArrivalKey(arrival.Scheduled, arrival.Terminal.toString, arrival.VoyageNumber.numeric)
+  }
+
   case class ArrivalKeyWithOrigin(scheduled: Long, terminal: String, number: Int, origin: String)
+
+  object ArrivalKeyWithOrigin {
+    def apply(arrival: Arrival): ArrivalKeyWithOrigin = ArrivalKeyWithOrigin(arrival.Scheduled, arrival.Terminal.toString, arrival.VoyageNumber.numeric, origin = arrival.Origin.toString)
+  }
 }

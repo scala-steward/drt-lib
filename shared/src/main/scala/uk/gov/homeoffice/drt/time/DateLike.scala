@@ -17,6 +17,16 @@ trait DateLike extends Ordered[DateLike] {
     if (toISOString < that.toISOString) -1
     else if (toISOString > that.toISOString) 1
     else 0
+
+  def to(endDate: LocalDate)(implicit toSDateLike: DateLike => SDateLike): Seq[LocalDate] = {
+    val start = if (this < endDate) this else endDate
+    val end = if (this < endDate) endDate else this
+    LazyList
+      .iterate(toSDateLike(start))(_.addDays(1))
+      .takeWhile(_.toLocalDate <= end)
+      .map(_.toLocalDate)
+  }
+
 }
 
 object DateLike {
