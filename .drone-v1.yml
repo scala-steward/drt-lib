@@ -79,8 +79,9 @@ steps:
     commands:
       - /root/entrypoint.sh
       - sbt -ivy ./.ivy2 dependencyCheck
-      - sbt -ivy ./.ivy2 -mem 4096 -J-XX:+UseG1GC clean coverage test coverageReport
+      - sbt -ivy ./.ivy2 -mem 4096 -J-XX:+UseG1GC coverage test coverageReport
     environment:
+      NVD_BASE_URL: http://nvdmirror:8008
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
       ARTIFACTORY_USERNAME: drt-artifactory-robot
@@ -89,6 +90,8 @@ steps:
       branch: master
       event:
         - push
+    depends_on:
+      - Test
 
   - name: sonar-scanner
     pull: if-not-exists
@@ -104,4 +107,10 @@ steps:
         - push
     depends_on:
       - analysis
+
+services:
+  - name: nvdmirror
+    image: sspringett/nvdmirror
+    ports:
+      - 8008
 ...

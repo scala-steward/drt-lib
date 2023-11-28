@@ -19,8 +19,7 @@ lazy val root = project.in(file(".")).
     logLevel := Level.Debug
   )
 
-lazy val akkaVersion = "2.7.0"
-lazy val akkaPersistenceInMemoryVersion = "2.5.15.2"
+lazy val akkaVersion = "2.8.5"
 lazy val jodaVersion = "2.12.5"
 lazy val upickleVersion = "3.1.0"
 lazy val sparkMlLibVersion = "3.4.1"
@@ -28,7 +27,7 @@ lazy val sslConfigCore = "0.6.1"
 lazy val scalaTestVersion = "3.2.16"
 lazy val autowireVersion = "0.3.3"
 lazy val booPickleVersion = "1.3.3"
-lazy val specs2 = "4.20.0"
+lazy val specs2 = "4.20.3"
 lazy val csvCommonsVersion = "1.10.0"
 lazy val catsVersion = "2.9.0"
 
@@ -60,7 +59,6 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "joda-time" % "joda-time" % jodaVersion,
       "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion,
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
-      "com.github.dnvriend" %% "akka-persistence-inmemory" % akkaPersistenceInMemoryVersion % "test",
       "com.typesafe" %% "ssl-config-core" % sslConfigCore,
     ),
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
