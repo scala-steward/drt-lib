@@ -1,6 +1,6 @@
 import sbt.Keys.libraryDependencies
 
-lazy val scala = "2.13.11"
+lazy val scala = "2.13.12"
 
 ThisBuild / scalaVersion := scala
 ThisBuild / organization := "uk.gov.homeoffice"
@@ -22,7 +22,7 @@ lazy val root = project.in(file(".")).
 lazy val akkaVersion = "2.8.5"
 lazy val jodaVersion = "2.12.5"
 lazy val upickleVersion = "3.1.0"
-lazy val sparkMlLibVersion = "3.4.1"
+lazy val sparkMlLibVersion = "3.5.0"
 lazy val sslConfigCore = "0.6.1"
 lazy val scalaTestVersion = "3.2.17"
 lazy val autowireVersion = "0.3.3"
