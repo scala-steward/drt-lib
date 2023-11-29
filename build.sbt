@@ -21,12 +21,11 @@ lazy val root = project.in(file(".")).
 
 lazy val akkaVersion = "2.8.5"
 lazy val jodaVersion = "2.12.5"
-lazy val upickleVersion = "3.1.0"
+lazy val upickleVersion = "3.1.3"
 lazy val sparkMlLibVersion = "3.5.0"
 lazy val sslConfigCore = "0.6.1"
 lazy val scalaTestVersion = "3.2.17"
 lazy val autowireVersion = "0.3.3"
-lazy val booPickleVersion = "1.3.3"
 lazy val specs2 = "4.20.3"
 lazy val csvCommonsVersion = "1.10.0"
 lazy val catsVersion = "2.10.0"
