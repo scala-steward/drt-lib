@@ -23,12 +23,11 @@ lazy val akkaVersion = "2.8.5"
 lazy val jodaVersion = "2.12.5"
 lazy val upickleVersion = "3.1.3"
 lazy val sparkMlLibVersion = "3.5.0"
-lazy val sslConfigCore = "0.6.1"
 lazy val scalaTestVersion = "3.2.17"
-lazy val autowireVersion = "0.3.3"
-lazy val specs2 = "4.20.3"
+lazy val specs2Version = "4.20.3"
 lazy val csvCommonsVersion = "1.10.0"
 lazy val catsVersion = "2.10.0"
+lazy val scribeSlf4jVersion = "3.12.2"
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .in(file("."))
@@ -37,12 +36,11 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % scalaTestVersion % Test,
       "com.lihaoyi" %% "upickle" % upickleVersion,
-      "com.lihaoyi" %% "autowire" % autowireVersion,
       "com.thesamet.scalapb" %% "scalapb-runtime" % scalapb.compiler.Version.scalapbVersion % "protobuf",
-      "org.specs2" %% "specs2-core" % specs2 % Test,
+      "org.specs2" %% "specs2-core" % specs2Version % Test,
       "org.apache.commons" % "commons-csv" % csvCommonsVersion,
       "org.typelevel" %% "cats-core" % catsVersion,
-      "com.outr" %% "scribe-slf4j" % "3.12.2"
+      "com.outr" %% "scribe-slf4j" % scribeSlf4jVersion
     ),
     resolvers ++= Seq(
       "Artifactory Snapshot Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-snapshot/",
@@ -58,7 +56,6 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "joda-time" % "joda-time" % jodaVersion,
       "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion,
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
-      "com.typesafe" %% "ssl-config-core" % sslConfigCore,
     ),
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
     Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
