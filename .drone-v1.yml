@@ -98,7 +98,6 @@ steps:
       - /root/entrypoint.sh
       - sbt scapegoat | true
     environment:
-      NVD_BASE_URL: http://nvdmirror:8008
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
       ARTIFACTORY_USERNAME: drt-artifactory-robot
@@ -106,8 +105,8 @@ steps:
     when:
       event:
         - push
-#      branch:
-#        - master
+      branch:
+        - master
     depends_on:
       - Code coverage report
 
@@ -126,12 +125,12 @@ steps:
     when:
       event:
         - push
-#      branch:
-#        - master
+      branch:
+        - master
     depends_on:
       - Scapegoat
 
-  - name: sonar-scanner
+  - name: Sonar scanner
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/sonar-scanner:v4.6
     commands:
@@ -147,7 +146,7 @@ steps:
       - Dependency check
 
 services:
-  - name: nvdmirror
+  - name: NVD mirror service
     image: sspringett/nvdmirror
     ports:
       - 8008
