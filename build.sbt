@@ -42,7 +42,7 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "org.specs2" %% "specs2-core" % specs2 % Test,
       "org.apache.commons" % "commons-csv" % csvCommonsVersion,
       "org.typelevel" %% "cats-core" % catsVersion,
-      "com.outr" %% "scribe-slf4j" % "3.11.9"
+      "com.outr" %% "scribe-slf4j" % "3.12.2"
     ),
     resolvers ++= Seq(
       "Artifactory Snapshot Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-snapshot/",
