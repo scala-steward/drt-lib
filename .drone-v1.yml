@@ -8,7 +8,7 @@ platform:
   arch: amd64
 
 steps:
-  - name: Build
+  - name: Build library
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     commands:
@@ -22,7 +22,7 @@ steps:
       event:
         - push
 
-  - name: Publish
+  - name: Publish library
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     commands:
@@ -36,9 +36,9 @@ steps:
       event:
         - push
     depends_on:
-      - Build
+      - Build library
 
-  - name: Test
+  - name: Unit tests
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
     commands:
@@ -53,9 +53,9 @@ steps:
       event:
         - push
     depends_on:
-      - Build
+      - Build library
 
-  - name: slack_notification
+  - name: Slack notification
     pull: if-not-exists
     image: plugins/slack
     settings:
@@ -71,15 +71,32 @@ steps:
       event:
         - push
     depends_on:
-      - Test
+      - Unit tests
 
-  - name: analysis
+  - name: Code coverage report
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.0.0
     commands:
       - /root/entrypoint.sh
-      - sbt -ivy ./.ivy2 dependencyCheck
-      - sbt -ivy ./.ivy2 -mem 4096 -J-XX:+UseG1GC coverage test coverageReport
+      - sbt -mem 4096 --error test coverage | true
+      - sbt coverageReport
+    environment:
+      ARTIFACTORY_PASSWORD:
+        from_secret: ARTIFACTORY_PASSWORD
+      ARTIFACTORY_USERNAME: drt-artifactory-robot
+      ENV_LOG_LEVEL: ERROR
+    when:
+      event:
+        - push
+    depends_on:
+      - Unit tests
+
+  - name: Scapegoat
+    pull: if-not-exists
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.0.0
+    commands:
+      - /root/entrypoint.sh
+      - sbt scapegoat | true
     environment:
       NVD_BASE_URL: http://nvdmirror:8008
       ARTIFACTORY_PASSWORD:
@@ -87,11 +104,32 @@ steps:
       ARTIFACTORY_USERNAME: drt-artifactory-robot
       ENV_LOG_LEVEL: ERROR
     when:
-      branch: master
       event:
         - push
+#      branch:
+#        - master
     depends_on:
-      - Test
+      - Code coverage report
+
+  - name: Dependency check
+    pull: if-not-exists
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.0.0
+    commands:
+      - /root/entrypoint.sh
+      - sbt -mem 4096 dependencyCheckAggregate
+    environment:
+      NVD_BASE_URL: http://nvdmirror:8008
+      ARTIFACTORY_PASSWORD:
+        from_secret: ARTIFACTORY_PASSWORD
+      ARTIFACTORY_USERNAME: drt-artifactory-robot
+      ENV_LOG_LEVEL: ERROR
+    when:
+      event:
+        - push
+#      branch:
+#        - master
+    depends_on:
+      - Scapegoat
 
   - name: sonar-scanner
     pull: if-not-exists
@@ -106,7 +144,7 @@ steps:
       event:
         - push
     depends_on:
-      - analysis
+      - Dependency check
 
 services:
   - name: nvdmirror

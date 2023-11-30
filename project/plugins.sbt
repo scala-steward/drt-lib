@@ -9,3 +9,5 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.13.2")
 
 addSbtPlugin("net.vonbuchholtz" %% "sbt-dependency-check" % "5.1.0")
 addDependencyTreePlugin
+
+addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "1.2.2")
