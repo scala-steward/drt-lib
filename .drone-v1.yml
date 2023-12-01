@@ -115,7 +115,7 @@ steps:
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.0.0
     commands:
       - /root/entrypoint.sh
-      - sbt -mem 4096 dependencyCheckAggregate
+      - sbt -mem 4096 dependencyCheck
     environment:
       NVD_BASE_URL: http://nvdmirror:8008
       ARTIFACTORY_PASSWORD:
