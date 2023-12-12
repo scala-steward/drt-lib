@@ -72,7 +72,7 @@ object Queues {
 
   case object QueueDesk extends Queue
 
-  val queueOrder = List(QueueDesk, EGate, EeaDesk, NonEeaDesk, FastTrack)
+  val queueOrder: List[Queue] = List(QueueDesk, EGate, EeaDesk, NonEeaDesk, FastTrack)
 
   def inOrder(queuesToSort: Seq[Queue]): Seq[Queue] = queueOrder.filter(q => queuesToSort.contains(q))
 
