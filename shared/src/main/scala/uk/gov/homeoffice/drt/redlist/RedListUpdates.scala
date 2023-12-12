@@ -20,19 +20,21 @@ case class RedListUpdates(updates: Map[Long, RedListUpdate]) {
   def update(setRedListUpdate: SetRedListUpdate): RedListUpdates =
     copy(updates = updates
       .filter {
-        case (effectiveFrom, update) => effectiveFrom != setRedListUpdate.originalDate
+        case (effectiveFrom, _) => effectiveFrom != setRedListUpdate.originalDate
       } + (setRedListUpdate.redListUpdate.effectiveFrom -> setRedListUpdate.redListUpdate)
     )
 
   def ++(other: RedListUpdates): RedListUpdates = copy(updates = updates ++ other.updates)
 
   def countryCodesByName(date: Long): Map[String, String] =
-    updates
-      .filterKeys(changeDate => changeDate <= date)
-      .toList.sortBy(_._1)
-      .foldLeft(Map[String, String]()) {
-        case (acc, (date, updates)) => (acc ++ updates.additions) -- updates.removals
-      }
+    if (date >= 1639267200000L) Map()
+    else
+      updates
+        .filterKeys(changeDate => changeDate <= date)
+        .toList.sortBy(_._1)
+        .foldLeft(Map[String, String]()) {
+          case (acc, (_, updates)) => (acc ++ updates.additions) -- updates.removals
+        }
 
   def redListNats(date: Long): Iterable[Nationality] =
     countryCodesByName(date).values.map(Nationality(_))
