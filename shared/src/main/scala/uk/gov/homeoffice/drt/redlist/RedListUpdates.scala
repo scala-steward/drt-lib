@@ -15,6 +15,8 @@ object RedListUpdate {
 case class RedListUpdates(updates: Map[Long, RedListUpdate]) {
   lazy val isEmpty: Boolean = updates.isEmpty
 
+  val decemberFifteen2021 = 1639267200000L
+
   def remove(effectiveFrom: Long): RedListUpdates = copy(updates = updates.filterKeys(_ != effectiveFrom).view.toMap)
 
   def update(setRedListUpdate: SetRedListUpdate): RedListUpdates =
@@ -26,8 +28,8 @@ case class RedListUpdates(updates: Map[Long, RedListUpdate]) {
 
   def ++(other: RedListUpdates): RedListUpdates = copy(updates = updates ++ other.updates)
 
-  def countryCodesByName(date: Long): Map[String, String] =
-    if (date >= 1639267200000L) Map()
+  def countryCodesByName(date: Long): Map[String, String] = {
+    if (date >= decemberFifteen2021) Map()
     else
       updates
         .filterKeys(changeDate => changeDate <= date)
@@ -35,6 +37,7 @@ case class RedListUpdates(updates: Map[Long, RedListUpdate]) {
         .foldLeft(Map[String, String]()) {
           case (acc, (_, updates)) => (acc ++ updates.additions) -- updates.removals
         }
+  }
 
   def redListNats(date: Long): Iterable[Nationality] =
     countryCodesByName(date).values.map(Nationality(_))
