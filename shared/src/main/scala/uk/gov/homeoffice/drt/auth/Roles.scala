@@ -223,6 +223,7 @@ object Roles {
   case object CreateAlerts extends Role {
     override val name: String = "create-alerts"
   }
+  
   case object DownloadManager extends Role {
     override val name: String = "download-manager"
   }
