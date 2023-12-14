@@ -18,6 +18,7 @@ object Roles {
     ArrivalSource,
     BorderForceStaff,
     CreateAlerts,
+    DownloadManager,
     Debug,
     DesksAndQueuesView,
     EgateBanksEdit,
@@ -221,6 +222,9 @@ object Roles {
 
   case object CreateAlerts extends Role {
     override val name: String = "create-alerts"
+  }
+  case object DownloadManager extends Role {
+    override val name: String = "download-manager"
   }
 
   case object ViewConfig extends Role {
