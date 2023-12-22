@@ -12,5 +12,6 @@ CREATE TABLE passengers_hourly
 );
 
 CREATE INDEX port_terminal_queue_date ON public.passengers_hourly (port, terminal, queue, date_utc);
+CREATE INDEX port_terminal_date_hour ON public.passengers_hourly (port, terminal, date_utc, hour);
 CREATE INDEX port_terminal_date ON public.passengers_hourly (port, terminal, date_utc);
 CREATE INDEX port_date ON public.passengers_hourly (port, date_utc);
