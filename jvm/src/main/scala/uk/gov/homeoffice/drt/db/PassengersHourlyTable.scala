@@ -15,7 +15,7 @@ case class PassengersHourly(portCode: PortCode,
                             dateUtc: UtcDate,
                             hour: Int,
                             passengers: Int,
-                            updatedAt: Option[Long])
+                           )
 
 case class PassengersHourlyRow(portCode: String,
                                terminal: String,
@@ -23,7 +23,8 @@ case class PassengersHourlyRow(portCode: String,
                                dateUtc: String,
                                hour: Int,
                                passengers: Int,
-                               updatedAt: Timestamp)
+                               updatedAt: Timestamp,
+                              )
 
 class PassengersHourlyTable(tag: Tag)
   extends Table[(String, String, String, String, Int, Int, Timestamp)](tag, "passengers_hourly") {

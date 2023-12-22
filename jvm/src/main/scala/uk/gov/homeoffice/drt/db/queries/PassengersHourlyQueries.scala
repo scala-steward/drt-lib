@@ -13,8 +13,8 @@ import java.sql.Timestamp
 import scala.concurrent.ExecutionContext
 
 object PassengersHourlySerialiser {
-  val toRow: PassengersHourly => PassengersHourlyRow = {
-    case PassengersHourly(portCode, terminal, queue, dateUtc, hour, passengers, _) =>
+  val toRow: (PassengersHourly, Long) => PassengersHourlyRow = {
+    case (PassengersHourly(portCode, terminal, queue, dateUtc, hour, passengers), updatedAt) =>
       PassengersHourlyRow(
         portCode.iata,
         terminal.toString,
@@ -22,7 +22,7 @@ object PassengersHourlySerialiser {
         dateUtc.toISOString,
         hour,
         passengers,
-        new Timestamp(SDate.now().millisSinceEpoch),
+        new Timestamp(updatedAt),
       )
   }
 
@@ -35,7 +35,6 @@ object PassengersHourlySerialiser {
         UtcDate.parse(dateUtc).getOrElse(throw new Exception(s"Could not parse date $dateUtc")),
         hour,
         passengers,
-        None,
       )
   }
 }
@@ -65,8 +64,8 @@ object PassengersHourlyQueries {
         }
         .delete
       val insert: FixedSqlAction[Option[Int], NoStream, Effect.Write] = table ++= rows.map {
-        case PassengersHourlyRow(port, terminal, queue, dateUtc, hour, passengers, _) =>
-          (port, terminal, queue, dateUtc, hour, passengers, new Timestamp(SDate.now().millisSinceEpoch))
+        case PassengersHourlyRow(port, terminal, queue, dateUtc, hour, passengers, updatedAt) =>
+          (port, terminal, queue, dateUtc, hour, passengers, updatedAt)
       }
       val transaction = (for {
         _ <- delete
