@@ -59,7 +59,7 @@ object PassengersHourlyQueries {
         .result
         .map { rows =>
           rows.filter {
-            case (utc, hour, _, _, pax, _, _) =>
+            case (_, _, _, utc, hour, _, _, _) =>
               val Array(y, m, d) = utc.split("-").map(_.toInt)
               val rowLocalDate = SDate(UtcDate(y, m, d)).addHours(hour).toLocalDate
               rowLocalDate == localDate
