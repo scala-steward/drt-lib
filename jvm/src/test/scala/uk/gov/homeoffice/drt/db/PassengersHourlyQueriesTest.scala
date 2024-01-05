@@ -7,7 +7,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.homeoffice.drt.db.queries.{PassengersHourlyQueries, PassengersHourlySerialiser}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.{EGate, EeaDesk, FastTrack, NonEeaDesk}
-import uk.gov.homeoffice.drt.ports.Terminals.{T2, T3}
+import uk.gov.homeoffice.drt.ports.Terminals.{T2, T3, Terminal}
 import uk.gov.homeoffice.drt.time.{LocalDate, UtcDate}
 
 import scala.concurrent.Await
@@ -71,18 +71,23 @@ class PassengersHourlyQueriesTest extends AnyWordSpec with Matchers with BeforeA
     }
   }
 
+  private val portCode: PortCode = PortCode("LHR")
+
+  private def hourlyPax(terminal: Terminal, eeaPax: Int, egatePax: Int): List[PassengersHourly] = List(
+    PassengersHourly(portCode, terminal, EeaDesk, UtcDate(2023, 6, 9), 22, 10),
+    PassengersHourly(portCode, terminal, EeaDesk, UtcDate(2023, 6, 9), 23, eeaPax),
+    PassengersHourly(portCode, terminal, EGate, UtcDate(2023, 6, 10), 1, egatePax),
+    PassengersHourly(portCode, terminal, EGate, UtcDate(2023, 6, 10), 23, 10),
+  )
+
+  private def insertHourlyPax(terminal: Terminal, eeaPax: Int, egatePax: Int): Option[Int] = {
+    val paxHourly = hourlyPax(terminal, eeaPax, egatePax).map(ph => PassengersHourlySerialiser.toRow(ph, 0L))
+    Await.result(db.run(PassengersHourlyQueries.replaceHours(portCode)(global)(terminal, paxHourly)), 2.second)
+  }
+
   "PassengerHourlyQueries totalForPortAndDate" should {
     "return the total passengers for a port and local date (spanning 2 utc dates)" in {
-      val portCode = PortCode("LHR")
-      val terminal = T2
-      val paxHourly = List(
-        PassengersHourly(portCode, terminal, EeaDesk, UtcDate(2023, 6, 9), 22, 10),
-        PassengersHourly(portCode, terminal, EeaDesk, UtcDate(2023, 6, 9), 23, 50),
-        PassengersHourly(portCode, terminal, EGate, UtcDate(2023, 6, 10), 1, 25),
-        PassengersHourly(portCode, terminal, EGate, UtcDate(2023, 6, 10), 23, 10),
-      ).map(ph => PassengersHourlySerialiser.toRow(ph, 0L))
-
-      Await.result(db.run(PassengersHourlyQueries.replaceHours(portCode)(global)(terminal, paxHourly)), 2.second)
+      insertHourlyPax(T2, 50, 25)
 
       val result = db.run(PassengersHourlyQueries.totalForPortAndDate(portCode.iata, None)(global)(LocalDate(2023, 6, 10))).futureValue
 
@@ -91,21 +96,8 @@ class PassengersHourlyQueriesTest extends AnyWordSpec with Matchers with BeforeA
 
     "return the total passengers for a port, terminal and local date (spanning 2 utc dates)" in {
       val portCode = PortCode("LHR")
-      val paxHourlyT2 = List(
-        PassengersHourly(portCode, T2, EeaDesk, UtcDate(2023, 6, 9), 22, 10),
-        PassengersHourly(portCode, T2, EeaDesk, UtcDate(2023, 6, 9), 23, 50),
-        PassengersHourly(portCode, T2, EGate, UtcDate(2023, 6, 10), 1, 25),
-        PassengersHourly(portCode, T2, EGate, UtcDate(2023, 6, 10), 23, 10),
-      ).map(ph => PassengersHourlySerialiser.toRow(ph, 0L))
-      val paxHourlyT3 = List(
-        PassengersHourly(portCode, T3, EeaDesk, UtcDate(2023, 6, 9), 22, 10),
-        PassengersHourly(portCode, T3, EeaDesk, UtcDate(2023, 6, 9), 23, 100),
-        PassengersHourly(portCode, T3, EGate, UtcDate(2023, 6, 10), 1, 50),
-        PassengersHourly(portCode, T3, EGate, UtcDate(2023, 6, 10), 23, 10),
-      ).map(ph => PassengersHourlySerialiser.toRow(ph, 0L))
-
-      Await.result(db.run(PassengersHourlyQueries.replaceHours(portCode)(global)(T2, paxHourlyT2)), 2.second)
-      Await.result(db.run(PassengersHourlyQueries.replaceHours(portCode)(global)(T3, paxHourlyT3)), 2.second)
+      insertHourlyPax(T2, 50, 25)
+      insertHourlyPax(T3, 50, 25)
 
       val resultT2 = db.run(PassengersHourlyQueries.totalForPortAndDate(portCode.iata, Option(T2.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
@@ -113,26 +105,13 @@ class PassengersHourlyQueriesTest extends AnyWordSpec with Matchers with BeforeA
 
       val resultT3 = db.run(PassengersHourlyQueries.totalForPortAndDate(portCode.iata, Option(T3.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
-      resultT3 should be(150)
+      resultT3 should be(75)
     }
 
     "return the hourly passengers for a port, terminal and local date (spanning 2 utc dates)" in {
       val portCode = PortCode("LHR")
-      val paxHourlyT2 = List(
-        PassengersHourly(portCode, T2, EeaDesk, UtcDate(2023, 6, 9), 22, 10),
-        PassengersHourly(portCode, T2, EeaDesk, UtcDate(2023, 6, 9), 23, 50),
-        PassengersHourly(portCode, T2, EGate, UtcDate(2023, 6, 10), 1, 25),
-        PassengersHourly(portCode, T2, EGate, UtcDate(2023, 6, 10), 23, 10),
-      ).map(ph => PassengersHourlySerialiser.toRow(ph, 0L))
-      val paxHourlyT3 = List(
-        PassengersHourly(portCode, T3, EeaDesk, UtcDate(2023, 6, 9), 22, 10),
-        PassengersHourly(portCode, T3, EeaDesk, UtcDate(2023, 6, 9), 23, 100),
-        PassengersHourly(portCode, T3, EGate, UtcDate(2023, 6, 10), 1, 50),
-        PassengersHourly(portCode, T3, EGate, UtcDate(2023, 6, 10), 23, 10),
-      ).map(ph => PassengersHourlySerialiser.toRow(ph, 0L))
-
-      Await.result(db.run(PassengersHourlyQueries.replaceHours(portCode)(global)(T2, paxHourlyT2)), 2.second)
-      Await.result(db.run(PassengersHourlyQueries.replaceHours(portCode)(global)(T3, paxHourlyT3)), 2.second)
+      insertHourlyPax(T2, 50, 25)
+      insertHourlyPax(T3, 100, 50)
 
       val resultT2 = db.run(PassengersHourlyQueries.hourlyForPortAndDate(portCode.iata, Option(T2.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
@@ -141,6 +120,30 @@ class PassengersHourlyQueriesTest extends AnyWordSpec with Matchers with BeforeA
       val resultT3 = db.run(PassengersHourlyQueries.hourlyForPortAndDate(portCode.iata, Option(T3.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
       resultT3 should be(Map((UtcDate(2023, 6, 9), 23) -> 100, (UtcDate(2023, 6, 10), 1) -> 50))
+    }
+  }
+
+  "PassengerHourlyQueries queueTotalsForPortAndDate" should {
+    "return the total passengers for a port and local date (spanning 2 utc dates)" in {
+      insertHourlyPax(T2, 50, 25)
+
+      val result = db.run(PassengersHourlyQueries.queueTotalsForPortAndDate(portCode.iata, None)(global)(LocalDate(2023, 6, 10))).futureValue
+
+      result should be(Map(EeaDesk -> 50, EGate -> 25))
+    }
+
+    "return the total passengers for a port, terminal and local date (spanning 2 utc dates)" in {
+      val portCode = PortCode("LHR")
+      insertHourlyPax(T2, 50, 25)
+      insertHourlyPax(T3, 100, 50)
+
+      val resultT2 = db.run(PassengersHourlyQueries.queueTotalsForPortAndDate(portCode.iata, Option(T2.toString))(global)(LocalDate(2023, 6, 10))).futureValue
+
+      resultT2 should be(Map(EeaDesk -> 50, EGate -> 25))
+
+      val resultT3 = db.run(PassengersHourlyQueries.queueTotalsForPortAndDate(portCode.iata, Option(T3.toString))(global)(LocalDate(2023, 6, 10))).futureValue
+
+      resultT3 should be(Map(EeaDesk -> 100, EGate -> 50))
     }
   }
 }

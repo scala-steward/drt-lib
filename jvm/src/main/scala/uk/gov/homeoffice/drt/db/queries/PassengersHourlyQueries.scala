@@ -86,14 +86,25 @@ object PassengersHourlyQueries {
 
   def totalForPortAndDate(port: String, maybeTerminal: Option[String])
                          (implicit ec: ExecutionContext): LocalDate => DBIOAction[Int, NoStream, Effect.Read] =
-    localDate => {
+    localDate =>
       filerPortTerminalDate(port, maybeTerminal, localDate)
         .map(_.map(_._6).sum)
-    }
+
+  def queueTotalsForPortAndDate(port: String, maybeTerminal: Option[String])
+                               (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Queue, Int], NoStream, Effect.Read] =
+    localDate => filerPortTerminalDate(port, maybeTerminal, localDate).map(rowsToQueueTotals)
+
+  def rowsToQueueTotals(rows: Seq[(String, String, String, String, Int, Int, Timestamp)]): Map[Queue, Int] =
+    rows
+      .groupBy(_._3)
+      .map {
+        case (queue, queueRows) =>
+          (Queue(queue), queueRows.map(_._6).sum)
+      }
 
   def hourlyForPortAndDate(port: String, maybeTerminal: Option[String])
                           (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[(UtcDate, Int), Int], NoStream, Effect.Read] =
-    localDate => {
+    localDate =>
       filerPortTerminalDate(port, maybeTerminal, localDate)
         .map {
           _
@@ -104,7 +115,6 @@ object PassengersHourlyQueries {
                 (utcDate, hour) -> rows.map(_._6).sum
             }
         }
-    }
 
   private def filterLocalDate(rows: Seq[(String, String, String, String, Int, Int, Timestamp)], localDate: LocalDate): Seq[(String, String, String, String, Int, Int, Timestamp)] =
     rows.filter {
