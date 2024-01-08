@@ -43,8 +43,7 @@ object PassengersHourlyQueries {
   val table: TableQuery[PassengersHourlyTable] = TableQuery[PassengersHourlyTable]
 
   def replaceHours(port: PortCode)
-                  (implicit ec: ExecutionContext): (Terminal, Iterable[PassengersHourlyRow]) =>
-    DBIOAction[Option[Int], NoStream, Effect.Write with Effect.Transactional] =
+                  (implicit ec: ExecutionContext): (Terminal, Iterable[PassengersHourlyRow]) => DBIOAction[Option[Int], NoStream, Effect.Write with Effect.Transactional] =
     (terminal, rows) => {
       val dateHours = rows.map {
         case PassengersHourlyRow(_, _, _, dateUtc, hour, _, _) => (dateUtc, hour)
@@ -56,9 +55,7 @@ object PassengersHourlyQueries {
         .filter { row =>
           dateHours
             .map {
-              case (date, hour) =>
-                val value: Rep[Boolean] = row.dateUtc === date && row.hour === hour
-                value
+              case (date, hour) => row.dateUtc === date && row.hour === hour
             }
             .reduce(_ || _)
         }
@@ -89,6 +86,36 @@ object PassengersHourlyQueries {
     localDate =>
       filerPortTerminalDate(port, maybeTerminal, localDate)
         .map(_.map(_._6).sum)
+
+  def fullLocalDateExists(port: String, maybeTerminal: Option[String])
+                         (implicit ec: ExecutionContext): LocalDate => DBIOAction[Boolean, NoStream, Effect.Read] =
+    localDate => {
+      table
+        .filter { row =>
+          val portMatches = row.port === port
+          val terminalMatches = maybeTerminal.fold(true.bind)(terminal => row.terminal === terminal)
+          portMatches && terminalMatches && matchLocalDate(row, localDate)
+        }
+        .distinctOn(_.hour)
+        .length
+        .result
+        .map(_ == 24)
+    }
+
+  private def matchLocalDate(row: PassengersHourlyTable, localDate: LocalDate): Rep[Boolean] = {
+    val startHour = SDate(localDate)
+
+    (0 to 23)
+      .map { hour =>
+        val sdateHour = startHour.addHours(hour)
+        (sdateHour.toUtcDate.toISOString, sdateHour.getHours)
+      }
+      .groupBy(_._1)
+      .map {
+        case (date, hours) => row.dateUtc === date && row.hour.inSet(hours.map(_._2))
+      }
+      .reduce(_ || _)
+  }
 
   def queueTotalsForPortAndDate(port: String, maybeTerminal: Option[String])
                                (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Queue, Int], NoStream, Effect.Read] =

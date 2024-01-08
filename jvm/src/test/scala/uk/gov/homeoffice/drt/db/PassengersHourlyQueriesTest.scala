@@ -8,7 +8,7 @@ import uk.gov.homeoffice.drt.db.queries.{PassengersHourlyQueries, PassengersHour
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.{EGate, EeaDesk, FastTrack, NonEeaDesk}
 import uk.gov.homeoffice.drt.ports.Terminals.{T2, T3, Terminal}
-import uk.gov.homeoffice.drt.time.{LocalDate, UtcDate}
+import uk.gov.homeoffice.drt.time.{LocalDate, SDate, UtcDate}
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -145,5 +145,36 @@ class PassengersHourlyQueriesTest extends AnyWordSpec with Matchers with BeforeA
 
       resultT3 should be(Map(EeaDesk -> 100, EGate -> 50))
     }
+  }
+
+  "fullLocalDateExists" should {
+    "return true if all hours are present" in {
+      val portCode = PortCode("LHR")
+      insertHoursForDate(0 to 23, LocalDate(2023, 6, 10))
+
+      val result = db.run(PassengersHourlyQueries.fullLocalDateExists(portCode.iata, None)(global)(LocalDate(2023, 6, 10))).futureValue
+
+      result should be(true)
+    }
+
+    "return false if all hours are not present" in {
+      val portCode = PortCode("LHR")
+      insertHoursForDate(0 to 9, LocalDate(2023, 6, 10))
+      insertHoursForDate(9 to 23, LocalDate(2023, 6, 11))
+
+      val result = db.run(PassengersHourlyQueries.fullLocalDateExists(portCode.iata, None)(global)(LocalDate(2023, 6, 10))).futureValue
+
+      result should be(false)
+    }
+  }
+
+  private def insertHoursForDate(hours: Seq[Int], date: LocalDate) = {
+    val completeHoursOfPax = hours
+      .map { hour =>
+        val sDate = SDate(date).addHours(hour)
+        PassengersHourly(portCode, T2, EeaDesk, sDate.toUtcDate, sDate.getHours, 10)
+      }
+      .map(ph => PassengersHourlySerialiser.toRow(ph, 0L))
+    db.run(PassengersHourlyQueries.replaceHours(portCode)(global)(T2, completeHoursOfPax)).futureValue
   }
 }
