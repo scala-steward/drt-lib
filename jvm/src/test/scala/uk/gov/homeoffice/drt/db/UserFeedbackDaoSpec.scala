@@ -13,7 +13,7 @@ import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 
-class UserFeedbackQueriesSpec extends Specification with BeforeEach {
+class UserFeedbackDaoSpec extends Specification with BeforeEach {
   sequential
 
   lazy val db = TestDatabase.db
@@ -40,7 +40,7 @@ class UserFeedbackQueriesSpec extends Specification with BeforeEach {
 
   "UserFeedbackDao" should {
     "should return a list of user feedback submitted" in {
-      val userFeedbackDao = UserFeedbackQueries(TestDatabase.db)
+      val userFeedbackDao = UserFeedbackDao(TestDatabase.db)
       val userFeedbackRow = getUserFeedBackRow(new Timestamp(Instant.now().minusSeconds(60).toEpochMilli))
 
       Await.result(userFeedbackDao.insertOrUpdate(userFeedbackRow), 1.second)
@@ -53,7 +53,7 @@ class UserFeedbackQueriesSpec extends Specification with BeforeEach {
     "should return a list of user feedback using stream" in {
       implicit val system: ActorSystem = ActorSystem("testSystem")
 
-      val userFeedbackDao = UserFeedbackQueries(TestDatabase.db)
+      val userFeedbackDao = UserFeedbackDao(TestDatabase.db)
       val userFeedbackResult = Await.result(userFeedbackDao.selectAll(), 1.second)
       userFeedbackResult.size === 1
       val exitingRow = userFeedbackResult.head
@@ -68,7 +68,7 @@ class UserFeedbackQueriesSpec extends Specification with BeforeEach {
     }
 
     "should return a list of user feedback for given email" in {
-      val userFeedbackDao = UserFeedbackQueries(TestDatabase.db)
+      val userFeedbackDao = UserFeedbackDao(TestDatabase.db)
       val userFeedbackRow = getUserFeedBackRow(new Timestamp(Instant.now().minusSeconds(60).toEpochMilli))
       val secondRow = userFeedbackRow.copy(email = "test2@test.com")
       Await.result(userFeedbackDao.insertOrUpdate(userFeedbackRow), 1.second)

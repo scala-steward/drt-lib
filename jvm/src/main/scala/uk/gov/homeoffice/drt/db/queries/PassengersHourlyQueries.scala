@@ -42,14 +42,13 @@ object PassengersHourlySerialiser {
 object PassengersHourlyQueries {
   val table: TableQuery[PassengersHourlyTable] = TableQuery[PassengersHourlyTable]
 
-  def replaceHours(port: PortCode)
-                  (implicit ec: ExecutionContext): (Terminal, Iterable[PassengersHourlyRow]) => DBIOAction[Option[Int], NoStream, Effect.Write with Effect.Transactional] =
+  def replaceHours(port: PortCode): (Terminal, Iterable[PassengersHourlyRow]) => DBIOAction[Unit, NoStream, Effect.Write with Effect.Transactional] =
     (terminal, rows) => {
       val dateHours = rows.map {
         case PassengersHourlyRow(_, _, _, dateUtc, hour, _, _) => (dateUtc, hour)
       }.toSet
 
-      val delete: FixedSqlAction[Int, NoStream, Effect.Write] = table
+      val deleteAction: FixedSqlAction[Int, NoStream, Effect.Write] = table
         .filter(_.port === port.iata)
         .filter(_.terminal === terminal.toString)
         .filter { row =>
@@ -60,16 +59,12 @@ object PassengersHourlyQueries {
             .reduce(_ || _)
         }
         .delete
-      val insert: FixedSqlAction[Option[Int], NoStream, Effect.Write] = table ++= rows.map {
+      val insertAction: FixedSqlAction[Option[Int], NoStream, Effect.Write] = table ++= rows.map {
         case PassengersHourlyRow(port, terminal, queue, dateUtc, hour, passengers, updatedAt) =>
           (port, terminal, queue, dateUtc, hour, passengers, updatedAt)
       }
-      val transaction = (for {
-        _ <- delete
-        v <- insert
-      } yield v).transactionally
 
-      transaction
+      DBIO.seq(deleteAction, insertAction).transactionally
     }
 
   def get(portCode: String, terminal: String, date: String)
@@ -87,41 +82,11 @@ object PassengersHourlyQueries {
       filerPortTerminalDate(port, maybeTerminal, localDate)
         .map(_.map(_._6).sum)
 
-  def fullLocalDateExists(port: String, maybeTerminal: Option[String])
-                         (implicit ec: ExecutionContext): LocalDate => DBIOAction[Boolean, NoStream, Effect.Read] =
-    localDate => {
-      table
-        .filter { row =>
-          val portMatches = row.port === port
-          val terminalMatches = maybeTerminal.fold(true.bind)(terminal => row.terminal === terminal)
-          portMatches && terminalMatches && matchLocalDate(row, localDate)
-        }
-        .distinctOn(_.hour)
-        .length
-        .result
-        .map(_ == 24)
-    }
-
-  private def matchLocalDate(row: PassengersHourlyTable, localDate: LocalDate): Rep[Boolean] = {
-    val startHour = SDate(localDate)
-
-    (0 to 23)
-      .map { hour =>
-        val sdateHour = startHour.addHours(hour)
-        (sdateHour.toUtcDate.toISOString, sdateHour.getHours)
-      }
-      .groupBy(_._1)
-      .map {
-        case (date, hours) => row.dateUtc === date && row.hour.inSet(hours.map(_._2))
-      }
-      .reduce(_ || _)
-  }
-
   def queueTotalsForPortAndDate(port: String, maybeTerminal: Option[String])
                                (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Queue, Int], NoStream, Effect.Read] =
     localDate => filerPortTerminalDate(port, maybeTerminal, localDate).map(rowsToQueueTotals)
 
-  def rowsToQueueTotals(rows: Seq[(String, String, String, String, Int, Int, Timestamp)]): Map[Queue, Int] =
+  private def rowsToQueueTotals(rows: Seq[(String, String, String, String, Int, Int, Timestamp)]): Map[Queue, Int] =
     rows
       .groupBy(_._3)
       .map {

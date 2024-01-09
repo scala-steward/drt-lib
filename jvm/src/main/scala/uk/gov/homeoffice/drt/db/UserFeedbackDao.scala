@@ -1,8 +1,8 @@
 package uk.gov.homeoffice.drt.db
 
 import akka.stream.scaladsl.Source
-import slick.lifted.{ProvenShape, TableQuery, Tag}
 import slick.jdbc.PostgresProfile.api._
+import slick.lifted.{TableQuery, Tag}
 import uk.gov.homeoffice.drt.feedback.UserFeedback
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,7 +42,7 @@ class UserFeedbackTable(tag: Tag) extends Table[UserFeedbackRow](tag, "user_feed
 
   val pk = primaryKey("user_feedback_pkey", (email, createdAt))
 
-  def * : ProvenShape[UserFeedbackRow] = (email, createdAt, feedbackType, bfRole, drtQuality, drtLikes, drtImprovements, participationInterest, abVersion).mapTo[UserFeedbackRow]
+  def * = (email, createdAt, feedbackType, bfRole, drtQuality, drtLikes, drtImprovements, participationInterest, abVersion) <> (UserFeedbackRow.tupled, UserFeedbackRow.unapply)
 }
 
 trait IUserFeedbackDao {
@@ -56,7 +56,7 @@ trait IUserFeedbackDao {
 
 }
 
-case class UserFeedbackQueries(db: Database) extends IUserFeedbackDao {
+case class UserFeedbackDao(db: Database) extends IUserFeedbackDao {
   val table: TableQuery[UserFeedbackTable] = TableQuery[UserFeedbackTable]
 
   override def insertOrUpdate(userFeedbackRow: UserFeedbackRow): Future[Int] = {
