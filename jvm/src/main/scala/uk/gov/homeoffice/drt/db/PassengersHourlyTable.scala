@@ -27,7 +27,7 @@ case class PassengersHourlyRow(portCode: String,
                               )
 
 class PassengersHourlyTable(tag: Tag)
-  extends Table[(String, String, String, String, Int, Int, Timestamp)](tag, "passengers_hourly") {
+  extends Table[PassengersHourlyRow](tag, "passengers_hourly") {
 
   def port: Rep[String] = column[String]("port")
 
@@ -45,7 +45,7 @@ class PassengersHourlyTable(tag: Tag)
 
   def pk = primaryKey("pk_port_terminal_queue_dateutc_hour", (port, terminal, queue, dateUtc, hour))
 
-  def * = (port, terminal, queue, dateUtc, hour, passengers, updatedAt)
+  def * = (port, terminal, queue, dateUtc, hour, passengers, updatedAt) <> (PassengersHourlyRow.tupled, PassengersHourlyRow.unapply)
 }
 
 

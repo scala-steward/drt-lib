@@ -59,39 +59,34 @@ object PassengersHourlyQueries {
             .reduce(_ || _)
         }
         .delete
-      val insertAction: FixedSqlAction[Option[Int], NoStream, Effect.Write] = table ++= rows.map {
-        case PassengersHourlyRow(port, terminal, queue, dateUtc, hour, passengers, updatedAt) =>
-          (port, terminal, queue, dateUtc, hour, passengers, updatedAt)
-      }
+      val insertAction: FixedSqlAction[Option[Int], NoStream, Effect.Write] = table ++= rows
 
       DBIO.seq(deleteAction, insertAction).transactionally
     }
 
-  def get(portCode: String, terminal: String, date: String)
-         (implicit ec: ExecutionContext): DBIOAction[Seq[PassengersHourlyRow], NoStream, Effect.Read] =
+  def get(portCode: String, terminal: String, date: String): DBIOAction[Seq[PassengersHourlyRow], NoStream, Effect.Read] =
     table
       .filter(_.port === portCode)
       .filter(_.terminal === terminal)
       .filter(_.dateUtc === date)
       .result
-      .map(_.map(PassengersHourlyRow.tupled))
 
   def totalForPortAndDate(port: String, maybeTerminal: Option[String])
                          (implicit ec: ExecutionContext): LocalDate => DBIOAction[Int, NoStream, Effect.Read] =
     localDate =>
       filerPortTerminalDate(port, maybeTerminal, localDate)
-        .map(_.map(_._6).sum)
+        .map(_.map {_.passengers }.sum)
 
   def queueTotalsForPortAndDate(port: String, maybeTerminal: Option[String])
                                (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Queue, Int], NoStream, Effect.Read] =
     localDate => filerPortTerminalDate(port, maybeTerminal, localDate).map(rowsToQueueTotals)
 
-  private def rowsToQueueTotals(rows: Seq[(String, String, String, String, Int, Int, Timestamp)]): Map[Queue, Int] =
+  private def rowsToQueueTotals(rows: Seq[PassengersHourlyRow]): Map[Queue, Int] =
     rows
-      .groupBy(_._3)
+      .groupBy(_.queue)
       .map {
         case (queue, queueRows) =>
-          (Queue(queue), queueRows.map(_._6).sum)
+          (Queue(queue), queueRows.map(_.passengers).sum)
       }
 
   def hourlyForPortAndDate(port: String, maybeTerminal: Option[String])
@@ -100,24 +95,25 @@ object PassengersHourlyQueries {
       filerPortTerminalDate(port, maybeTerminal, localDate)
         .map {
           _
-            .groupBy(r => (r._4, r._5))
+            .groupBy { r =>
+              (r.dateUtc, r.hour)
+            }
             .map {
               case ((date, hour), rows) =>
                 val utcDate = UtcDate.parse(date).getOrElse(throw new Exception(s"Failed to parse UtcDate from $date"))
-                (utcDate, hour) -> rows.map(_._6).sum
+                (utcDate, hour) -> rows.map(_.passengers).sum
             }
         }
 
-  private def filterLocalDate(rows: Seq[(String, String, String, String, Int, Int, Timestamp)], localDate: LocalDate): Seq[(String, String, String, String, Int, Int, Timestamp)] =
-    rows.filter {
-      case (_, _, _, utc, hour, _, _) =>
-        val utcDate = UtcDate.parse(utc).getOrElse(throw new Exception(s"Failed to parse UtcDate from $utc"))
-        val rowLocalDate = SDate(utcDate).addHours(hour).toLocalDate
+  private def filterLocalDate(rows: Seq[PassengersHourlyRow], localDate: LocalDate): Seq[PassengersHourlyRow] =
+    rows.filter { row =>
+        val utcDate = UtcDate.parse(row.dateUtc).getOrElse(throw new Exception(s"Failed to parse UtcDate from ${row.dateUtc}"))
+        val rowLocalDate = SDate(utcDate).addHours(row.hour).toLocalDate
         rowLocalDate == localDate
     }
 
   private def filerPortTerminalDate(port: String, maybeTerminal: Option[String], localDate: LocalDate)
-                                   (implicit ec: ExecutionContext): DBIOAction[Seq[(String, String, String, String, Int, Int, Timestamp)], NoStream, Effect.Read] = {
+                                   (implicit ec: ExecutionContext): DBIOAction[Seq[PassengersHourlyRow], NoStream, Effect.Read] = {
     val sdate = SDate(localDate)
     val utcDates = Set(
       sdate.getLocalLastMidnight.toUtcDate,
