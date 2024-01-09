@@ -3,41 +3,15 @@ package uk.gov.homeoffice.drt.db.queries
 import slick.dbio.Effect
 import slick.sql.FixedSqlAction
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
-import uk.gov.homeoffice.drt.db.{PassengersHourly, PassengersHourlyRow, PassengersHourlyTable}
+import uk.gov.homeoffice.drt.db.{PassengersHourlyRow, PassengersHourlyTable}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.{LocalDate, SDate, UtcDate}
 
-import java.sql.Timestamp
 import scala.concurrent.ExecutionContext
 
-object PassengersHourlySerialiser {
-  val toRow: (PassengersHourly, Long) => PassengersHourlyRow = {
-    case (PassengersHourly(portCode, terminal, queue, dateUtc, hour, passengers), updatedAt) =>
-      PassengersHourlyRow(
-        portCode.iata,
-        terminal.toString,
-        queue.toString,
-        dateUtc.toISOString,
-        hour,
-        passengers,
-        new Timestamp(updatedAt),
-      )
-  }
 
-  val fromRow: PassengersHourlyRow => PassengersHourly = {
-    case PassengersHourlyRow(portCode, terminal, queue, dateUtc, hour, passengers, _) =>
-      PassengersHourly(
-        PortCode(portCode),
-        Terminal(terminal),
-        Queue(queue),
-        UtcDate.parse(dateUtc).getOrElse(throw new Exception(s"Could not parse date $dateUtc")),
-        hour,
-        passengers,
-      )
-  }
-}
 
 object PassengersHourlyQueries {
   val table: TableQuery[PassengersHourlyTable] = TableQuery[PassengersHourlyTable]
@@ -74,12 +48,12 @@ object PassengersHourlyQueries {
   def totalForPortAndDate(port: String, maybeTerminal: Option[String])
                          (implicit ec: ExecutionContext): LocalDate => DBIOAction[Int, NoStream, Effect.Read] =
     localDate =>
-      filerPortTerminalDate(port, maybeTerminal, localDate)
+      filterPortTerminalDate(port, maybeTerminal, localDate)
         .map(_.map {_.passengers }.sum)
 
   def queueTotalsForPortAndDate(port: String, maybeTerminal: Option[String])
                                (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Queue, Int], NoStream, Effect.Read] =
-    localDate => filerPortTerminalDate(port, maybeTerminal, localDate).map(rowsToQueueTotals)
+    localDate => filterPortTerminalDate(port, maybeTerminal, localDate).map(rowsToQueueTotals)
 
   private def rowsToQueueTotals(rows: Seq[PassengersHourlyRow]): Map[Queue, Int] =
     rows
@@ -90,9 +64,9 @@ object PassengersHourlyQueries {
       }
 
   def hourlyForPortAndDate(port: String, maybeTerminal: Option[String])
-                          (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[(UtcDate, Int), Int], NoStream, Effect.Read] =
+                          (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Long, Int], NoStream, Effect.Read] =
     localDate =>
-      filerPortTerminalDate(port, maybeTerminal, localDate)
+      filterPortTerminalDate(port, maybeTerminal, localDate)
         .map {
           _
             .groupBy { r =>
@@ -101,7 +75,8 @@ object PassengersHourlyQueries {
             .map {
               case ((date, hour), rows) =>
                 val utcDate = UtcDate.parse(date).getOrElse(throw new Exception(s"Failed to parse UtcDate from $date"))
-                (utcDate, hour) -> rows.map(_.passengers).sum
+                val hourMillis = SDate(utcDate).addHours(hour).millisSinceEpoch
+                hourMillis -> rows.map(_.passengers).sum
             }
         }
 
@@ -112,7 +87,7 @@ object PassengersHourlyQueries {
         rowLocalDate == localDate
     }
 
-  private def filerPortTerminalDate(port: String, maybeTerminal: Option[String], localDate: LocalDate)
+  private def filterPortTerminalDate(port: String, maybeTerminal: Option[String], localDate: LocalDate)
                                    (implicit ec: ExecutionContext): DBIOAction[Seq[PassengersHourlyRow], NoStream, Effect.Read] = {
     val sdate = SDate(localDate)
     val utcDates = Set(

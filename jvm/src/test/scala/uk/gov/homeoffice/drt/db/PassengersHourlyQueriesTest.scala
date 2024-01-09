@@ -4,11 +4,12 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.homeoffice.drt.db.queries.{PassengersHourlyQueries, PassengersHourlySerialiser}
+import uk.gov.homeoffice.drt.db.queries.PassengersHourlyQueries
+import uk.gov.homeoffice.drt.db.serialisers.PassengersHourlySerialiser
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.{EGate, EeaDesk, FastTrack, NonEeaDesk}
 import uk.gov.homeoffice.drt.ports.Terminals.{T2, T3, Terminal}
-import uk.gov.homeoffice.drt.time.{LocalDate, UtcDate}
+import uk.gov.homeoffice.drt.time.{LocalDate, SDate, UtcDate}
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -115,11 +116,11 @@ class PassengersHourlyQueriesTest extends AnyWordSpec with Matchers with BeforeA
 
       val resultT2 = db.run(PassengersHourlyQueries.hourlyForPortAndDate(portCode.iata, Option(T2.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
-      resultT2 should be(Map((UtcDate(2023, 6, 9), 23) -> 50, (UtcDate(2023, 6, 10), 1) -> 25))
+      resultT2 should be(Map(SDate(2023, 6, 9, 23, 0).millisSinceEpoch -> 50, SDate(2023, 6, 10, 1, 0).millisSinceEpoch -> 25))
 
       val resultT3 = db.run(PassengersHourlyQueries.hourlyForPortAndDate(portCode.iata, Option(T3.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
-      resultT3 should be(Map((UtcDate(2023, 6, 9), 23) -> 100, (UtcDate(2023, 6, 10), 1) -> 50))
+      resultT3 should be(Map(SDate(2023, 6, 9, 23, 0).millisSinceEpoch -> 100, SDate(2023, 6, 10, 1, 0).millisSinceEpoch -> 50))
     }
   }
 
