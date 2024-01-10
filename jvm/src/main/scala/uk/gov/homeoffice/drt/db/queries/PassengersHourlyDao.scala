@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext
 
 
 
-object PassengersHourlyQueries {
+object PassengersHourlyDao {
   val table: TableQuery[PassengersHourlyTable] = TableQuery[PassengersHourlyTable]
 
   def replaceHours(port: PortCode): (Terminal, Iterable[PassengersHourlyRow]) => DBIOAction[Unit, NoStream, Effect.Write with Effect.Transactional] =
