@@ -8,7 +8,7 @@ import uk.gov.homeoffice.drt.db.queries.PassengersHourlyDao
 import uk.gov.homeoffice.drt.db.serialisers.PassengersHourlySerialiser
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.{EGate, EeaDesk, FastTrack, NonEeaDesk}
-import uk.gov.homeoffice.drt.ports.Terminals.{T2, T3, Terminal}
+import uk.gov.homeoffice.drt.ports.Terminals.{T1, T2, T3, Terminal}
 import uk.gov.homeoffice.drt.time.{LocalDate, SDate, UtcDate}
 
 import scala.concurrent.Await
@@ -69,6 +69,52 @@ class PassengersHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAf
 
       val rows = db.run(PassengersHourlyDao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
       rows.toSet.map(ph => PassengersHourlySerialiser.fromRow(ph)) should be(expected.toSet)
+    }
+
+    "only insert/replace entries for the port and terminal specified" in {
+      val portCode = PortCode("LHR")
+      val otherPortCode = PortCode("JFK")
+      val terminal = T2
+      val otherTerminal = T1
+      val paxHourly = List(
+        PassengersHourly(otherPortCode, otherTerminal, EeaDesk, UtcDate(2020, 1, 1), 1, 1),
+        PassengersHourly(otherPortCode, otherTerminal, EGate, UtcDate(2020, 1, 1), 1, 1),
+        PassengersHourly(otherPortCode, otherTerminal, NonEeaDesk, UtcDate(2020, 1, 1), 3, 3),
+      ).map(ph => PassengersHourlySerialiser.toRow(ph, 0L))
+
+      Await.result(db.run(PassengersHourlyDao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
+      val rows = db.run(PassengersHourlyDao.get(otherPortCode.iata, otherTerminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
+      rows.toSet.map(ph => PassengersHourlySerialiser.fromRow(ph)) should be(Set())
+    }
+
+    "only insert/replace entries for the port specified" in {
+      val portCode = PortCode("LHR")
+      val otherPortCode = PortCode("JFK")
+      val terminal = T2
+      val paxHourly = List(
+        PassengersHourly(otherPortCode, terminal, EeaDesk, UtcDate(2020, 1, 1), 1, 1),
+        PassengersHourly(otherPortCode, terminal, EGate, UtcDate(2020, 1, 1), 1, 1),
+        PassengersHourly(otherPortCode, terminal, NonEeaDesk, UtcDate(2020, 1, 1), 3, 3),
+      ).map(ph => PassengersHourlySerialiser.toRow(ph, 0L))
+
+      Await.result(db.run(PassengersHourlyDao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
+      val rows = db.run(PassengersHourlyDao.get(otherPortCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
+      rows.toSet.map(ph => PassengersHourlySerialiser.fromRow(ph)) should be(Set())
+    }
+
+    "only insert/replace entries for the terminal specified" in {
+      val portCode = PortCode("LHR")
+      val terminal = T2
+      val otherTerminal = T1
+      val paxHourly = List(
+        PassengersHourly(portCode, otherTerminal, EeaDesk, UtcDate(2020, 1, 1), 1, 1),
+        PassengersHourly(portCode, otherTerminal, EGate, UtcDate(2020, 1, 1), 1, 1),
+        PassengersHourly(portCode, otherTerminal, NonEeaDesk, UtcDate(2020, 1, 1), 3, 3),
+      ).map(ph => PassengersHourlySerialiser.toRow(ph, 0L))
+
+      Await.result(db.run(PassengersHourlyDao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
+      val rows = db.run(PassengersHourlyDao.get(portCode.iata, otherTerminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
+      rows.toSet.map(ph => PassengersHourlySerialiser.fromRow(ph)) should be(Set())
     }
   }
 
