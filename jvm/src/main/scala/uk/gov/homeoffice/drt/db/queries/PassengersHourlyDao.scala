@@ -70,6 +70,28 @@ object PassengersHourlyDao {
       }
 
   def hourlyForPortAndDate(port: String, maybeTerminal: Option[String])
+                          (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Long, Map[Queue, Int]], NoStream, Effect.Read] =
+    localDate =>
+      filterPortTerminalDate(port, maybeTerminal, localDate)
+        .map {
+          _
+            .groupBy { r =>
+              (r.dateUtc, r.hour)
+            }
+            .map {
+              case ((date, hour), rows) =>
+                val utcDate = UtcDate.parse(date).getOrElse(throw new Exception(s"Failed to parse UtcDate from $date"))
+                val hourMillis = SDate(utcDate).addHours(hour).millisSinceEpoch
+                val byQueue = rows.groupBy(_.queue).map {
+                  case (queue, queueRows) =>
+                    val queueTotal = queueRows.map(_.passengers).sum
+                    Queue(queue) -> queueTotal
+                }
+                hourMillis -> byQueue
+            }
+        }
+
+  def hourlyForPortAndDate_(port: String, maybeTerminal: Option[String])
                           (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Long, Int], NoStream, Effect.Read] =
     localDate =>
       filterPortTerminalDate(port, maybeTerminal, localDate)

@@ -162,11 +162,17 @@ class PassengersHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAf
 
       val resultT2 = db.run(PassengersHourlyDao.hourlyForPortAndDate(portCode.iata, Option(T2.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
-      resultT2 should be(Map(SDate(2023, 6, 9, 23, 0).millisSinceEpoch -> 50, SDate(2023, 6, 10, 1, 0).millisSinceEpoch -> 25))
+      resultT2 should be(Map(
+        SDate(2023, 6, 9, 23, 0).millisSinceEpoch -> Map(EeaDesk -> 50),
+        SDate(2023, 6, 10, 1, 0).millisSinceEpoch -> Map(EGate -> 25))
+      )
 
       val resultT3 = db.run(PassengersHourlyDao.hourlyForPortAndDate(portCode.iata, Option(T3.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
-      resultT3 should be(Map(SDate(2023, 6, 9, 23, 0).millisSinceEpoch -> 100, SDate(2023, 6, 10, 1, 0).millisSinceEpoch -> 50))
+      resultT3 should be(Map(
+        SDate(2023, 6, 9, 23, 0).millisSinceEpoch -> Map(EeaDesk -> 100),
+        SDate(2023, 6, 10, 1, 0).millisSinceEpoch -> Map(EGate -> 50))
+      )
     }
   }
 
