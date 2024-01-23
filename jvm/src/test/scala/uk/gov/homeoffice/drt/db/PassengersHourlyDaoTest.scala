@@ -120,20 +120,17 @@ class PassengersHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAf
 
   private val portCode: PortCode = PortCode("LHR")
 
-  private def hourlyPax(terminal: Terminal, eeaPax: Int, egatePax: Int, date: LocalDate): List[PassengersHourly] = {
-    val sdate = SDate(date)
-    val startUtcDate = sdate.getLocalLastMidnight.toUtcDate
-    val endUtcDate = sdate.getLocalNextMidnight.addMinutes(-1).toUtcDate
-    List(
-      PassengersHourly(portCode, terminal, EeaDesk, startUtcDate, 22, 10),
-      PassengersHourly(portCode, terminal, EeaDesk, startUtcDate, 23, eeaPax),
-      PassengersHourly(portCode, terminal, EGate, endUtcDate, 1, egatePax),
-      PassengersHourly(portCode, terminal, EGate, endUtcDate, 23, 10),
-    )
-  }
-
   private def insertHourlyPax(terminal: Terminal, eeaPax: Int, egatePax: Int, date: LocalDate): Unit = {
-    val paxHourly = hourlyPax(terminal, eeaPax, egatePax, date).map(ph => PassengersHourlySerialiser.toRow(ph, 0L))
+    val sdate = SDate(date)
+    val sDate = sdate.getLocalNextMidnight.addMinutes(-1)
+    val utcDate = sDate.toUtcDate
+    val utcDayBefore = sDate.addDays(-1).toUtcDate
+    val paxHourly = List(
+      PassengersHourly(portCode, terminal, EeaDesk, utcDayBefore, 22, 10),
+      PassengersHourly(portCode, terminal, EeaDesk, utcDayBefore, 23, eeaPax),
+      PassengersHourly(portCode, terminal, EGate, utcDate, 1, egatePax),
+      PassengersHourly(portCode, terminal, EGate, utcDate, 23, 10),
+    ).map(ph => PassengersHourlySerialiser.toRow(ph, 0L))
     Await.result(db.run(PassengersHourlyDao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
   }
 
@@ -188,6 +185,18 @@ class PassengersHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAf
       val result = db.run(PassengersHourlyDao.queueTotalsForPortAndDate(portCode.iata, None)(global)(LocalDate(2023, 6, 10))).futureValue
 
       result should be(Map(EeaDesk -> 50, EGate -> 25))
+    }
+
+    "return the total passengers for a port and local date during GMT" in {
+      insertHourlyPax(T2, 50, 25, LocalDate(2023, 1, 10))
+
+      val result = db.run(PassengersHourlyDao.queueTotalsForPortAndDate(portCode.iata, None)(global)(LocalDate(2023, 1, 10))).futureValue
+
+      val before2300 = 25
+      val after2300 = 10
+      val expectedEgatePax = before2300 + after2300
+
+      result should be(Map(EGate -> expectedEgatePax))
     }
 
     "return the total passengers for a port and local date on an october clock change date" in {
