@@ -90,7 +90,7 @@ object PassengersHourlyDao {
                 hourMillis -> byQueue
             }
         }
-  
+
   private def filterLocalDate(rows: Seq[PassengersHourlyRow], localDate: LocalDate): Seq[PassengersHourlyRow] =
     rows.filter { row =>
       val utcDate = UtcDate.parse(row.dateUtc).getOrElse(throw new Exception(s"Failed to parse UtcDate from ${row.dateUtc}"))
@@ -101,10 +101,9 @@ object PassengersHourlyDao {
   private def filterPortTerminalDate(port: String, maybeTerminal: Option[String], localDate: LocalDate)
                                     (implicit ec: ExecutionContext): DBIOAction[Seq[PassengersHourlyRow], NoStream, Effect.Read] = {
     val sdate = SDate(localDate)
-    val utcDates = Set(
-      sdate.getLocalLastMidnight.toUtcDate,
-      sdate.getLocalNextMidnight.toUtcDate,
-    )
+    val startUtcDate = sdate.getLocalLastMidnight.toUtcDate
+    val endUtcDate = sdate.getLocalNextMidnight.addMinutes(-1).toUtcDate
+    val utcDates = Set(startUtcDate, endUtcDate)
 
     table
       .filter { row =>
