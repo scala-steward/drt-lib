@@ -110,6 +110,7 @@ object FeatureColumns {
       case Term3a.label => Term3a()
       case SummerHalfTerm.label => SummerHalfTerm()
       case Term3b.label => Term3b()
+      case PreSummerHoliday.label => PreSummerHoliday()
       case SummerHolidayScotland.label => SummerHolidayScotland()
       case SummerHoliday.label => SummerHoliday()
       case PostPandemicRecovery.label => PostPandemicRecovery(sDateFromLocalDate(LocalDate(2022, 6, 1)))
@@ -395,13 +396,39 @@ object FeatureColumns {
     val label: String = "term3SecondHalf"
   }
 
-  case class SummerHolidayScotland()
-                                  (implicit
+  /**
+   * @deprecated
+   * Deprecating this in favour of SummerHolidayScotland
+   */
+  case class PreSummerHoliday()
+                             (implicit
                               val sDateTs: Long => SDateLike,
                               val sDateLocalDate: LocalDate => SDateLike,
                              ) extends OneToMany[Arrival] with HolidayLike {
-    override val label: String = SummerHolidayScotland.label
+    override val label: String = PreSummerHoliday.label
     override val prefix: String = "psumhol"
+    override val hols: Seq[(LocalDate, LocalDate)] = Seq(
+      (LocalDate(2022, 6, 28), LocalDate(2022, 7, 24)),
+      (LocalDate(2023, 6, 26), LocalDate(2023, 7, 23)),
+      (LocalDate(2024, 6, 24), LocalDate(2024, 7, 24)),
+    )
+  }
+
+  /**
+   * @deprecated
+   * Deprecating this in favour of SummerHolidayScotland
+   */
+  object PreSummerHoliday {
+    val label: String = "preSummerHoliday"
+  }
+
+  case class SummerHolidayScotland()
+                                  (implicit
+                                   val sDateTs: Long => SDateLike,
+                                   val sDateLocalDate: LocalDate => SDateLike,
+                                  ) extends OneToMany[Arrival] with HolidayLike {
+    override val label: String = SummerHolidayScotland.label
+    override val prefix: String = "sumholsco"
     override val hols: Seq[(LocalDate, LocalDate)] = Seq(
       (LocalDate(2022, 6, 28), LocalDate(2022, 8, 14)),
       (LocalDate(2023, 6, 26), LocalDate(2023, 8, 13)),
@@ -411,7 +438,7 @@ object FeatureColumns {
   }
 
   object SummerHolidayScotland {
-    val label: String = "preSummerHoliday"
+    val label: String = "summerHolidayScotland"
   }
 
   case class SummerHoliday()
