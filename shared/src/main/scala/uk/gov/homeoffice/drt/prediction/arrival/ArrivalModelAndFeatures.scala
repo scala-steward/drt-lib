@@ -178,7 +178,7 @@ object FeatureColumns {
 
   case class ChristmasDay()(implicit sDateProvider: Long => SDateLike) extends OneToMany[Arrival] {
     override val label: String = ChristmasDay.label
-    override val prefix: String = "dow"
+    override val prefix: String = "xmas"
     override val value: Arrival => Option[String] =
       (a: Arrival) => {
         val date = sDateProvider(a.Scheduled).toLocalDate
