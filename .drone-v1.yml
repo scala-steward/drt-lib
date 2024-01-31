@@ -141,7 +141,7 @@ steps:
       DRONE_BUILD_NUMBER: ${DRONE_BUILD_NUMBER}
     when:
       branch:
-        - ${DRONE_BRANCH}
+        - master
       event:
         - push
     depends_on:
