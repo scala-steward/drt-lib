@@ -262,7 +262,7 @@ object FeatureColumns {
   }
 
   object PreChristmasHoliday {
-    val label: String = "christmasHoliday"
+    val label: String = "preChristmasHoliday"
   }
 
   case class ChristmasHoliday()
@@ -356,7 +356,7 @@ object FeatureColumns {
   }
 
   object PreEasterHoliday {
-    val label: String = "easterHoliday"
+    val label: String = "preEasterHoliday"
   }
 
   case class EasterHoliday()
