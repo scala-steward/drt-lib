@@ -519,7 +519,7 @@ object FeatureColumns {
 
     def dayOfHoliday(localDate: LocalDate): Option[String] = {
       val date = sDateLocalDate(localDate)
-      val day = hols
+      val maybeDay = hols
         .find { case (start, end) =>
           val afterStart = date >= sDateLocalDate(start)
           val beforeEnd = date <= sDateLocalDate(end)
@@ -534,8 +534,8 @@ object FeatureColumns {
 
           partOfHoliday.toString
         }
-        .getOrElse("no")
-      Option(day)
+
+      maybeDay
     }
   }
 
