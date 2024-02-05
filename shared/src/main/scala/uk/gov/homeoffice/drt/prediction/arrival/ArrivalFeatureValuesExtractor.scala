@@ -2,8 +2,8 @@ package uk.gov.homeoffice.drt.prediction.arrival
 
 import cats.implicits.toTraverseOps
 import uk.gov.homeoffice.drt.arrivals.{Arrival, ArrivalStatus, Passengers}
-import uk.gov.homeoffice.drt.ports.{ApiFeedSource, LiveFeedSource}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
+import uk.gov.homeoffice.drt.ports.{ApiFeedSource, LiveFeedSource}
 import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{Feature, OneToMany, Single}
 
 object ArrivalFeatureValuesExtractor {

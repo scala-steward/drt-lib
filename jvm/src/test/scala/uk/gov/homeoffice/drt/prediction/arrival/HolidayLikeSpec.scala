@@ -34,8 +34,8 @@ class HolidayLikeSpec extends AnyWordSpec with Matchers {
     "Give 'no' for each day falling outside the holiday period" in {
       val arrivalBeforeHoliday = ArrivalGenerator.arrival(sch = SDate("2023-01-1T00:00").addDays(-1).millisSinceEpoch)
       val arrivalAfterHoliday = ArrivalGenerator.arrival(sch = SDate("2023-01-1T00:00").addDays(7).millisSinceEpoch)
-      holiday.value(arrivalBeforeHoliday) should ===(None)
-      holiday.value(arrivalAfterHoliday) should ===(None)
+      holiday.value(arrivalBeforeHoliday) should ===(Option("no"))
+      holiday.value(arrivalAfterHoliday) should ===(Option("no"))
     }
   }
 }
