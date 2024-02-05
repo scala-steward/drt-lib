@@ -519,7 +519,7 @@ object FeatureColumns {
 
     def dayOfHoliday(localDate: LocalDate): Option[String] = {
       val date = sDateLocalDate(localDate)
-      val maybeDay = hols
+      val day = hols
         .find { case (start, end) =>
           val afterStart = date >= sDateLocalDate(start)
           val beforeEnd = date <= sDateLocalDate(end)
@@ -534,8 +534,8 @@ object FeatureColumns {
 
           partOfHoliday.toString
         }
-
-      maybeDay
+        .getOrElse("no")
+      Option(day)
     }
   }
 
@@ -545,7 +545,7 @@ object FeatureColumns {
     override val value: Arrival => Option[String] =
       (a: Arrival) => {
         val isWeekend = List(6, 7).contains(sDateProvider(a.Scheduled).getDayOfWeek)
-        Option(if (isWeekend) "1" else "0")
+        Option(if (isWeekend) "1" else "no")
       }
   }
 
