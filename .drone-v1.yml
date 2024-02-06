@@ -68,6 +68,8 @@ steps:
       status: [ success, failure ]
       event:
         - push
+    depends_on:
+      - Unit tests
 
   - name: Code coverage report
     pull: if-not-exists
