@@ -544,6 +544,8 @@ object FeatureColumns {
     implicit val sDateLocalDate: LocalDate => SDateLike
     val value: Arrival => Option[String] = (a: Arrival) => dayOfHoliday(sDateTs(a.Scheduled).toLocalDate)
 
+    val maxGranularity = 21
+
     def localDateRange(start: LocalDate, end: LocalDate)
                       (implicit sdate: LocalDate => SDateLike): Seq[LocalDate] = {
       @tailrec
@@ -566,7 +568,7 @@ object FeatureColumns {
         .map { case (start, end) =>
           val daysInHoliday = localDateRange(start, end)
           val dayOfHoliday = daysInHoliday.indexOf(localDate) + 1
-          val numParts = if (daysInHoliday.size <= 21) daysInHoliday.size else 21
+          val numParts = if (daysInHoliday.size <= maxGranularity) daysInHoliday.size else maxGranularity
           val fraction = 1d / numParts
           val partOfHoliday = (dayOfHoliday.toDouble / daysInHoliday.size / fraction).round.toInt
 

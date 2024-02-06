@@ -74,7 +74,10 @@ object ArrivalFeatureValuesExtractor {
         paxCount <- arrival.bestPcpPaxEstimate(List(LiveFeedSource, ApiFeedSource))
         maxPax <- arrival.MaxPax
       } yield {
-        val pctFull = 100 * paxCount.toDouble / maxPax
+        val pctFull = 100 * paxCount.toDouble / maxPax match {
+          case over100 if over100 > 100 => 100
+          case pct => pct
+        }
         (pctFull, oneToManyValues, singleValues)
       }
   }
