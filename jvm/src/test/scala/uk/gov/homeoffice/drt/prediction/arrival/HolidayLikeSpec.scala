@@ -25,19 +25,19 @@ class HolidayLikeSpec extends AnyWordSpec with Matchers {
 
   "TestHoliday" should {
     val holiday = TestHoliday()
-    "Give multiples of 14 for each day falling within the holiday period 2023" in {
+    "Give consecutive numbers for each day falling within the shortest holiday period (2023)" in {
       val values = (0 until 7).map { d =>
         val arrival = ArrivalGenerator.arrival(sch = SDate("2023-01-1T00:00").addDays(d).millisSinceEpoch)
         holiday.value(arrival)
       }
-      values should ===((0 until 7).map(n => Some((n * 14).toString)))
+      values should ===((0 until 7).map(n => Some(n.toString)))
     }
-    "Give multiples of 14 for each day falling within the holiday period 2024" in {
+    "Give increasing numbers up to 2023's max for each day falling within the holiday period 2024" in {
       val values = (0 until 10).map { d =>
         val arrival = ArrivalGenerator.arrival(sch = SDate("2024-01-1T00:00").addDays(d).millisSinceEpoch)
         holiday.value(arrival)
       }
-      values should ===(Seq(0, 0, 14, 28, 28, 42, 56, 70, 70, 84).map(n => Some(n.toString)))
+      values should ===(Seq(0, 0, 1, 2, 2, 3, 4, 5, 5, 6).map(n => Some(n.toString)))
     }
     "Have identical sets of numbers for each day of each holiday for 2023 vs 2024" in {
       val values2023 = (0 until 7).map { d =>

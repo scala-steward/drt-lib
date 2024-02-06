@@ -588,7 +588,7 @@ object FeatureColumns {
     def rangeBaseValues(length: Int, base: Int): IndexedSeq[Int] =
       (0 until length)
         .map(d => 100 * d / length)
-        .map(pct => pct - (pct % base))
+        .map(pct => (pct - (pct % base)) / base)
 
   }
 
