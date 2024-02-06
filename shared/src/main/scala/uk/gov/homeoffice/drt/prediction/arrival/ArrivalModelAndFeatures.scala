@@ -540,11 +540,21 @@ object FeatureColumns {
   trait HolidayLike {
     val hols: Seq[(LocalDate, LocalDate)]
 
+    private lazy val ranges: Map[(LocalDate, LocalDate), Seq[LocalDate]] = hols.map {
+      case (start, end) =>
+        (start, end) -> localDateRange(start, end)
+    }.toMap
+
+    private lazy val baseValue: Int = 100 / ranges.values.map(_.size).min
+
+    lazy val rangeValues: Map[(LocalDate, LocalDate), IndexedSeq[Int]] = ranges.map {
+      case (startAndEnd, range) =>
+        startAndEnd -> rangeBaseValues(range.length, baseValue)
+    }
+
     val sDateTs: Long => SDateLike
     implicit val sDateLocalDate: LocalDate => SDateLike
     val value: Arrival => Option[String] = (a: Arrival) => dayOfHoliday(sDateTs(a.Scheduled).toLocalDate)
-
-    val maxGranularity = 21
 
     def localDateRange(start: LocalDate, end: LocalDate)
                       (implicit sdate: LocalDate => SDateLike): Seq[LocalDate] = {
@@ -566,17 +576,20 @@ object FeatureColumns {
           afterStart && beforeEnd
         }
         .map { case (start, end) =>
-          val daysInHoliday = localDateRange(start, end)
-          val dayOfHoliday = daysInHoliday.indexOf(localDate) + 1
-          val numParts = if (daysInHoliday.size <= maxGranularity) daysInHoliday.size else maxGranularity
-          val fraction = 1d / numParts
-          val partOfHoliday = (dayOfHoliday.toDouble / daysInHoliday.size / fraction).round.toInt
-
-          partOfHoliday.toString
+          val daysInHoliday = ranges((start, end))
+          val indexOfDate = daysInHoliday.indexOf(localDate)
+          val value = rangeValues((start, end))(indexOfDate)
+          value.toString
         }
         .getOrElse("no")
       Option(day)
     }
+
+    def rangeBaseValues(length: Int, base: Int): IndexedSeq[Int] =
+      (0 until length)
+        .map(d => 100 * d / length)
+        .map(pct => pct - (pct % base))
+
   }
 
   case class WeekendDay()(implicit sDateProvider: Long => SDateLike) extends OneToMany[Arrival] {

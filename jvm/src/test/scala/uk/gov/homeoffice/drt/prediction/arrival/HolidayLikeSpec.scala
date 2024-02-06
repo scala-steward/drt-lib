@@ -15,6 +15,7 @@ case class TestHoliday()
   override val prefix: String = "th"
   override val hols: Seq[(LocalDate, LocalDate)] = Seq(
     (LocalDate(2023, 1, 1), LocalDate(2023, 1, 7)),
+    (LocalDate(2024, 1, 1), LocalDate(2024, 1, 10)),
   )
 }
 
@@ -24,12 +25,30 @@ class HolidayLikeSpec extends AnyWordSpec with Matchers {
 
   "TestHoliday" should {
     val holiday = TestHoliday()
-    "Give sequential numbers for each day falling within the holiday period" in {
+    "Give multiples of 14 for each day falling within the holiday period 2023" in {
       val values = (0 until 7).map { d =>
         val arrival = ArrivalGenerator.arrival(sch = SDate("2023-01-1T00:00").addDays(d).millisSinceEpoch)
         holiday.value(arrival)
       }
-      values should ===((1 to 7).map(n => Some(n.toString)))
+      values should ===((0 until 7).map(n => Some((n * 14).toString)))
+    }
+    "Give multiples of 14 for each day falling within the holiday period 2024" in {
+      val values = (0 until 10).map { d =>
+        val arrival = ArrivalGenerator.arrival(sch = SDate("2024-01-1T00:00").addDays(d).millisSinceEpoch)
+        holiday.value(arrival)
+      }
+      values should ===(Seq(0, 0, 14, 28, 28, 42, 56, 70, 70, 84).map(n => Some(n.toString)))
+    }
+    "Have identical sets of numbers for each day of each holiday for 2023 vs 2024" in {
+      val values2023 = (0 until 7).map { d =>
+        val arrival = ArrivalGenerator.arrival(sch = SDate("2023-01-1T00:00").addDays(d).millisSinceEpoch)
+        holiday.value(arrival)
+      }.toSet
+      val values2024 = (0 until 10).map { d =>
+        val arrival = ArrivalGenerator.arrival(sch = SDate("2024-01-1T00:00").addDays(d).millisSinceEpoch)
+        holiday.value(arrival)
+      }.toSet
+      values2023 should ===(values2024)
     }
     "Give 'no' for each day falling outside the holiday period" in {
       val arrivalBeforeHoliday = ArrivalGenerator.arrival(sch = SDate("2023-01-1T00:00").addDays(-1).millisSinceEpoch)

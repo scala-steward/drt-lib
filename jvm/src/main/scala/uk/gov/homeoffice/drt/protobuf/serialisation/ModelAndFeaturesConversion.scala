@@ -30,7 +30,7 @@ object ModelAndFeaturesConversion {
     Try(ModelAndFeatures(model, features, targetName, examplesTrainedOn, improvementPct)) match {
       case Success(maf) => Option(maf)
       case Failure(exception) =>
-        log.warn(s"Failed to deserialise ModelAndFeatures", exception.getMessage)
+        log.warn(s"Failed to deserialise ModelAndFeatures: ${exception.getMessage}")
         None
     }
   }
