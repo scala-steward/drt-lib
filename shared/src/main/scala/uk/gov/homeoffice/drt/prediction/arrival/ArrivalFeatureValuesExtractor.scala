@@ -20,7 +20,7 @@ object ArrivalFeatureValuesExtractor {
       case feature: Single[T] => feature.value(arrival)
     }.traverse(identity)
 
-  val minutesOffSchedule: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
+  val minutesOffSchedule: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double], String)] = features => {
     arrival =>
       for {
         touchdown <- arrival.Actual
@@ -28,11 +28,11 @@ object ArrivalFeatureValuesExtractor {
         singleValues <- singleFeatureValues(arrival, features)
       } yield {
         val minutes = (touchdown - arrival.Scheduled).toDouble / 60000
-        (minutes, oneToManyValues, singleValues)
+        (minutes, oneToManyValues, singleValues, arrival.unique.stringValue)
       }
   }
 
-  val minutesToChox: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
+  val minutesToChox: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double], String)] = features => {
     arrival =>
       for {
         touchdown <- arrival.Actual
@@ -41,19 +41,19 @@ object ArrivalFeatureValuesExtractor {
         singleValues <- singleFeatureValues(arrival, features)
       } yield {
         val minutes = (actualChox - touchdown).toDouble / 60000
-        (minutes, oneToManyValues, singleValues)
+        (minutes, oneToManyValues, singleValues, arrival.unique.stringValue)
       }
   }
 
   def walkTimeMinutes(walkTimeProvider: (Terminal, String, String) => Option[Int],
-                     ): Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
+                     ): Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double], String)] = features => {
     arrival =>
       for {
         walkTimeMinutes <- walkTimeProvider(arrival.Terminal, arrival.Gate.getOrElse(""), arrival.Stand.getOrElse(""))
         oneToManyValues <- oneToManyFeatureValues(arrival, features)
         singleValues <- singleFeatureValues(arrival, features)
       } yield {
-        (walkTimeMinutes.toDouble, oneToManyValues, singleValues)
+        (walkTimeMinutes.toDouble, oneToManyValues, singleValues, arrival.unique.stringValue)
       }
   }
 
@@ -63,7 +63,7 @@ object ArrivalFeatureValuesExtractor {
     }
   }
 
-  val percentCapacity: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double])] = features => {
+  val percentCapacity: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double], String)] = features => {
     case arrival if arrival.MaxPax.isEmpty => None
     case arrival if noReliablePaxCount(arrival) => None
     case arrival if arrival.Status == ArrivalStatus("Cancelled") => None
@@ -78,7 +78,7 @@ object ArrivalFeatureValuesExtractor {
           case over100 if over100 > 100 => 100
           case pct => pct
         }
-        (pctFull, oneToManyValues, singleValues)
+        (pctFull, oneToManyValues, singleValues, arrival.unique.stringValue)
       }
   }
 }

@@ -54,6 +54,8 @@ case class UniqueArrival(number: Int, terminal: Terminal, scheduled: Long, origi
 
   def equalsLegacy(lua: LegacyUniqueArrival): Boolean =
     lua.number == number && lua.scheduled == scheduled && lua.terminal == terminal
+
+  def stringValue = s"$number-${terminal.toString}-$scheduled-${origin.iata}"
 }
 
 object UniqueArrival {

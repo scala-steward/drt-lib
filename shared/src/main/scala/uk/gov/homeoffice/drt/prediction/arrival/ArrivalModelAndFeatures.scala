@@ -242,9 +242,9 @@ object FeatureColumns {
     override val label: String = PreChristmasHoliday.label
     override val prefix: String = "prexmas"
     override val hols: Seq[(LocalDate, LocalDate)] = Seq(
-      (LocalDate(2022, 12, 1), LocalDate(2022, 12, 18)),
-      (LocalDate(2023, 12, 1), LocalDate(2023, 12, 21)),
-      (LocalDate(2024, 12, 1), LocalDate(2024, 12, 20)),
+      (LocalDate(2022, 12, 14), LocalDate(2022, 12, 18)),
+      (LocalDate(2023, 12, 14), LocalDate(2023, 12, 21)),
+      (LocalDate(2024, 12, 14), LocalDate(2024, 12, 20)),
     )
   }
 
