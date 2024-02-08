@@ -29,6 +29,7 @@ lazy val csvCommonsVersion = "1.10.0"
 lazy val catsVersion = "2.10.0"
 lazy val scribeSlf4jVersion = "3.12.2"
 lazy val slickVersion = "3.4.1"
+lazy val h2Version = "2.2.220"
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .in(file("."))
@@ -58,7 +59,7 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion,
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
       "com.typesafe.slick" %% "slick" % slickVersion,
-      "com.h2database" % "h2" % "2.2.220" % Test
+      "com.h2database" % "h2" % h2Version % Test
     ),
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
     Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
