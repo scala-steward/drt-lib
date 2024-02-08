@@ -6,9 +6,9 @@ import akka.pattern.ask
 import akka.util.Timeout
 import org.apache.spark.ml.regression.LinearRegressionModel
 import uk.gov.homeoffice.drt.actor.PredictionModelActor
-import uk.gov.homeoffice.drt.actor.PredictionModelActor.{ModelUpdate, Models, RegressionModelFromSpark, RemoveModel, WithId}
+import uk.gov.homeoffice.drt.actor.PredictionModelActor._
 import uk.gov.homeoffice.drt.actor.commands.Commands.GetState
-import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
+import uk.gov.homeoffice.drt.time.SDate
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -21,8 +21,8 @@ trait ModelPersistence {
 
 trait ActorModelPersistence extends ModelPersistence {
   val modelCategory: ModelCategory
-  val now: () => SDateLike
-  val actorProvider: (ModelCategory, WithId) => ActorRef
+  val actorProvider: (ModelCategory, WithId) => ActorRef =
+    (modelCategory, identifier) => system.actorOf(Props(new PredictionModelActor(() => SDate.now(), modelCategory, identifier)))
 
   implicit val ec: ExecutionContext
   implicit val timeout: Timeout
@@ -63,9 +63,4 @@ trait ActorModelPersistence extends ModelPersistence {
     (modelIdentifier, modelName) => {
       updateModel(modelIdentifier, modelName, None)
     }
-}
-
-trait ActorModelPersistenceImpl extends ActorModelPersistence {
-  override val actorProvider: (ModelCategory, WithId) => ActorRef =
-    (modelCategory, identifier) => system.actorOf(Props(new PredictionModelActor(() => SDate.now(), modelCategory, identifier)))
 }
