@@ -10,7 +10,7 @@ import uk.gov.homeoffice.drt.time.UtcDate
 trait TerminalDateActor[T] extends Actor {
   val terminal: Terminal
   val date: UtcDate
-  val extractValues: T => Option[(Double, Seq[String], Seq[Double])]
+  val extractValues: T => Option[(Double, Seq[String], Seq[Double], String)]
 }
 
 object TerminalDateActor {

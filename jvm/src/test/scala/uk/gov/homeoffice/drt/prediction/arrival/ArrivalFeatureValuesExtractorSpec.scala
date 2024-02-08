@@ -18,7 +18,7 @@ class ArrivalFeatureValuesExtractorSpec extends AnyWordSpec {
     "give the different between scheduled and touchdown, with the day of the week and morning or afternoon flag" in {
       val arrival = ArrivalGenerator.arrival(sch = scheduledDt, act = scheduledPlus10)
       val result = ArrivalFeatureValuesExtractor.minutesOffSchedule(features)(arrival)
-      assert(result == Option((10d, Seq("dow_7", "pod_0"), Seq())))
+      assert(result == Option((10d, Seq("dow_7", "pod_0"), Seq(), arrival.unique.stringValue)))
     }
     "give None when there is no touchdown time" in {
       val arrival = ArrivalGenerator.arrival(sch = scheduledDt)
@@ -31,7 +31,7 @@ class ArrivalFeatureValuesExtractorSpec extends AnyWordSpec {
     "give the different between chox and touchdown, with the day of the week and morning or afternoon flag" in {
       val arrival = ArrivalGenerator.arrival(sch = scheduledDt, act = scheduledDt, actChox = scheduledPlus15)
       val result = ArrivalFeatureValuesExtractor.minutesToChox(features)(arrival)
-      assert(result == Option((15d, Seq("dow_7", "pod_0"), Seq())))
+      assert(result == Option((15d, Seq("dow_7", "pod_0"), Seq(), arrival.unique.stringValue)))
     }
     "give None when there is no touchdown time" in {
       val arrival = ArrivalGenerator.arrival(sch = scheduledDt, actChox = scheduledPlus15)
