@@ -87,7 +87,6 @@ object FeatureColumns {
                  (implicit
                   sDateProvider: Long => SDateLike,
                   sDateFromLocalDate: LocalDate => SDateLike,
-                  now: () => SDateLike,
                  ): OneToMany[_] = label match {
       case DayOfWeek.label => DayOfWeek()
       case WeekendDay.label => WeekendDay()
@@ -103,6 +102,7 @@ object FeatureColumns {
       case OctoberHalfTerm.label => OctoberHalfTerm()
       case Term1b.label => Term1b()
       case ChristmasHoliday.label => ChristmasHoliday()
+      case LegacyChristmasHoliday.label => LegacyChristmasHoliday()
       case Term2a.label => Term2a()
       case SpringHalfTerm.label => SpringHalfTerm()
       case Term2b.label => Term2b()
@@ -263,7 +263,7 @@ object FeatureColumns {
   }
 
   object ChristmasHoliday {
-    val label: String = "christmasHoliday"
+    val label: String = "xmasHoliday"
   }
 
   case class ChristmasDay()(implicit sDateProvider: Long => SDateLike) extends OneToMany[Arrival] {
