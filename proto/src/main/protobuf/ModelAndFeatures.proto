@@ -13,6 +13,7 @@ message ModelAndFeaturesMessage {
   optional double improvementPct = 4;
   optional string targetName = 5;
   optional int64 timestamp = 6;
+  optional int32 featuresVersion = 7;
 }
 
 message RemoveModelMessage {

@@ -8,6 +8,7 @@ trait ModelAndFeatures {
   val targetName: String
   val examplesTrainedOn: Int
   val improvementPct: Double
+  val featuresVersion: Int
 }
 
 object ModelAndFeatures {

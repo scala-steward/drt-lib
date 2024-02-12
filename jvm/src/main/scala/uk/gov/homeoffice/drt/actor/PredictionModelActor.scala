@@ -18,6 +18,7 @@ object PredictionModelActor {
   case class Models(models: Map[String, ModelAndFeatures])
 
   case class ModelUpdate(model: RegressionModel,
+                         featuresVersion: Int,
                          features: FeaturesWithOneToManyValues,
                          examplesTrainedOn: Int,
                          improvementPct: Double,

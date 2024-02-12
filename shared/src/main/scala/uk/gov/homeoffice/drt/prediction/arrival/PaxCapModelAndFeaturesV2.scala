@@ -7,6 +7,7 @@ import uk.gov.homeoffice.drt.time.SDateLike
 
 object PaxCapModelAndFeaturesV2 {
   val targetName: String = "paxcap-v2"
+  val featuresVersion: Int = 2
 }
 
 case class PaxCapModelAndFeaturesV2(model: RegressionModel,
@@ -14,6 +15,7 @@ case class PaxCapModelAndFeaturesV2(model: RegressionModel,
                                   examplesTrainedOn: Int,
                                   improvementPct: Double,
                                  ) extends ArrivalModelAndFeatures {
+  override val featuresVersion: Int = PaxCapModelAndFeaturesV2.featuresVersion
   override val targetName: String = PaxCapModelAndFeaturesV2.targetName
 
   private val fallback: Int = 175

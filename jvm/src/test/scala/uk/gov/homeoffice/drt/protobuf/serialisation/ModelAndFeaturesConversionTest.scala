@@ -1,8 +1,9 @@
 package uk.gov.homeoffice.drt.protobuf.serialisation
 
 import org.specs2.mutable.Specification
-import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.DayOfWeek
-import uk.gov.homeoffice.drt.prediction.arrival.OffScheduleModelAndFeatures
+import uk.gov.homeoffice.drt.prediction.arrival.features.FeatureColumnsV1.DayOfWeek
+import uk.gov.homeoffice.drt.prediction.arrival.features.FeatureColumnsV2.SummerHolidayScotland
+import uk.gov.homeoffice.drt.prediction.arrival.{OffScheduleModelAndFeatures, PaxCapModelAndFeaturesV2}
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFeatures, RegressionModel}
 import uk.gov.homeoffice.drt.time.{LocalDate, SDate, SDateLike}
 
@@ -29,6 +30,19 @@ class ModelAndFeaturesConversionTest extends Specification {
       val model = RegressionModel(Seq(1, 2, 3), -1.45)
       val features = FeaturesWithOneToManyValues(List(DayOfWeek()), IndexedSeq("aa", "bb", "cc"))
       val modelAndFeatures = OffScheduleModelAndFeatures(model, features, 100, 10.1.toInt)
+
+      val serialised = ModelAndFeaturesConversion.modelAndFeaturesToMessage(modelAndFeatures, 0L)
+
+      val deserialised = ModelAndFeaturesConversion.modelAndFeaturesFromMessage(serialised)
+
+      deserialised === Option(modelAndFeatures)
+    }
+  }
+  "Given a class with version 2 features (PaxCapModelAndFeaturesV2)" >> {
+    "I should be able to serialise and deserialise it back to its original form" >> {
+      val model = RegressionModel(Seq(1, 2, 3), -1.45)
+      val features = FeaturesWithOneToManyValues(List(SummerHolidayScotland()), IndexedSeq("aa", "bb", "cc"))
+      val modelAndFeatures = PaxCapModelAndFeaturesV2(model, features, 100, 10.1.toInt)
 
       val serialised = ModelAndFeaturesConversion.modelAndFeaturesToMessage(modelAndFeatures, 0L)
 

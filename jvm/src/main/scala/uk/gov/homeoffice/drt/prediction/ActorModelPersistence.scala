@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait ModelPersistence {
   def getModels(validModelNames: Seq[String]): WithId => Future[Models]
-  val persist: (WithId, LinearRegressionModel, FeaturesWithOneToManyValues, Int, Double, String) => Future[Done]
+  val persist: (WithId, Int, LinearRegressionModel, FeaturesWithOneToManyValues, Int, Double, String) => Future[Done]
   val clear: (WithId, String) => Future[Done]
 }
 
@@ -52,10 +52,10 @@ trait ActorModelPersistence extends ModelPersistence {
         }
     }
 
-  override val persist: (WithId, LinearRegressionModel, FeaturesWithOneToManyValues, Int, Double, String) => Future[Done] =
-    (modelIdentifier, linearRegressionModel, featuresWithValues, trainingExamples, improvementPct, modelName) => {
+  override val persist: (WithId, Int, LinearRegressionModel, FeaturesWithOneToManyValues, Int, Double, String) => Future[Done] =
+    (modelIdentifier, featuresVersion, linearRegressionModel, featuresWithValues, trainingExamples, improvementPct, modelName) => {
       val regressionModel = RegressionModelFromSpark(linearRegressionModel)
-      val modelUpdate = ModelUpdate(regressionModel, featuresWithValues, trainingExamples, improvementPct, modelName)
+      val modelUpdate = ModelUpdate(regressionModel, featuresVersion, featuresWithValues, trainingExamples, improvementPct, modelName)
       updateModel(modelIdentifier, modelName, Option(modelUpdate)).map(_ => Done)
     }
 
