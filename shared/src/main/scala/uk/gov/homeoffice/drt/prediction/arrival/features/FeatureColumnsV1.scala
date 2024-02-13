@@ -6,9 +6,6 @@ import uk.gov.homeoffice.drt.time.{LocalDate, SDateLike}
 
 import scala.annotation.tailrec
 
-
-
-
 object FeatureColumnsV1 {
 
   object Single {
