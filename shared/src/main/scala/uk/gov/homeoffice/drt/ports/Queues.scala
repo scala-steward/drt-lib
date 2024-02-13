@@ -32,6 +32,7 @@ object Queues {
 
   sealed trait Queue extends ClassNameForToString with Ordered[Queue] {
     override def compare(that: Queue): Int = toString.compareTo(that.toString)
+    val stringValue: String
   }
 
   object Queue {
@@ -58,19 +59,32 @@ object Queues {
 
   case object InvalidQueue extends Queue {
     override val toString: String = ""
+    override val stringValue: String = "invalidqueue"
   }
 
-  case object EeaDesk extends Queue
+  case object EeaDesk extends Queue {
+    override val stringValue: String = "eeadesk"
+  }
 
-  case object EGate extends Queue
+  case object EGate extends Queue {
+    override val stringValue: String = "egate"
+  }
 
-  case object NonEeaDesk extends Queue
+  case object NonEeaDesk extends Queue {
+    override val stringValue: String = "noneeadesk"
+  }
 
-  case object FastTrack extends Queue
+  case object FastTrack extends Queue {
+    override val stringValue: String = "fasttrack"
+  }
 
-  case object Transfer extends Queue
+  case object Transfer extends Queue {
+    override val stringValue: String = "transfer"
+  }
 
-  case object QueueDesk extends Queue
+  case object QueueDesk extends Queue {
+    override val stringValue: String = "queuedesk"
+  }
 
   val queueOrder: List[Queue] = List(QueueDesk, EGate, EeaDesk, NonEeaDesk, FastTrack)
 
