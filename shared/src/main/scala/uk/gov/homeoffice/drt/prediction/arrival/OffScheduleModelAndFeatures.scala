@@ -4,6 +4,7 @@ import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, Regression
 
 object OffScheduleModelAndFeatures {
   val targetName: String = "off-schedule"
+  val featuresVersion: Int = 1
 }
 
 case class OffScheduleModelAndFeatures(model: RegressionModel,
@@ -11,5 +12,6 @@ case class OffScheduleModelAndFeatures(model: RegressionModel,
                                        examplesTrainedOn: Int,
                                        improvementPct: Double,
                                       ) extends ArrivalModelAndFeatures {
+  override val featuresVersion: Int = OffScheduleModelAndFeatures.featuresVersion
   override val targetName: String = OffScheduleModelAndFeatures.targetName
 }

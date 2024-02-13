@@ -5,18 +5,18 @@ import uk.gov.homeoffice.drt.ports.MlFeedSource
 import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, RegressionModel}
 import uk.gov.homeoffice.drt.time.SDateLike
 
-object PaxCapModelAndFeatures {
-  val targetName: String = "paxcap"
-  val featuresVersion: Int = 1
+object PaxCapModelAndFeaturesV2 {
+  val targetName: String = "paxcap-v2"
+  val featuresVersion: Int = 2
 }
 
-case class PaxCapModelAndFeatures(model: RegressionModel,
+case class PaxCapModelAndFeaturesV2(model: RegressionModel,
                                   features: FeaturesWithOneToManyValues,
                                   examplesTrainedOn: Int,
                                   improvementPct: Double,
                                  ) extends ArrivalModelAndFeatures {
-  override val featuresVersion: Int = PaxCapModelAndFeatures.featuresVersion
-  override val targetName: String = PaxCapModelAndFeatures.targetName
+  override val featuresVersion: Int = PaxCapModelAndFeaturesV2.featuresVersion
+  override val targetName: String = PaxCapModelAndFeaturesV2.targetName
 
   private val fallback: Int = 175
 

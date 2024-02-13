@@ -4,12 +4,12 @@ import cats.implicits.toTraverseOps
 import uk.gov.homeoffice.drt.arrivals.{Arrival, ArrivalStatus, Passengers}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.ports.{ApiFeedSource, LiveFeedSource}
-import uk.gov.homeoffice.drt.prediction.arrival.FeatureColumns.{Feature, OneToMany, Single}
+import uk.gov.homeoffice.drt.prediction.arrival.features.{Feature, OneToManyFeature, SingleFeature}
 
 object ArrivalFeatureValuesExtractor {
   def oneToManyFeatureValues[T](arrival: T, features: Seq[Feature[_]]): Option[Seq[String]] =
     features.collect {
-      case feature: OneToMany[T] =>
+      case feature: OneToManyFeature[T] =>
         val value: Option[String] = feature.value(arrival).map(value => s"${feature.prefix}_$value")
         if (value.isEmpty) scribe.warn(s"Feature ${feature.label} has no value for ${arrival.toString}")
         value
@@ -17,7 +17,7 @@ object ArrivalFeatureValuesExtractor {
 
   def singleFeatureValues[T](arrival: T, features: Seq[Feature[_]]): Option[Seq[Double]] =
     features.collect {
-      case feature: Single[T] => feature.value(arrival)
+      case feature: SingleFeature[T] => feature.value(arrival)
     }.traverse(identity)
 
   val minutesOffSchedule: Seq[Feature[Arrival]] => Arrival => Option[(Double, Seq[String], Seq[Double], String)] = features => {
