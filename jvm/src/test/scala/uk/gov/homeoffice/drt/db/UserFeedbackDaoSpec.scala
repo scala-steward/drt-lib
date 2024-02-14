@@ -4,8 +4,6 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
 import org.specs2.mutable.Specification
 import org.specs2.specification.BeforeEach
-import slick.dbio.DBIO
-import slick.jdbc.PostgresProfile.api._
 
 import java.sql.Timestamp
 import java.time.Instant
@@ -17,6 +15,8 @@ class UserFeedbackDaoSpec extends Specification with BeforeEach {
   sequential
 
   lazy val db = TestDatabase.db
+
+  import TestDatabase.profile.api._
 
   override def before = {
     Await.result(
