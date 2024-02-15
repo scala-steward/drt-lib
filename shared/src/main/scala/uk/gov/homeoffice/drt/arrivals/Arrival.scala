@@ -219,7 +219,8 @@ case class Arrival(Operator: Option[Operator],
       BaggageReclaimId = if (incoming.BaggageReclaimId.exists(_.nonEmpty)) incoming.BaggageReclaimId else this.BaggageReclaimId,
       Stand = if (incoming.Stand.exists(_.nonEmpty)) incoming.Stand else this.Stand,
       Gate = if (incoming.Gate.exists(_.nonEmpty)) incoming.Gate else this.Gate,
-      RedListPax = if (incoming.RedListPax.nonEmpty) incoming.RedListPax else this.RedListPax
+      RedListPax = if (incoming.RedListPax.nonEmpty) incoming.RedListPax else this.RedListPax,
+      MaxPax = if (incoming.MaxPax.nonEmpty) incoming.MaxPax else this.MaxPax,
     )
 
   lazy val hasNoPaxSource: Boolean = !PassengerSources.values.exists(_.actual.nonEmpty)
