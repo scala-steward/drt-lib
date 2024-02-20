@@ -29,7 +29,7 @@ lazy val csvCommonsVersion = "1.10.0"
 lazy val catsVersion = "2.10.0"
 lazy val scribeSlf4jVersion = "3.12.2"
 lazy val slickVersion = "3.4.1"
-lazy val h2Version = "2.2.220"
+lazy val h2Version = "2.2.224"
 lazy val sprayJsonVersion = "1.3.6"
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
