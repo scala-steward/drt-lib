@@ -29,7 +29,7 @@ case class TerminalUpdateRequest(terminal: Terminal, date: LocalDate, offsetMinu
 
 case class RemoveProcessingRequest(request: ProcessingRequest)
 
-case class CrunchRequest(date: LocalDate, offsetMinutes: Int, durationMinutes: Int) extends ProcessingRequest
+case class CrunchRequest(date: LocalDate, offsetMinutes: Int, durationMinutes: Int) extends LoadProcessingRequest
 
 case class MergeArrivalsRequest(date: UtcDate) extends ProcessingRequest
 
