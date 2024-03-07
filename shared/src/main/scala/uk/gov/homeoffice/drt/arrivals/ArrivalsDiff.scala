@@ -6,8 +6,6 @@ import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.{SDateLike, UtcDate}
 import upickle.default.{macroRW, _}
 
-import scala.collection.immutable.SortedMap
-
 
 object ArrivalsDiff {
   implicit val rw: ReadWriter[ArrivalsDiff] = macroRW
@@ -15,11 +13,11 @@ object ArrivalsDiff {
   val empty: ArrivalsDiff = ArrivalsDiff(Seq(), Seq())
 
   def apply(toUpdate: Iterable[Arrival], toRemove: Iterable[UniqueArrival]): ArrivalsDiff = ArrivalsDiff(
-    SortedMap[UniqueArrival, Arrival]() ++ toUpdate.map(a => (a.unique, a)), toRemove
+    toUpdate.map(a => (a.unique, a)).toMap, toRemove
   )
 }
 
-case class ArrivalsDiff(toUpdate: SortedMap[UniqueArrival, Arrival], toRemove: Iterable[UniqueArrival]) extends FlightUpdates {
+case class ArrivalsDiff(toUpdate: Map[UniqueArrival, Arrival], toRemove: Iterable[UniqueArrival]) extends FlightUpdates {
   def diff(arrivals: Map[UniqueArrival, Arrival]): ArrivalsDiff = {
     val updatedFlights = toUpdate
       .map {
