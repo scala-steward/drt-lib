@@ -1,7 +1,8 @@
 package uk.gov.homeoffice.drt.arrivals
 
 import uk.gov.homeoffice.drt.DataUpdates.FlightUpdates
-import uk.gov.homeoffice.drt.ports.FeedSource
+import uk.gov.homeoffice.drt.ports.{ApiFeedSource, FeedSource, HistoricApiFeedSource}
+import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.{ApiSplitsWithHistoricalEGateAndFTPercentages, Historical}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.{SDateLike, UtcDate}
 import upickle.default.{macroRW, _}
@@ -80,7 +81,16 @@ case class ArrivalsDiff(toUpdate: Map[UniqueArrival, Arrival], toRemove: Iterabl
       case (acc, (key, arrival)) =>
         acc.get(key) match {
           case Some(fws) =>
-            acc + (key -> fws.copy(apiFlight = arrival, lastUpdated = Option(nowMillis)))
+            val (feedSources, paxSources) = fws.splits.foldLeft((arrival.FeedSources, arrival.PassengerSources)) {
+              case ((accFs, accPs), split) if Set(ApiSplitsWithHistoricalEGateAndFTPercentages, Historical).contains(split.source) =>
+                val totalPax = Option(split.totalPax)
+                val transPax = if (split.transPax > 0) Option(split.transPax) else None
+                val fs = if (split.source == ApiSplitsWithHistoricalEGateAndFTPercentages) ApiFeedSource else HistoricApiFeedSource
+                (accFs + fs, accPs + (fs -> Passengers(totalPax, transPax)))
+              case ((accFs, accPs), _) => (accFs, accPs)
+            }
+            val arrivalWithApiSources = arrival.copy(FeedSources = feedSources, PassengerSources = paxSources)
+            acc + (key -> fws.copy(apiFlight = arrivalWithApiSources, lastUpdated = Option(nowMillis)))
           case None =>
             acc + (key -> ApiFlightWithSplits(arrival, Set(), Option(nowMillis)))
         }

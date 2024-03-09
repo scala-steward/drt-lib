@@ -65,6 +65,8 @@ class Serializer extends SerializerWithStringManifest {
   final val RemoveDay: String = classOf[RemoveDayMessage].getName
   final val CrunchRequest: String = classOf[CrunchRequestMessage].getName
   final val CrunchRequests: String = classOf[CrunchRequestsMessage].getName
+  final val MergeArrivalsRequest: String = classOf[MergeArrivalsRequestMessage].getName
+  final val MergeArrivalsRequests: String = classOf[MergeArrivalsRequestsMessage].getName
   final val RemoveCrunchRequest: String = classOf[RemoveCrunchRequestMessage].getName
   final val SetRedListUpdate: String = classOf[SetRedListUpdateMessage].getName
   final val RedListUpdates: String = classOf[RedListUpdatesMessage].getName
@@ -133,6 +135,8 @@ class Serializer extends SerializerWithStringManifest {
       case SplitsForArrivals => SplitsForArrivalsMessage.parseFrom(bytes)
       case CrunchRequest => CrunchRequestMessage.parseFrom(bytes)
       case CrunchRequests => CrunchRequestsMessage.parseFrom(bytes)
+      case MergeArrivalsRequest => MergeArrivalsRequestMessage.parseFrom(bytes)
+      case MergeArrivalsRequests => MergeArrivalsRequestsMessage.parseFrom(bytes)
       case RemoveCrunchRequest => RemoveCrunchRequestMessage.parseFrom(bytes)
       case SetRedListUpdate => SetRedListUpdateMessage.parseFrom(bytes)
       case RedListUpdates => RedListUpdatesMessage.parseFrom(bytes)
