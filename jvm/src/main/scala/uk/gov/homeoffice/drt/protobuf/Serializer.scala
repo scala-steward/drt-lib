@@ -3,7 +3,7 @@ package uk.gov.homeoffice.drt.protobuf
 import akka.serialization.SerializerWithStringManifest
 import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.protobuf.messages.Alert.{Alert, AlertSnapshotMessage}
-import uk.gov.homeoffice.drt.protobuf.messages.CrunchState._
+import uk.gov.homeoffice.drt.protobuf.messages.CrunchState.{RemoveMergeArrivalsRequestMessage, _}
 import uk.gov.homeoffice.drt.protobuf.messages.EgateBanksUpdates.{PortEgateBanksUpdatesMessage, RemoveEgateBanksUpdateMessage, SetEgateBanksUpdateMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.FixedPointMessage.{FixedPointMessage, FixedPointsMessage, FixedPointsStateSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage._
@@ -65,7 +65,10 @@ class Serializer extends SerializerWithStringManifest {
   final val RemoveDay: String = classOf[RemoveDayMessage].getName
   final val CrunchRequest: String = classOf[CrunchRequestMessage].getName
   final val CrunchRequests: String = classOf[CrunchRequestsMessage].getName
+  final val MergeArrivalsRequest: String = classOf[MergeArrivalsRequestMessage].getName
+  final val MergeArrivalsRequests: String = classOf[MergeArrivalsRequestsMessage].getName
   final val RemoveCrunchRequest: String = classOf[RemoveCrunchRequestMessage].getName
+  final val RemoveMergeArrivalsRequest: String = classOf[RemoveMergeArrivalsRequestMessage].getName
   final val SetRedListUpdate: String = classOf[SetRedListUpdateMessage].getName
   final val RedListUpdates: String = classOf[RedListUpdatesMessage].getName
   final val RedListUpdate: String = classOf[RedListUpdateMessage].getName
@@ -133,7 +136,10 @@ class Serializer extends SerializerWithStringManifest {
       case SplitsForArrivals => SplitsForArrivalsMessage.parseFrom(bytes)
       case CrunchRequest => CrunchRequestMessage.parseFrom(bytes)
       case CrunchRequests => CrunchRequestsMessage.parseFrom(bytes)
+      case MergeArrivalsRequest => MergeArrivalsRequestMessage.parseFrom(bytes)
+      case MergeArrivalsRequests => MergeArrivalsRequestsMessage.parseFrom(bytes)
       case RemoveCrunchRequest => RemoveCrunchRequestMessage.parseFrom(bytes)
+      case RemoveMergeArrivalsRequest => RemoveMergeArrivalsRequestMessage.parseFrom(bytes)
       case SetRedListUpdate => SetRedListUpdateMessage.parseFrom(bytes)
       case RedListUpdates => RedListUpdatesMessage.parseFrom(bytes)
       case RedListUpdate => RedListUpdateMessage.parseFrom(bytes)
