@@ -12,7 +12,8 @@ import uk.gov.homeoffice.drt.ports._
 import uk.gov.homeoffice.drt.protobuf.messages.CrunchState._
 import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage._
 import uk.gov.homeoffice.drt.protobuf.messages.Prediction.{PredictionIntMessage, PredictionLongMessage, PredictionsMessage}
-import uk.gov.homeoffice.drt.time.SDate
+
+
 
 object FlightMessageConversion {
   val log: Logger = LoggerFactory.getLogger(getClass.toString)
@@ -165,8 +166,8 @@ object FlightMessageConversion {
     .map(nc => {
       nc.paxNationality -> nc.count
     }).collect {
-    case (Some(nat), Some(count)) => Nationality(nat) -> count
-  }.toMap match {
+      case (Some(nat), Some(count)) => Nationality(nat) -> count
+    }.toMap match {
     case nats if nats.isEmpty => None
     case nats => Option(nats)
   }
@@ -176,8 +177,8 @@ object FlightMessageConversion {
     .map(pa => {
       pa.paxAge -> pa.count
     }).collect {
-    case (Some(age), Some(count)) => PaxAge(age) -> count
-  }.toMap match {
+      case (Some(age), Some(count)) => PaxAge(age) -> count
+    }.toMap match {
     case ages if ages.isEmpty => None
     case ages => Option(ages)
   }
