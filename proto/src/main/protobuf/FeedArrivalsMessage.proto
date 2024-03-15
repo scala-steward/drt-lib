@@ -1,0 +1,85 @@
+syntax = "proto2";
+
+package uk.gov.homeoffice.drt.protobuf.messages;
+
+import "Prediction.proto";
+
+message FeedArrivalStateSnapshotMessage {
+    repeated ForecastFeedArrivalMessage forecastArrivalMessages = 1;
+    repeated LiveFeedArrivalMessage liveArrivalMessages = 2;
+    optional FeedStatusesMessage statuses = 3;
+}
+
+message LiveFeedArrivalMessage {
+    optional string Operator = 1;
+    optional int32 MaxPax = 2;
+    optional int32 TotalPax = 3;
+    optional string Terminal = 4;
+    optional int32 VoyageNumber = 5;
+    optional string CarrierCode = 6;
+    optional string FlightCodeSuffix = 7;
+    optional string Origin = 8;
+    optional int64 Scheduled = 9;
+    optional int64 Estimated = 10;
+    optional int64 Touchdown = 11;
+    optional int64 EstimatedChox = 12;
+    optional int64 ActualChox = 13;
+    optional string Status = 14;
+    optional string Gate = 15;
+    optional string Stand = 16;
+    optional string Runway = 17;
+    optional string BaggageReclaim = 18;
+}
+
+message ForecastFeedArrivalMessage {
+    optional string Operator = 1;
+    optional int32 MaxPax = 2;
+    optional int32 TotalPax = 3;
+    optional string Terminal = 4;
+    optional int32 VoyageNumber = 5;
+    optional string CarrierCode = 6;
+    optional string FlightCodeSuffix = 7;
+    optional string Origin = 8;
+    optional int64 Scheduled = 9;
+}
+
+message UniqueArrivalMessage {
+    optional int32 number = 1;
+    optional string terminalName = 2;
+    optional int64 scheduled = 3;
+    optional string origin = 4;
+}
+
+message FeedArrivalsDiffMessage {
+    optional int64 createdAt = 1;
+    repeated UniqueArrivalMessage removals = 2;
+    repeated ForecastFeedArrivalMessage forecastUpdates = 3;
+    repeated LiveFeedArrivalMessage liveUpdates = 4;
+}
+
+message FeedStatusesMessage {
+    repeated FeedStatusMessage statuses = 2;
+    optional int64 lastSuccessAt = 3;
+    optional int64 lastFailureAt = 4;
+    optional int64 lastUpdatesAt = 5;
+
+    optional string name__OLD = 1;
+}
+
+message FeedStatusMessage {
+    optional int64 date = 1;
+    optional int32 updates = 2;
+    optional string message = 3;
+}
+
+message TotalPaxSourceMessage {
+    optional string feedSource = 2;
+    optional PassengersMessage passengers = 3;
+
+    optional int32 pax__OLD = 1;
+}
+
+message PassengersMessage {
+    optional int32 actual = 1;
+    optional int32 transit = 2;
+}
