@@ -45,11 +45,11 @@ trait RecoveryActorLike extends PersistentActor with RecoveryLogging {
     case unknown => logUnknown(unknown)
   }
 
-  def processRecoveryMessage: PartialFunction[Any, Unit]
+  def processRecoveryMessage: PartialFunction[GeneratedMessage, Unit]
 
   def processSnapshotMessage: PartialFunction[Any, Unit]
 
-  def playRecoveryMessage: PartialFunction[Any, Unit] = processRecoveryMessage orElse unknownMessage
+  def playRecoveryMessage: PartialFunction[GeneratedMessage, Unit] = processRecoveryMessage orElse unknownMessage
 
   def playSnapshotMessage: PartialFunction[Any, Unit] = processSnapshotMessage orElse unknownMessage
 

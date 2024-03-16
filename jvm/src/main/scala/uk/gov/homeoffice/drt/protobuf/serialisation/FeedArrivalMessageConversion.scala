@@ -3,7 +3,7 @@ package uk.gov.homeoffice.drt.protobuf.serialisation
 import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.arrivals.{FlightCode, ForecastArrival, LiveArrival}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.protobuf.messages.FeedArrivalsMessage.{FeedArrivalStateSnapshotMessage, ForecastFeedArrivalMessage, LiveFeedArrivalMessage}
+import uk.gov.homeoffice.drt.protobuf.messages.FeedArrivalsMessage.{FeedArrivalStateSnapshotMessage, ForecastArrivalStateSnapshotMessage, ForecastFeedArrivalMessage, LiveFeedArrivalMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage.{FlightMessage, FlightStateSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.serialisation.FlightMessageConversion.getPassengerSources
 
@@ -13,6 +13,9 @@ object FeedArrivalMessageConversion {
       case FlightStateSnapshotMessage(flights, _) => flights.map(forecastArrivalFromLegacyMessage)
       case msg: FeedArrivalStateSnapshotMessage => FeedArrivalMessageConversion.forecastArrivalsFromSnapshotMessage(msg)
     }
+
+  def forecastArrivalsToSnapshot(arrivals: Seq[ForecastArrival]): ForecastArrivalStateSnapshotMessage =
+    ForecastArrivalStateSnapshotMessage(arrivals.map(forecastArrivalToMessage))
 
   def liveArrivalsFromSnapshot(msg: GeneratedMessage): Seq[LiveArrival] =
     msg match {
