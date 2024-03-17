@@ -6,7 +6,7 @@ import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.time.SDate
 
 
-trait PartitionActor[S, E] extends RecoveryActorLike {
+trait PartitionActor[S, E, Q] extends RecoveryActorLike {
   def emptyState: S
 
   val eventToMaybeMessage: PartialFunction[(E, S), Option[GeneratedMessage]]
@@ -16,7 +16,7 @@ trait PartitionActor[S, E] extends RecoveryActorLike {
   val stateToSnapshotMessage: S => GeneratedMessage
   val stateFromSnapshotMessage: GeneratedMessage => S
 
-  val processQuery: PartialFunction[Any, Unit]
+  val processQuery: Q => Any
 
   def maybePointInTime: Option[Long]
 
@@ -25,12 +25,12 @@ trait PartitionActor[S, E] extends RecoveryActorLike {
     case Some(pit) => f"@${SDate(pit).toISOString}"
   }
 
-  private lazy val log: Logger = LoggerFactory.getLogger(f"$persistenceId$loggerSuffix")
+  protected lazy val log: Logger = LoggerFactory.getLogger(f"$persistenceId$loggerSuffix")
 
   var state: S = emptyState
 
   private val maxSnapshotInterval = 250
-  private val maybeSnapshotInterval: Option[Int] = Option(maxSnapshotInterval)
+  override val maybeSnapshotInterval: Option[Int] = Option(maxSnapshotInterval)
 
   override def stateToMessage: GeneratedMessage = stateToSnapshotMessage(state)
 
@@ -42,7 +42,10 @@ trait PartitionActor[S, E] extends RecoveryActorLike {
     case msg => state = messageToState(msg, state)
   }
 
-  private def processDataEvent: Receive = {
+  override def receiveCommand: Receive = {
+    case query: Q =>
+      sender() ! processQuery(query)
+
     case event: E =>
       val maybeMsg = eventToMaybeMessage(event, state)
       val maybeAck = maybeMessageToMaybeAck(maybeMsg)
@@ -60,8 +63,5 @@ trait PartitionActor[S, E] extends RecoveryActorLike {
 
     case m => log.error(s"Got unexpected message: $m")
   }
-
-  override def receiveCommand: Receive =
-    processQuery orElse processDataEvent
 }
 

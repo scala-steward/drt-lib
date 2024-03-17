@@ -1,18 +1,14 @@
 package uk.gov.homeoffice.drt.actor
 
-import akka.persistence.SaveSnapshotSuccess
-import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
-import uk.gov.homeoffice.drt.actor.commands.Commands.GetState
-import uk.gov.homeoffice.drt.actor.commands.MergeArrivalsRequest
+import uk.gov.homeoffice.drt.actor.TerminalDayForecastArrivalActor.{Command, GetState}
 import uk.gov.homeoffice.drt.arrivals._
 import uk.gov.homeoffice.drt.ports.FeedSource
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.protobuf.messages.CrunchState.{FlightsWithSplitsDiffMessage, FlightsWithSplitsMessage, SplitsForArrivalsMessage}
-import uk.gov.homeoffice.drt.protobuf.messages.FeedArrivalsMessage.{ForecastArrivalStateSnapshotMessage, ForecastFeedArrivalMessage, ForecastFeedArrivalsDiffMessage}
-import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage.FlightsDiffMessage
-import uk.gov.homeoffice.drt.protobuf.serialisation.{FeedArrivalMessageConversion, FlightMessageConversion}
+import uk.gov.homeoffice.drt.protobuf.messages.FeedArrivalsMessage.{ForecastArrivalStateSnapshotMessage, ForecastFeedArrivalMessage, ForecastFeedArrivalsDiffMessage, LiveFeedArrivalMessage, LiveFeedArrivalsDiffMessage}
+import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage.UniqueArrivalMessage
 import uk.gov.homeoffice.drt.protobuf.serialisation.FlightMessageConversion._
+import uk.gov.homeoffice.drt.protobuf.serialisation.{FeedArrivalMessageConversion, FlightMessageConversion}
 import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 
 case class FeedArrivalsDiff[A <: FeedArrival](updates: Iterable[A], removals: Iterable[UniqueArrival]) {
@@ -20,14 +16,81 @@ case class FeedArrivalsDiff[A <: FeedArrival](updates: Iterable[A], removals: It
   lazy val nonEmpty: Boolean = !isEmpty
 }
 
+object TerminalDayForecastArrivalActor {
+  trait Command
+
+  object GetState extends Command
+
+  val forecastDiffToMaybeMessage =
+    diffToMaybeMessage(
+      () => SDate.now(),
+      arrivalsToMessages(FeedArrivalMessageConversion.forecastArrivalToMessage),
+      (n, u, msgs) => ForecastFeedArrivalsDiffMessage(Option(n), msgs, u)
+    )
+
+  def diffToMaybeMessage[A <: FeedArrival, U, R]
+  (now: () => SDateLike,
+   arrivalsToMessages: (FeedArrivalsDiff[A], Map[UniqueArrival, A]) => U,
+   toMessage: (Long, U, Seq[UniqueArrivalMessage]) => GeneratedMessage
+  ):
+  PartialFunction[(FeedArrivalsDiff[A], Map[UniqueArrival, A]), Option[GeneratedMessage]] = {
+    case (diff, state) =>
+      val validatedDiff = validateDiff(diff, state)
+      val updatesForDiff = arrivalsToMessages(diff, state)
+      val removalsForDiff: Seq[UniqueArrivalMessage] = diff.removals.map(uniqueArrivalToMessage).toSeq
+
+      if (validatedDiff.nonEmpty) {
+        val msg = toMessage(now().millisSinceEpoch, updatesForDiff, removalsForDiff)
+        Option(msg)
+      } else None
+  }
+
+  private def toMessage(now: () => SDateLike, updatesForDiff: Seq[ForecastFeedArrivalMessage], removalsForDiff: Seq[UniqueArrivalMessage]): ForecastFeedArrivalsDiffMessage = {
+    ForecastFeedArrivalsDiffMessage(Option(now().millisSinceEpoch), removalsForDiff, updatesForDiff)
+  }
+
+  private def arrivalsToMessages[A <: FeedArrival, M](arrivalToMessage: A => M)
+                                                     (diff: FeedArrivalsDiff[A],
+                                                      state: Map[UniqueArrival, A],
+                                                     ): Seq[M] =
+    diff.updates.foldLeft(Seq.empty[M]) {
+      case (acc, a) =>
+        state.get(a.unique) match {
+          case Some(existing) if existing != a =>
+            acc :+ arrivalToMessage
+          case _ => acc
+        }
+    }
+
+  def liveDiffToMaybeMessage(now: () => SDateLike): PartialFunction[(FeedArrivalsDiff[LiveArrival], Map[UniqueArrival, LiveArrival]), Option[GeneratedMessage]] = {
+    case (diff, state) =>
+      val validatedDiff = validateDiff(diff, state)
+      val updatesForDiff = arrivalsToMessages(diff, state, FeedArrivalMessageConversion.liveArrivalToMessage)
+      val removalsForDiff = diff.removals.map(uniqueArrivalToMessage).toSeq
+
+      if (validatedDiff.nonEmpty) {
+        val msg = LiveFeedArrivalsDiffMessage(Option(now().millisSinceEpoch), removalsForDiff, updatesForDiff)
+        Option(msg)
+      } else None
+  }
+
+  private def validateDiff[A <: FeedArrival](diff: FeedArrivalsDiff[A], state: Map[UniqueArrival, A]): FeedArrivalsDiff[LiveArrival] = {
+    diff.copy(
+      updates = diff.updates.filterNot(u => state.get(u.unique).contains(u)),
+      removals = diff.removals.filter(state.contains),
+    )
+  }
+}
+
 class TerminalDayForecastArrivalActor(year: Int,
                                       month: Int,
                                       day: Int,
                                       terminal: Terminal,
                                       now: () => SDateLike,
-                                      maybePointInTime: Option[Long],
+                                      override val maybePointInTime: Option[Long],
                                       feedSource: FeedSource,
-                                     ) extends PartitionActor[Map[UniqueArrival, ForecastArrival], FeedArrivalsDiff[ForecastArrival]] {
+                                     )
+  extends PartitionActor[Map[UniqueArrival, ForecastArrival], FeedArrivalsDiff[ForecastArrival], Command] {
   override val emptyState: Map[UniqueArrival, ForecastArrival] = Map.empty
 
   override val eventToMaybeMessage: PartialFunction[(FeedArrivalsDiff[ForecastArrival], Map[UniqueArrival, ForecastArrival]), Option[GeneratedMessage]] = {
@@ -73,106 +136,12 @@ class TerminalDayForecastArrivalActor(year: Int,
         .toMap
   }
 
-  val firstMinuteOfDay: SDateLike = SDate(year, month, day, 0, 0)
-  private val lastMinuteOfDay: SDateLike = firstMinuteOfDay.addDays(1).addMinutes(-1)
-
-  override val log: Logger = LoggerFactory.getLogger(f"$getClass-$terminal-$year%04d-$month%02d-$day%02d$loggerSuffix")
-
   override def persistenceId: String = f"${feedSource.id}-feed-arrivals-${terminal.toString.toLowerCase}-$year-$month%02d-$day%02d"
 
   private val maxSnapshotInterval = 250
   override val maybeSnapshotInterval: Option[Int] = Option(maxSnapshotInterval)
-
-  override def receiveCommand: Receive = {
-    case diff: FeedArrivalsDiff[ForecastArrival] =>
-      val validatedDiff = diff.copy(
-        updates = diff.updates.filterNot(u => state.get(u.unique).contains(u)),
-        removals = diff.removals.filter(state.contains),
-      )
-
-      updateAndPersistForecastDiffAndAck(validatedDiff)
-
-    case GetState =>
-      sender() ! state
-
-    case _: SaveSnapshotSuccess =>
-      ackIfRequired()
-
-    case m => log.error(s"Got unexpected message: $m")
-  }
-
-  private def updateAndPersistForecastDiffAndAck(diff: FeedArrivalsDiff[ForecastArrival]): Unit = {
-    if (!diff.isEmpty) {
-      val updatesForDiff = diff.updates.foldLeft(Seq.empty[ForecastFeedArrivalMessage]) {
-        case (acc, a) =>
-          state.get(a.unique) match {
-            case Some(existing) if existing != a =>
-              acc :+ FeedArrivalMessageConversion.forecastArrivalToMessage(a)
-            case _ => acc
-          }
-      }
-      val removalsForDiff = diff.removals.map(uniqueArrivalToMessage).toSeq
-
-      val msg = ForecastFeedArrivalsDiffMessage(Option(now().millisSinceEpoch), removalsForDiff, updatesForDiff)
-      val updateRequests = diff.updates.map(a => MergeArrivalsRequest(SDate(a.scheduled).toUtcDate)).toSet
-      val removalRequests = diff.removals.map(ua => MergeArrivalsRequest(SDate(ua.scheduled).toUtcDate)).toSet
-
-      persistAndMaybeSnapshotWithAck(msg, List((sender(), updateRequests ++ removalRequests)))
-    }
-  }
-
-  override def processRecoveryMessage: PartialFunction[Any, Unit] = {
-    case FlightsWithSplitsDiffMessage(Some(createdAt), removals, updates) =>
-      maybePointInTime match {
-        case Some(pit) if pit < createdAt =>
-          log.debug(s"Ignoring diff created more recently than the recovery point in time")
-        case _ =>
-          if (isBeforeCutoff(createdAt))
-            restorer.remove(uniqueArrivalsFromMessages(removals))
-
-          val incomingFws = updates.map(flightWithSplitsFromMessage).map(fws => (fws.unique, fws)).toMap
-          val updateFws: (Option[ApiFlightWithSplits], ApiFlightWithSplits) => Option[ApiFlightWithSplits] = (maybeExisting, newFws) =>
-            Option(maybeExisting.map(_.update(newFws)).getOrElse(newFws))
-          restorer.applyUpdates(incomingFws, updateFws)
-      }
-
-    case FlightsDiffMessage(Some(createdAt), removals, updates, _) =>
-      maybePointInTime match {
-        case Some(pit) if pit < createdAt =>
-          log.debug(s"Ignoring diff created more recently than the recovery point in time")
-        case _ =>
-          if (isBeforeCutoff(createdAt))
-            restorer.remove(uniqueArrivalsFromMessages(removals))
-
-          val incomingArrivals = updates.map(flightMessageToApiFlight).map(a => (a.unique, a)).toMap
-          val updateFws: (Option[ApiFlightWithSplits], Arrival) => Option[ApiFlightWithSplits] = (maybeExistingFws, incoming) => {
-            val updated = maybeExistingFws
-              .map(existingFws => existingFws.copy(apiFlight = existingFws.apiFlight.update(incoming)))
-              .getOrElse(ApiFlightWithSplits(incoming, Set(), Option(createdAt)))
-              .copy(lastUpdated = Option(createdAt))
-            Option(updated)
-          }
-
-          restorer.applyUpdates(incomingArrivals, updateFws)
-      }
-
-    case msg@SplitsForArrivalsMessage(Some(createdAt), _) =>
-      maybePointInTime match {
-        case Some(pit) if pit < createdAt =>
-          log.debug(s"Ignoring diff created more recently than the recovery point in time")
-        case _ =>
-          val incomingSplits = splitsForArrivalsFromMessage(msg).splits
-          val updateFws: (Option[ApiFlightWithSplits], Set[Splits]) => Option[ApiFlightWithSplits] = (maybeFws, incoming) => {
-            maybeFws.map(fws => SplitsForArrivals.updateFlightWithSplits(fws, incoming, createdAt))
-          }
-          restorer.applyUpdates(incomingSplits, updateFws)
-      }
-  }
-
-  override def processSnapshotMessage: PartialFunction[Any, Unit] = {
-    case m: FlightsWithSplitsMessage =>
-      val flights = m.flightWithSplits.map(FlightMessageConversion.flightWithSplitsFromMessage)
-      restorer.applyUpdates(flights)
+  override val processQuery: Command => Any = {
+    case GetState => state
   }
 }
 
