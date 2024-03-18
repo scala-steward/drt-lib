@@ -95,12 +95,12 @@ object TerminalDayFeedArrivalActor {
       case (acc, a) =>
         state.get(a.unique) match {
           case Some(existing) if existing != a =>
-            acc :+ arrivalToMessage
+            acc :+ arrivalToMessage(a)
           case _ => acc
         }
     }
 
-  private def validateDiff[A <: FeedArrival](diff: FeedArrivalsDiff[A], state: Map[UniqueArrival, A]): FeedArrivalsDiff[LiveArrival] = {
+  private def validateDiff[A <: FeedArrival](diff: FeedArrivalsDiff[A], state: Map[UniqueArrival, A]): FeedArrivalsDiff[A] = {
     diff.copy(
       updates = diff.updates.filterNot(u => state.get(u.unique).contains(u)),
       removals = diff.removals.filter(state.contains),

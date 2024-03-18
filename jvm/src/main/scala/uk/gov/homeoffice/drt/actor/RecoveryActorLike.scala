@@ -14,7 +14,7 @@ object Sizes {
 }
 
 trait RecoveryActorLike extends PersistentActor with RecoveryLogging {
-  val log: Logger
+  protected val log: Logger
 
   val recoveryStartMillis: MillisSinceEpoch = SDate.now().millisSinceEpoch
   var messageRecoveryStartMillis: Option[MillisSinceEpoch] = None

@@ -1,36 +1,17 @@
 package uk.gov.homeoffice.drt.protobuf.serialisation
 
-import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.arrivals.{FlightCode, ForecastArrival, LiveArrival}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.protobuf.messages.FeedArrivalsMessage.{FeedArrivalStateSnapshotMessage, ForecastArrivalStateSnapshotMessage, ForecastFeedArrivalMessage, LiveArrivalStateSnapshotMessage, LiveFeedArrivalMessage}
-import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage.{FlightMessage, FlightStateSnapshotMessage}
+import uk.gov.homeoffice.drt.protobuf.messages.FeedArrivalsMessage.{ForecastArrivalStateSnapshotMessage, ForecastFeedArrivalMessage, LiveArrivalStateSnapshotMessage, LiveFeedArrivalMessage}
+import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage.FlightMessage
 import uk.gov.homeoffice.drt.protobuf.serialisation.FlightMessageConversion.getPassengerSources
 
 object FeedArrivalMessageConversion {
-  def forecastArrivalsFromSnapshot(msg: GeneratedMessage): Seq[ForecastArrival] =
-    msg match {
-      case FlightStateSnapshotMessage(flights, _) => flights.map(forecastArrivalFromLegacyMessage)
-      case msg: FeedArrivalStateSnapshotMessage => FeedArrivalMessageConversion.forecastArrivalsFromSnapshotMessage(msg)
-    }
-
   def forecastArrivalsToSnapshot(arrivals: Seq[ForecastArrival]): ForecastArrivalStateSnapshotMessage =
     ForecastArrivalStateSnapshotMessage(arrivals.map(forecastArrivalToMessage))
 
   def liveArrivalsToSnapshot(arrivals: Seq[LiveArrival]): LiveArrivalStateSnapshotMessage =
     LiveArrivalStateSnapshotMessage(arrivals.map(liveArrivalToMessage))
-
-  def liveArrivalsFromSnapshot(msg: GeneratedMessage): Seq[LiveArrival] =
-    msg match {
-      case FlightStateSnapshotMessage(flights, _) => flights.map(liveArrivalFromLegacyMessage)
-      case msg: FeedArrivalStateSnapshotMessage => FeedArrivalMessageConversion.liveArrivalsFromSnapshot(msg)
-    }
-
-  def forecastArrivalsFromSnapshotMessage(msg: FeedArrivalStateSnapshotMessage): Seq[ForecastArrival] =
-    msg.forecastArrivalMessages.map(forecastArrivalFromMessage)
-
-  def liveArrivalsFromSnapshotMessage(msg: FeedArrivalStateSnapshotMessage): Seq[LiveArrival] =
-    msg.liveArrivalMessages.map(liveArrivalFromMessage)
 
   def forecastArrivalToMessage(fa: ForecastArrival): ForecastFeedArrivalMessage =
     ForecastFeedArrivalMessage(
