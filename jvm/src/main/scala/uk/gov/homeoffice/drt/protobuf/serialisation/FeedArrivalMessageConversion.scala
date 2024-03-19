@@ -15,7 +15,7 @@ object  FeedArrivalMessageConversion {
 
   def forecastArrivalToMessage(fa: ForecastArrival): ForecastFeedArrivalMessage =
     ForecastFeedArrivalMessage(
-      operator = Option(fa.operator),
+      operator = fa.operator,
       maxPax = fa.maxPax,
       totalPax = fa.totalPax,
       terminal = Option(fa.terminal.toString),
@@ -28,7 +28,7 @@ object  FeedArrivalMessageConversion {
 
   def forecastArrivalFromMessage(msg: ForecastFeedArrivalMessage): ForecastArrival =
     ForecastArrival(
-      operator = msg.operator.getOrElse(""),
+      operator = msg.operator,
       maxPax = msg.maxPax,
       totalPax = msg.totalPax,
       transPax = msg.transPax,
@@ -42,7 +42,7 @@ object  FeedArrivalMessageConversion {
 
   def liveArrivalToMessage(fa: LiveArrival): LiveFeedArrivalMessage =
     LiveFeedArrivalMessage(
-      operator = Option(fa.operator),
+      operator = fa.operator,
       maxPax = fa.maxPax,
       totalPax = fa.totalPax,
       transPax = fa.transPax,
@@ -65,7 +65,7 @@ object  FeedArrivalMessageConversion {
 
   def liveArrivalFromMessage(msg: LiveFeedArrivalMessage): LiveArrival =
     LiveArrival(
-      operator = msg.operator.getOrElse(""),
+      operator = msg.operator,
       maxPax = msg.maxPax,
       totalPax = msg.totalPax,
       transPax = msg.transPax,
@@ -92,7 +92,7 @@ object  FeedArrivalMessageConversion {
     val (carrierCode, voyageNumber, suffix) = FlightCode.flightCodeToParts(bestFlightCode)
 
     ForecastArrival(
-      operator = msg.operator.getOrElse(""),
+      operator = msg.operator,
       maxPax = msg.maxPax,
       totalPax = totalPax,
       transPax = transPax,
@@ -111,7 +111,7 @@ object  FeedArrivalMessageConversion {
     val (carrierCode, voyageNumber, suffix) = FlightCode.flightCodeToParts(bestFlightCode)
 
     LiveArrival(
-      operator = msg.operator.getOrElse(""),
+      operator = msg.operator,
       maxPax = msg.maxPax,
       totalPax = totalPax,
       transPax = transPax,

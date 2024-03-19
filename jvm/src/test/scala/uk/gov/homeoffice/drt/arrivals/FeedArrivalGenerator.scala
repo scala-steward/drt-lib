@@ -3,7 +3,7 @@ package uk.gov.homeoffice.drt.arrivals
 import uk.gov.homeoffice.drt.ports.Terminals.{T1, Terminal}
 
 object FeedArrivalGenerator {
-  def live(operator: String = "",
+  def live(operator: Option[String] = None,
            maxPax: Option[Int] = None,
            totalPax: Option[Int] = None,
            transPax: Option[Int] = None,
@@ -45,7 +45,7 @@ object FeedArrivalGenerator {
       baggageReclaim = baggageReclaim,
     )
 
-  def forecast(operator: String = "",
+  def forecast(operator: Option[String] = None,
                maxPax: Option[Int] = None,
                totalPax: Option[Int] = None,
                transPax: Option[Int] = None,

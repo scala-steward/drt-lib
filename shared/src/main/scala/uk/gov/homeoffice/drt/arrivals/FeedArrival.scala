@@ -4,7 +4,7 @@ import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.ports.{FeedSource, PortCode}
 
 sealed trait FeedArrival extends WithUnique[UniqueArrival] with Updatable[FeedArrival] {
-  val operator: String
+  val operator: Option[String]
   val maxPax: Option[Int]
   val totalPax: Option[Int]
   val transPax: Option[Int]
@@ -21,7 +21,7 @@ sealed trait FeedArrival extends WithUnique[UniqueArrival] with Updatable[FeedAr
   def update(feedArrival: FeedArrival): FeedArrival
 }
 
-case class ForecastArrival(operator: String,
+case class ForecastArrival(operator: Option[String],
                            maxPax: Option[Int],
                            totalPax: Option[Int],
                            transPax: Option[Int],
@@ -40,7 +40,7 @@ case class ForecastArrival(operator: String,
   }
 
   override def toArrival(feedSource: FeedSource): Arrival = Arrival(
-    Operator = Option(Operator(operator)),
+    Operator = operator.map(Operator),
     CarrierCode = CarrierCode(carrierCode),
     VoyageNumber = VoyageNumber(voyageNumber),
     FlightCodeSuffix = flightCodeSuffix.map(FlightCodeSuffix),
@@ -68,7 +68,7 @@ case class ForecastArrival(operator: String,
   )
 }
 
-case class LiveArrival(operator: String,
+case class LiveArrival(operator: Option[String],
                        maxPax: Option[Int],
                        totalPax: Option[Int],
                        transPax: Option[Int],
@@ -107,7 +107,7 @@ case class LiveArrival(operator: String,
   }
 
   override def toArrival(feedSource: FeedSource): Arrival = Arrival(
-    Operator = Option(Operator(operator)),
+    Operator = operator.map(Operator),
     CarrierCode = CarrierCode(carrierCode),
     VoyageNumber = VoyageNumber(voyageNumber),
     FlightCodeSuffix = flightCodeSuffix.map(FlightCodeSuffix),
