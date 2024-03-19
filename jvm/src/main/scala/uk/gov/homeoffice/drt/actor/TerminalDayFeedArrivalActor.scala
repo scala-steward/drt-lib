@@ -1,36 +1,38 @@
 package uk.gov.homeoffice.drt.actor
 
 import scalapb.GeneratedMessage
-import uk.gov.homeoffice.drt.actor.TerminalDayFeedArrivalActor.{Command, GetState}
+import uk.gov.homeoffice.drt.actor.TerminalDayFeedArrivalActor.{GetState, Query}
 import uk.gov.homeoffice.drt.arrivals._
+import uk.gov.homeoffice.drt.ports.FeedSource
 import uk.gov.homeoffice.drt.ports.Terminals.{T1, Terminal}
-import uk.gov.homeoffice.drt.ports.{FeedSource, ForecastFeedSource}
 import uk.gov.homeoffice.drt.protobuf.messages.FeedArrivalsMessage.{ForecastArrivalStateSnapshotMessage, ForecastFeedArrivalsDiffMessage, LiveArrivalStateSnapshotMessage, LiveFeedArrivalsDiffMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage.UniqueArrivalMessage
 import uk.gov.homeoffice.drt.protobuf.serialisation.FlightMessageConversion._
 import uk.gov.homeoffice.drt.protobuf.serialisation.{FeedArrivalMessageConversion, FlightMessageConversion}
-import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 
-case class FeedArrivalsDiff[A <: FeedArrival](updates: Iterable[A], removals: Iterable[UniqueArrival]) {
-  lazy val isEmpty: Boolean = updates.isEmpty && removals.isEmpty
-  lazy val nonEmpty: Boolean = !isEmpty
-}
 
 object TerminalDayFeedArrivalActor {
-  trait Command
+  trait Query
 
-  object GetState extends Command
+  trait Event
 
-  val forecastDiffToMaybeMessage: PartialFunction[(FeedArrivalsDiff[ForecastArrival], Map[UniqueArrival, ForecastArrival]), Option[GeneratedMessage]] =
+  object GetState extends Query
+
+  case class FeedArrivalsDiff[A <: FeedArrival](updates: Iterable[A], removals: Iterable[UniqueArrival]) extends Event {
+    lazy val isEmpty: Boolean = updates.isEmpty && removals.isEmpty
+    lazy val nonEmpty: Boolean = !isEmpty
+  }
+
+  def forecastDiffToMaybeMessage(now: () => Long): PartialFunction[(Any, Map[UniqueArrival, ForecastArrival]), Option[GeneratedMessage]] =
     diffToMaybeMessage(
-      () => SDate.now(),
+      now,
       arrivalsToMessages(FeedArrivalMessageConversion.forecastArrivalToMessage),
       (n, u, msgs) => ForecastFeedArrivalsDiffMessage(Option(n), msgs, u)
     )
 
-  val liveDiffToMaybeMessage: PartialFunction[(FeedArrivalsDiff[LiveArrival], Map[UniqueArrival, LiveArrival]), Option[GeneratedMessage]] =
+  def liveDiffToMaybeMessage(now: () => Long): PartialFunction[(Any, Map[UniqueArrival, LiveArrival]), Option[GeneratedMessage]] =
     diffToMaybeMessage(
-      () => SDate.now(),
+      now,
       arrivalsToMessages(FeedArrivalMessageConversion.liveArrivalToMessage),
       (n, u, msgs) => LiveFeedArrivalsDiffMessage(Option(n), msgs, u)
     )
@@ -49,13 +51,13 @@ object TerminalDayFeedArrivalActor {
       (state -- removals) ++ updates.map(a => a.unique -> a)
   }
 
-  val forecastStateToSnapshotMessage: Map[UniqueArrival, ForecastArrival] => GeneratedMessage =
+  private val forecastStateToSnapshotMessage: Map[UniqueArrival, ForecastArrival] => GeneratedMessage =
     state => FeedArrivalMessageConversion.forecastArrivalsToSnapshot(state.values.toSeq)
 
-  val liveStateToSnapshotMessage: Map[UniqueArrival, LiveArrival] => GeneratedMessage =
+  private val liveStateToSnapshotMessage: Map[UniqueArrival, LiveArrival] => GeneratedMessage =
     state => FeedArrivalMessageConversion.liveArrivalsToSnapshot(state.values.toSeq)
 
-  val forecastStateFromSnapshotMessage: GeneratedMessage => Map[UniqueArrival, ForecastArrival] = {
+  private val forecastStateFromSnapshotMessage: GeneratedMessage => Map[UniqueArrival, ForecastArrival] = {
     case ForecastArrivalStateSnapshotMessage(arrivalMessages) =>
       arrivalMessages
         .map(FeedArrivalMessageConversion.forecastArrivalFromMessage)
@@ -63,7 +65,7 @@ object TerminalDayFeedArrivalActor {
         .toMap
   }
 
-  val liveStateFromSnapshotMessage: GeneratedMessage => Map[UniqueArrival, LiveArrival] = {
+  private val liveStateFromSnapshotMessage: GeneratedMessage => Map[UniqueArrival, LiveArrival] = {
     case LiveArrivalStateSnapshotMessage(arrivalMessages) =>
       arrivalMessages
         .map(FeedArrivalMessageConversion.liveArrivalFromMessage)
@@ -71,20 +73,24 @@ object TerminalDayFeedArrivalActor {
         .toMap
   }
 
-  private def diffToMaybeMessage[A <: FeedArrival, U, R]
-  (now: () => SDateLike,
+  private def diffToMaybeMessage[A <: FeedArrival, U]
+  (now: () => Long,
    arrivalsToMessages: (FeedArrivalsDiff[A], Map[UniqueArrival, A]) => U,
    toMessage: (Long, U, Seq[UniqueArrivalMessage]) => GeneratedMessage
-  ): PartialFunction[(FeedArrivalsDiff[A], Map[UniqueArrival, A]), Option[GeneratedMessage]] = {
-    case (diff, state) =>
+  ): PartialFunction[(Any, Map[UniqueArrival, A]), Option[GeneratedMessage]] = {
+    case (diff: FeedArrivalsDiff[A], state) =>
       val validatedDiff = validateDiff(diff, state)
       val updatesForDiff = arrivalsToMessages(diff, state)
       val removalsForDiff: Seq[UniqueArrivalMessage] = diff.removals.map(uniqueArrivalToMessage).toSeq
 
       if (validatedDiff.nonEmpty) {
-        val msg = toMessage(now().millisSinceEpoch, updatesForDiff, removalsForDiff)
+        val msg = toMessage(now(), updatesForDiff, removalsForDiff)
         Option(msg)
       } else None
+
+    case unexpected =>
+      log.error(s"Unexpected message: $unexpected")
+      None
   }
 
   private def arrivalsToMessages[A <: FeedArrival, M](arrivalToMessage: A => M)
@@ -94,9 +100,10 @@ object TerminalDayFeedArrivalActor {
     diff.updates.foldLeft(Seq.empty[M]) {
       case (acc, a) =>
         state.get(a.unique) match {
-          case Some(existing) if existing != a =>
+          case Some(existing) if existing == a =>
+            acc
+          case _ =>
             acc :+ arrivalToMessage(a)
-          case _ => acc
         }
     }
 
@@ -112,12 +119,15 @@ object TerminalDayFeedArrivalActor {
                day: Int,
                feedSource: FeedSource,
                maybePointInTime: Option[Long],
+               now: () => Long,
+               maxSnapshotInterval: Int = 250,
               ): TerminalDayFeedArrivalActor[ForecastArrival] = {
     new TerminalDayFeedArrivalActor(year, month, day, T1, feedSource, maybePointInTime,
-      eventToMaybeMessage = TerminalDayFeedArrivalActor.forecastDiffToMaybeMessage,
+      eventToMaybeMessage = TerminalDayFeedArrivalActor.forecastDiffToMaybeMessage(now),
       messageToState = TerminalDayFeedArrivalActor.forecastStateFromMessage,
       stateToSnapshotMessage = TerminalDayFeedArrivalActor.forecastStateToSnapshotMessage,
       stateFromSnapshotMessage = TerminalDayFeedArrivalActor.forecastStateFromSnapshotMessage,
+      maxSnapshotInterval = maxSnapshotInterval,
     )
   }
 
@@ -126,12 +136,15 @@ object TerminalDayFeedArrivalActor {
            day: Int,
            feedSource: FeedSource,
            maybePointInTime: Option[Long],
+           now: () => Long,
+           maxSnapshotInterval: Int = 250,
           ): TerminalDayFeedArrivalActor[LiveArrival] = {
     new TerminalDayFeedArrivalActor(year, month, day, T1, feedSource, maybePointInTime,
-      eventToMaybeMessage = TerminalDayFeedArrivalActor.liveDiffToMaybeMessage,
+      eventToMaybeMessage = TerminalDayFeedArrivalActor.liveDiffToMaybeMessage(now),
       messageToState = TerminalDayFeedArrivalActor.liveStateFromMessage,
       stateToSnapshotMessage = TerminalDayFeedArrivalActor.liveStateToSnapshotMessage,
       stateFromSnapshotMessage = TerminalDayFeedArrivalActor.liveStateFromSnapshotMessage,
+      maxSnapshotInterval = maxSnapshotInterval,
     )
   }
 }
@@ -142,22 +155,21 @@ class TerminalDayFeedArrivalActor[A <: FeedArrival](year: Int,
                                                     terminal: Terminal,
                                                     feedSource: FeedSource,
                                                     override val maybePointInTime: Option[Long],
-                                                    override val eventToMaybeMessage: PartialFunction[(FeedArrivalsDiff[A], Map[UniqueArrival, A]), Option[GeneratedMessage]],
+                                                    override val eventToMaybeMessage: PartialFunction[(Any, Map[UniqueArrival, A]), Option[GeneratedMessage]],
                                                     override val messageToState: (GeneratedMessage, Map[UniqueArrival, A]) => Map[UniqueArrival, A],
                                                     override val stateToSnapshotMessage: Map[UniqueArrival, A] => GeneratedMessage,
                                                     override val stateFromSnapshotMessage: GeneratedMessage => Map[UniqueArrival, A],
-                                                   )
-  extends PartitionActor[Map[UniqueArrival, A], FeedArrivalsDiff[A], Command] {
+                                                    override val maxSnapshotInterval: Int = 250,
+                                                   ) extends PartitionActor[Map[UniqueArrival, A], Query] {
   override def persistenceId: String = f"${feedSource.id}-feed-arrivals-${terminal.toString.toLowerCase}-$year-$month%02d-$day%02d"
 
-  override val emptyState: Map[UniqueArrival, A] = Map.empty
+  override def emptyState: Map[UniqueArrival, A] = Map.empty
 
   override val maybeMessageToMaybeAck: Option[GeneratedMessage] => Option[Any] =
     maybeMsg => Option(maybeMsg.nonEmpty)
 
-  private val maxSnapshotInterval = 250
-  override val maybeSnapshotInterval: Option[Int] = Option(maxSnapshotInterval)
-  override val processQuery: Command => Any = {
-    case GetState => state
+  override lazy val maybeSnapshotInterval: Option[Int] = Option(maxSnapshotInterval)
+  override val processQuery: PartialFunction[Any, Unit] = {
+    case GetState => sender() ! state
   }
 }

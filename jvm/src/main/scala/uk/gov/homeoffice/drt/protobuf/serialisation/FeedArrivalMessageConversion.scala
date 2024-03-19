@@ -6,7 +6,7 @@ import uk.gov.homeoffice.drt.protobuf.messages.FeedArrivalsMessage.{ForecastArri
 import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage.FlightMessage
 import uk.gov.homeoffice.drt.protobuf.serialisation.FlightMessageConversion.getPassengerSources
 
-object FeedArrivalMessageConversion {
+object  FeedArrivalMessageConversion {
   def forecastArrivalsToSnapshot(arrivals: Seq[ForecastArrival]): ForecastArrivalStateSnapshotMessage =
     ForecastArrivalStateSnapshotMessage(arrivals.map(forecastArrivalToMessage))
 

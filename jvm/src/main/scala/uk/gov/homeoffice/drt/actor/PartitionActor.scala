@@ -6,21 +6,21 @@ import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.time.SDate
 
 
-trait PartitionActor[S, E, Q] extends RecoveryActorLike {
+trait PartitionActor[S, Q] extends RecoveryActorLike {
   def emptyState: S
 
-  val eventToMaybeMessage: PartialFunction[(E, S), Option[GeneratedMessage]]
+  val eventToMaybeMessage: PartialFunction[(Any, S), Option[GeneratedMessage]]
   val messageToState: (GeneratedMessage, S) => S
   val maybeMessageToMaybeAck: Option[GeneratedMessage] => Option[Any]
 
   val stateToSnapshotMessage: S => GeneratedMessage
   val stateFromSnapshotMessage: GeneratedMessage => S
 
-  val processQuery: Q => Any
+  val processQuery: PartialFunction[Any, Unit]
 
   def maybePointInTime: Option[Long]
 
-  lazy val loggerSuffix: String = maybePointInTime match {
+  private lazy val loggerSuffix: String = maybePointInTime match {
     case None => ""
     case Some(pit) => f"@${SDate(pit).toISOString}"
   }
@@ -29,24 +29,27 @@ trait PartitionActor[S, E, Q] extends RecoveryActorLike {
 
   var state: S = emptyState
 
-  private val maxSnapshotInterval = 250
-  override val maybeSnapshotInterval: Option[Int] = Option(maxSnapshotInterval)
+  protected val maxSnapshotInterval = 250
+  override lazy val maybeSnapshotInterval: Option[Int] = Option(maxSnapshotInterval)
 
   override def stateToMessage: GeneratedMessage = stateToSnapshotMessage(state)
 
   override def processSnapshotMessage: PartialFunction[Any, Unit] = {
-    case msg: GeneratedMessage => stateFromSnapshotMessage(msg)
+    case msg: GeneratedMessage =>
+      state = stateFromSnapshotMessage(msg)
   }
 
   override def processRecoveryMessage: PartialFunction[GeneratedMessage, Unit] = {
-    case msg => state = messageToState(msg, state)
+    case msg =>
+      state = messageToState(msg, state)
   }
 
-  override def receiveCommand: Receive = {
-    case query: Q =>
-      sender() ! processQuery(query)
+  private def receiveEvent: Receive = {
+    case SaveSnapshotSuccess(metadata) =>
+      log.info(s"Snapshot saved: $metadata")
+      ackIfRequired()
 
-    case event: E =>
+    case event =>
       val maybeMsg = eventToMaybeMessage(event, state)
       val maybeAck = maybeMessageToMaybeAck(maybeMsg)
       maybeMsg match {
@@ -57,11 +60,7 @@ trait PartitionActor[S, E, Q] extends RecoveryActorLike {
         case None =>
           maybeAck.foreach(sender() ! _)
       }
-
-    case _: SaveSnapshotSuccess =>
-      ackIfRequired()
-
-    case m => log.error(s"Got unexpected message: $m")
   }
+  override def receiveCommand: Receive = processQuery orElse receiveEvent
 }
 

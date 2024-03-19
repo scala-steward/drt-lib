@@ -59,6 +59,7 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "joda-time" % "joda-time" % jodaVersion,
       "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion,
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
+      "com.typesafe.akka" %% "akka-persistence-testkit" % akkaVersion % "test",
       "com.typesafe.slick" %% "slick" % slickVersion,
       "io.spray" %% "spray-json" % sprayJsonVersion,
       "com.h2database" % "h2" % h2Version % Test

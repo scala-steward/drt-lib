@@ -5,6 +5,7 @@ import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.protobuf.messages.Alert.{Alert, AlertSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.CrunchState.{RemoveMergeArrivalsRequestMessage, _}
 import uk.gov.homeoffice.drt.protobuf.messages.EgateBanksUpdates.{PortEgateBanksUpdatesMessage, RemoveEgateBanksUpdateMessage, SetEgateBanksUpdateMessage}
+import uk.gov.homeoffice.drt.protobuf.messages.FeedArrivalsMessage.{ForecastArrivalStateSnapshotMessage, ForecastFeedArrivalsDiffMessage, LiveArrivalStateSnapshotMessage, LiveFeedArrivalsDiffMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.FixedPointMessage.{FixedPointMessage, FixedPointsMessage, FixedPointsStateSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage._
 import uk.gov.homeoffice.drt.protobuf.messages.FlightsSummary.FlightsSummaryMessage
@@ -89,6 +90,10 @@ class Serializer extends SerializerWithStringManifest {
   final val PassengersMinutes: String = classOf[PassengersMinutesMessage].getName
   final val SetSlasUpdate = classOf[SetSlaConfigMessage].getName
   final val RemoveSlasUpdate = classOf[Configs.RemoveConfigMessage].getName
+  final val LiveFeedArrivalsDiff = classOf[LiveFeedArrivalsDiffMessage].getName
+  final val ForecastFeedArrivalsDiff = classOf[ForecastFeedArrivalsDiffMessage].getName
+  final val LiveArrivalStateSnapshot = classOf[LiveArrivalStateSnapshotMessage].getName
+  final val ForecastArrivalStateSnapshot = classOf[ForecastArrivalStateSnapshotMessage].getName
 
   override def toBinary(objectToSerialize: AnyRef): Array[Byte] = objectToSerialize match {
     case m: GeneratedMessage => m.toByteArray
@@ -160,6 +165,10 @@ class Serializer extends SerializerWithStringManifest {
       case PassengersMinutes => PassengersMinutesMessage.parseFrom(bytes)
       case SetSlasUpdate => SetSlaConfigMessage.parseFrom(bytes)
       case RemoveSlasUpdate => Configs.RemoveConfigMessage.parseFrom(bytes)
+      case LiveFeedArrivalsDiff => LiveFeedArrivalsDiffMessage.parseFrom(bytes)
+      case ForecastFeedArrivalsDiff => ForecastFeedArrivalsDiffMessage.parseFrom(bytes)
+      case LiveArrivalStateSnapshot => LiveArrivalStateSnapshotMessage.parseFrom(bytes)
+      case ForecastArrivalStateSnapshot => ForecastArrivalStateSnapshotMessage.parseFrom(bytes)
     }
   }
 }
