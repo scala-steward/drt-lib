@@ -12,6 +12,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 import uk.gov.homeoffice.drt.actor.TerminalDayFeedArrivalActor.{FeedArrivalsDiff, GetState}
 import uk.gov.homeoffice.drt.arrivals.{FeedArrival, FeedArrivalGenerator, UniqueArrival}
+import uk.gov.homeoffice.drt.ports.Terminals.T1
 import uk.gov.homeoffice.drt.ports.{AclFeedSource, LiveFeedSource}
 import uk.gov.homeoffice.drt.protobuf.messages.FeedArrivalsMessage.{ForecastFeedArrivalsDiffMessage, LiveFeedArrivalsDiffMessage}
 import uk.gov.homeoffice.drt.protobuf.serialisation.FeedArrivalMessageConversion
@@ -94,7 +95,7 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
 
   "TerminalDayFeedArrivalActor for live arrivals" should {
     val arrival = FeedArrivalGenerator.live()
-    def props(snapshotThreshold: Int) = Props(TerminalDayFeedArrivalActor.live(2024, 6, 1, LiveFeedSource, None, myNow, snapshotThreshold))
+    def props(snapshotThreshold: Int) = Props(TerminalDayFeedArrivalActor.live(2024, 6, 1, T1, LiveFeedSource, None, myNow, snapshotThreshold))
     "respond with an empty map when asked for the latest arrivals" in {
       val terminalDayFeedArrivalActor = system.actorOf(props(2))
       terminalDayFeedArrivalActor ! GetState
@@ -137,7 +138,7 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
 
   "TerminalDayFeedArrivalActor for forecast arrivals" should {
     val arrival = FeedArrivalGenerator.forecast()
-    def props(snapshotThreshold: Int) = Props(TerminalDayFeedArrivalActor.forecast(2024, 6, 1, AclFeedSource, None, myNow, snapshotThreshold))
+    def props(snapshotThreshold: Int) = Props(TerminalDayFeedArrivalActor.forecast(2024, 6, 1, T1, AclFeedSource, None, myNow, snapshotThreshold))
     "respond with an empty map when asked for the latest arrivals" in {
       val terminalDayFeedArrivalActor = system.actorOf(props(2))
       terminalDayFeedArrivalActor ! GetState

@@ -4,7 +4,7 @@ import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.actor.TerminalDayFeedArrivalActor.{GetState, Query}
 import uk.gov.homeoffice.drt.arrivals._
 import uk.gov.homeoffice.drt.ports.FeedSource
-import uk.gov.homeoffice.drt.ports.Terminals.{T1, Terminal}
+import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.protobuf.messages.FeedArrivalsMessage.{ForecastArrivalStateSnapshotMessage, ForecastFeedArrivalsDiffMessage, LiveArrivalStateSnapshotMessage, LiveFeedArrivalsDiffMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage.UniqueArrivalMessage
 import uk.gov.homeoffice.drt.protobuf.serialisation.FlightMessageConversion._
@@ -117,12 +117,13 @@ object TerminalDayFeedArrivalActor {
   def forecast(year: Int,
                month: Int,
                day: Int,
+               terminal: Terminal,
                feedSource: FeedSource,
                maybePointInTime: Option[Long],
                now: () => Long,
                maxSnapshotInterval: Int = 250,
               ): TerminalDayFeedArrivalActor[ForecastArrival] = {
-    new TerminalDayFeedArrivalActor(year, month, day, T1, feedSource, maybePointInTime,
+    new TerminalDayFeedArrivalActor(year, month, day, terminal, feedSource, maybePointInTime,
       eventToMaybeMessage = TerminalDayFeedArrivalActor.forecastDiffToMaybeMessage(now),
       messageToState = TerminalDayFeedArrivalActor.forecastStateFromMessage,
       stateToSnapshotMessage = TerminalDayFeedArrivalActor.forecastStateToSnapshotMessage,
@@ -134,12 +135,13 @@ object TerminalDayFeedArrivalActor {
   def live(year: Int,
            month: Int,
            day: Int,
+           terminal: Terminal,
            feedSource: FeedSource,
            maybePointInTime: Option[Long],
            now: () => Long,
            maxSnapshotInterval: Int = 250,
           ): TerminalDayFeedArrivalActor[LiveArrival] = {
-    new TerminalDayFeedArrivalActor(year, month, day, T1, feedSource, maybePointInTime,
+    new TerminalDayFeedArrivalActor(year, month, day, terminal, feedSource, maybePointInTime,
       eventToMaybeMessage = TerminalDayFeedArrivalActor.liveDiffToMaybeMessage(now),
       messageToState = TerminalDayFeedArrivalActor.liveStateFromMessage,
       stateToSnapshotMessage = TerminalDayFeedArrivalActor.liveStateToSnapshotMessage,
