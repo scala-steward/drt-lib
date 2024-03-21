@@ -1,5 +1,6 @@
 package uk.gov.homeoffice.drt.actor
 
+import akka.actor.Props
 import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.actor.TerminalDayFeedArrivalActor.{GetState, Query}
 import uk.gov.homeoffice.drt.arrivals._
@@ -122,14 +123,14 @@ object TerminalDayFeedArrivalActor {
                maybePointInTime: Option[Long],
                now: () => Long,
                maxSnapshotInterval: Int = 250,
-              ): TerminalDayFeedArrivalActor[ForecastArrival] = {
-    new TerminalDayFeedArrivalActor(year, month, day, terminal, feedSource, maybePointInTime,
+              ): Props = {
+    Props(new TerminalDayFeedArrivalActor(year, month, day, terminal, feedSource, maybePointInTime,
       eventToMaybeMessage = TerminalDayFeedArrivalActor.forecastDiffToMaybeMessage(now),
       messageToState = TerminalDayFeedArrivalActor.forecastStateFromMessage,
       stateToSnapshotMessage = TerminalDayFeedArrivalActor.forecastStateToSnapshotMessage,
       stateFromSnapshotMessage = TerminalDayFeedArrivalActor.forecastStateFromSnapshotMessage,
       maxSnapshotInterval = maxSnapshotInterval,
-    )
+    ))
   }
 
   def live(year: Int,
@@ -140,14 +141,14 @@ object TerminalDayFeedArrivalActor {
            maybePointInTime: Option[Long],
            now: () => Long,
            maxSnapshotInterval: Int = 250,
-          ): TerminalDayFeedArrivalActor[LiveArrival] = {
-    new TerminalDayFeedArrivalActor(year, month, day, terminal, feedSource, maybePointInTime,
+          ): Props = {
+    Props(new TerminalDayFeedArrivalActor(year, month, day, terminal, feedSource, maybePointInTime,
       eventToMaybeMessage = TerminalDayFeedArrivalActor.liveDiffToMaybeMessage(now),
       messageToState = TerminalDayFeedArrivalActor.liveStateFromMessage,
       stateToSnapshotMessage = TerminalDayFeedArrivalActor.liveStateToSnapshotMessage,
       stateFromSnapshotMessage = TerminalDayFeedArrivalActor.liveStateFromSnapshotMessage,
       maxSnapshotInterval = maxSnapshotInterval,
-    )
+    ))
   }
 }
 

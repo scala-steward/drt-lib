@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.actor
 
-import akka.actor.{ActorSystem, Props}
+import akka.actor.ActorSystem
 import akka.pattern.ask
 import akka.persistence.testkit.scaladsl.PersistenceTestKit
 import akka.persistence.testkit.{PersistenceTestKitPlugin, PersistenceTestKitSnapshotPlugin}
@@ -95,7 +95,7 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
 
   "TerminalDayFeedArrivalActor for live arrivals" should {
     val arrival = FeedArrivalGenerator.live()
-    def props(snapshotThreshold: Int) = Props(TerminalDayFeedArrivalActor.live(2024, 6, 1, T1, LiveFeedSource, None, myNow, snapshotThreshold))
+    def props(snapshotThreshold: Int) = TerminalDayFeedArrivalActor.live(2024, 6, 1, T1, LiveFeedSource, None, myNow, snapshotThreshold)
     "respond with an empty map when asked for the latest arrivals" in {
       val terminalDayFeedArrivalActor = system.actorOf(props(2))
       terminalDayFeedArrivalActor ! GetState
@@ -138,7 +138,7 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
 
   "TerminalDayFeedArrivalActor for forecast arrivals" should {
     val arrival = FeedArrivalGenerator.forecast()
-    def props(snapshotThreshold: Int) = Props(TerminalDayFeedArrivalActor.forecast(2024, 6, 1, T1, AclFeedSource, None, myNow, snapshotThreshold))
+    def props(snapshotThreshold: Int) = TerminalDayFeedArrivalActor.forecast(2024, 6, 1, T1, AclFeedSource, None, myNow, snapshotThreshold)
     "respond with an empty map when asked for the latest arrivals" in {
       val terminalDayFeedArrivalActor = system.actorOf(props(2))
       terminalDayFeedArrivalActor ! GetState
