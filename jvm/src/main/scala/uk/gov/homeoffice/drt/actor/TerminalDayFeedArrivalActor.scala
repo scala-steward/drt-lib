@@ -2,6 +2,7 @@ package uk.gov.homeoffice.drt.actor
 
 import akka.actor.Props
 import scalapb.GeneratedMessage
+import uk.gov.homeoffice.drt.DataUpdates.FlightUpdates
 import uk.gov.homeoffice.drt.actor.TerminalDayFeedArrivalActor.{GetState, Query}
 import uk.gov.homeoffice.drt.arrivals._
 import uk.gov.homeoffice.drt.ports.FeedSource
@@ -19,7 +20,7 @@ object TerminalDayFeedArrivalActor {
 
   object GetState extends Query
 
-  case class FeedArrivalsDiff[A <: FeedArrival](updates: Iterable[A], removals: Iterable[UniqueArrival]) extends Event {
+  case class FeedArrivalsDiff[A <: FeedArrival](updates: Iterable[A], removals: Iterable[UniqueArrival]) extends Event with FlightUpdates {
     lazy val isEmpty: Boolean = updates.isEmpty && removals.isEmpty
     lazy val nonEmpty: Boolean = !isEmpty
   }
