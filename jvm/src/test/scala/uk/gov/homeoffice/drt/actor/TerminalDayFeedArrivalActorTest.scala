@@ -10,7 +10,7 @@ import com.typesafe.config.ConfigFactory
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
-import uk.gov.homeoffice.drt.actor.TerminalDayFeedArrivalActor.{FeedArrivalsDiff, GetState}
+import uk.gov.homeoffice.drt.actor.TerminalDayFeedArrivalActor.GetState
 import uk.gov.homeoffice.drt.arrivals.{FeedArrival, FeedArrivalGenerator, UniqueArrival}
 import uk.gov.homeoffice.drt.ports.Terminals.T1
 import uk.gov.homeoffice.drt.ports.{AclFeedSource, LiveFeedSource}
@@ -44,16 +44,16 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
   "liveDiffToMaybeMessage" should {
     "return a diff message containing the arrival not already existing in the state" in {
       val arrival = FeedArrivalGenerator.live()
-      val feedArrivalsDiff = FeedArrivalsDiff(List(arrival), List())
-      val maybeMessage = TerminalDayFeedArrivalActor.liveDiffToMaybeMessage(myNow)(feedArrivalsDiff, Map.empty)
+      val feedArrivals = Seq(arrival)
+      val maybeMessage = TerminalDayFeedArrivalActor.liveArrivalsToMaybeDiffMessage(myNow, processRemovals = false)(feedArrivals, Map.empty)
       val arrivalMsg = FeedArrivalMessageConversion.liveArrivalToMessage(arrival)
 
       maybeMessage shouldBe Option(LiveFeedArrivalsDiffMessage(Option(1L), List(), List(arrivalMsg)))
     }
-    "return an empty diff message when the arriavl already exists in the state" in {
+    "return an empty diff message when the arrival already exists in the state" in {
       val arrival = FeedArrivalGenerator.live()
-      val feedArrivalsDiff = FeedArrivalsDiff(List(arrival), List())
-      val maybeMessage = TerminalDayFeedArrivalActor.liveDiffToMaybeMessage(myNow)(feedArrivalsDiff, Map(arrival.unique -> arrival))
+      val feedArrivals = Seq(arrival)
+      val maybeMessage = TerminalDayFeedArrivalActor.liveArrivalsToMaybeDiffMessage(myNow, processRemovals = false)(feedArrivals, Map(arrival.unique -> arrival))
       maybeMessage.isDefined shouldBe false
     }
   }
@@ -61,16 +61,16 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
   "forecastDiffToMaybeMessage" should {
     "return a diff message containing the arrival not already existing in the state" in {
       val arrival = FeedArrivalGenerator.forecast()
-      val feedArrivalsDiff = FeedArrivalsDiff(List(arrival), List())
-      val maybeMessage = TerminalDayFeedArrivalActor.forecastDiffToMaybeMessage(myNow)(feedArrivalsDiff, Map.empty)
+      val feedArrivals = Seq(arrival)
+      val maybeMessage = TerminalDayFeedArrivalActor.forecastArrivalsToMaybeDiffMessage(myNow, processRemovals = false)(feedArrivals, Map.empty)
       val arrivalMsg = FeedArrivalMessageConversion.forecastArrivalToMessage(arrival)
 
       maybeMessage shouldBe Option(ForecastFeedArrivalsDiffMessage(Option(1L), List(), List(arrivalMsg)))
     }
     "return an empty diff message when the arriavl already exists in the state" in {
       val arrival = FeedArrivalGenerator.forecast()
-      val feedArrivalsDiff = FeedArrivalsDiff(List(arrival), List())
-      val maybeMessage = TerminalDayFeedArrivalActor.forecastDiffToMaybeMessage(myNow)(feedArrivalsDiff, Map(arrival.unique -> arrival))
+      val feedArrivals = Seq(arrival)
+      val maybeMessage = TerminalDayFeedArrivalActor.forecastArrivalsToMaybeDiffMessage(myNow, processRemovals = false)(feedArrivals, Map(arrival.unique -> arrival))
       maybeMessage.isDefined shouldBe false
     }
   }
@@ -103,15 +103,15 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
     }
     "take a FeedArrivalsDiff and respond with the updated state" in {
       val terminalDayFeedArrivalActor = system.actorOf(props(2))
-      val feedArrivalsDiff = FeedArrivalsDiff(List(arrival), List())
-      Await.ready(terminalDayFeedArrivalActor.ask(feedArrivalsDiff), 1.second)
+      val feedArrivals = Seq(arrival)
+      Await.ready(terminalDayFeedArrivalActor.ask(feedArrivals), 1.second)
       terminalDayFeedArrivalActor ! GetState
       expectMsg(Map(arrival.unique -> arrival))
     }
     "recover previously persisted state using a snapshot" in {
       val terminalDayFeedArrivalActor = system.actorOf(props(1))
-      val feedArrivalsDiff = FeedArrivalsDiff(List(arrival), List())
-      Await.ready(terminalDayFeedArrivalActor.ask(feedArrivalsDiff), 1.second)
+      val feedArrivals = Seq(arrival)
+      Await.ready(terminalDayFeedArrivalActor.ask(feedArrivals), 1.second)
       watch(terminalDayFeedArrivalActor)
       terminalDayFeedArrivalActor ! akka.actor.PoisonPill
       expectMsgClass(classOf[akka.actor.Terminated])
@@ -123,8 +123,8 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
     }
     "recover previously persisted state using a replaying events" in {
       val terminalDayFeedArrivalActor = system.actorOf(props(2))
-      val feedArrivalsDiff = FeedArrivalsDiff(List(arrival), List())
-      Await.ready(terminalDayFeedArrivalActor.ask(feedArrivalsDiff), 1.second)
+      val feedArrivals = Seq(arrival)
+      Await.ready(terminalDayFeedArrivalActor.ask(feedArrivals), 1.second)
       watch(terminalDayFeedArrivalActor)
       terminalDayFeedArrivalActor ! akka.actor.PoisonPill
       expectMsgClass(classOf[akka.actor.Terminated])
@@ -138,7 +138,7 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
 
   "TerminalDayFeedArrivalActor for forecast arrivals" should {
     val arrival = FeedArrivalGenerator.forecast()
-    def props(snapshotThreshold: Int) = TerminalDayFeedArrivalActor.forecast(2024, 6, 1, T1, AclFeedSource, None, myNow, snapshotThreshold)
+    def props(snapshotThreshold: Int) = TerminalDayFeedArrivalActor.forecast(2024, 6, 1, T1, AclFeedSource, None, myNow, snapshotThreshold, processRemovals = true)
     "respond with an empty map when asked for the latest arrivals" in {
       val terminalDayFeedArrivalActor = system.actorOf(props(2))
       terminalDayFeedArrivalActor ! GetState
@@ -146,15 +146,15 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
     }
     "take a FeedArrivalsDiff and respond with the updated state" in {
       val terminalDayFeedArrivalActor = system.actorOf(props(2))
-      val feedArrivalsDiff = FeedArrivalsDiff(List(arrival), List())
-      Await.ready(terminalDayFeedArrivalActor.ask(feedArrivalsDiff), 1.second)
+      val feedArrivals = Seq(arrival)
+      Await.ready(terminalDayFeedArrivalActor.ask(feedArrivals), 1.second)
       terminalDayFeedArrivalActor ! GetState
       expectMsg(Map(arrival.unique -> arrival))
     }
     "recover previously persisted state using a snapshot" in {
       val terminalDayFeedArrivalActor = system.actorOf(props(1))
-      val feedArrivalsDiff = FeedArrivalsDiff(List(arrival), List())
-      Await.ready(terminalDayFeedArrivalActor.ask(feedArrivalsDiff), 1.second)
+      val feedArrivals = Seq(arrival)
+      Await.ready(terminalDayFeedArrivalActor.ask(feedArrivals), 1.second)
       watch(terminalDayFeedArrivalActor)
       terminalDayFeedArrivalActor ! akka.actor.PoisonPill
       expectMsgClass(classOf[akka.actor.Terminated])
@@ -166,8 +166,8 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
     }
     "recover previously persisted state using a replaying events" in {
       val terminalDayFeedArrivalActor = system.actorOf(props(2))
-      val feedArrivalsDiff = FeedArrivalsDiff(List(arrival), List())
-      Await.ready(terminalDayFeedArrivalActor.ask(feedArrivalsDiff), 1.second)
+      val feedArrivals = Seq(arrival)
+      Await.ready(terminalDayFeedArrivalActor.ask(feedArrivals), 1.second)
       watch(terminalDayFeedArrivalActor)
       terminalDayFeedArrivalActor ! akka.actor.PoisonPill
       expectMsgClass(classOf[akka.actor.Terminated])

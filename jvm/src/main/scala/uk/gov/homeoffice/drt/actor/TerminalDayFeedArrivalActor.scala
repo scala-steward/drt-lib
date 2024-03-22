@@ -25,18 +25,24 @@ object TerminalDayFeedArrivalActor {
     lazy val nonEmpty: Boolean = !isEmpty
   }
 
-  def forecastDiffToMaybeMessage(now: () => Long): PartialFunction[(Any, Map[UniqueArrival, ForecastArrival]), Option[GeneratedMessage]] =
+  def forecastArrivalsToMaybeDiffMessage(now: () => Long,
+                                         processRemovals: Boolean,
+                                        ): PartialFunction[(Any, Map[UniqueArrival, ForecastArrival]), Option[GeneratedMessage]] =
     diffToMaybeMessage(
       now,
       arrivalsToMessages(FeedArrivalMessageConversion.forecastArrivalToMessage),
-      (n, u, msgs) => ForecastFeedArrivalsDiffMessage(Option(n), msgs, u)
+      (n, u, msgs) => ForecastFeedArrivalsDiffMessage(Option(n), msgs, u),
+      processRemovals
     )
 
-  def liveDiffToMaybeMessage(now: () => Long): PartialFunction[(Any, Map[UniqueArrival, LiveArrival]), Option[GeneratedMessage]] =
+  def liveArrivalsToMaybeDiffMessage(now: () => Long,
+                                     processRemovals: Boolean,
+                                    ): PartialFunction[(Any, Map[UniqueArrival, LiveArrival]), Option[GeneratedMessage]] =
     diffToMaybeMessage(
       now,
       arrivalsToMessages(FeedArrivalMessageConversion.liveArrivalToMessage),
-      (n, u, msgs) => LiveFeedArrivalsDiffMessage(Option(n), msgs, u)
+      (n, u, msgs) => LiveFeedArrivalsDiffMessage(Option(n), msgs, u),
+      processRemovals
     )
 
   def forecastStateFromMessage: (GeneratedMessage, Map[UniqueArrival, ForecastArrival]) => Map[UniqueArrival, ForecastArrival] = {
@@ -77,15 +83,19 @@ object TerminalDayFeedArrivalActor {
 
   private def diffToMaybeMessage[A <: FeedArrival, U]
   (now: () => Long,
-   arrivalsToMessages: (FeedArrivalsDiff[A], Map[UniqueArrival, A]) => U,
-   toMessage: (Long, U, Seq[UniqueArrivalMessage]) => GeneratedMessage
+   arrivalsToMessages: (Seq[A], Map[UniqueArrival, A]) => U,
+   toMessage: (Long, U, Seq[UniqueArrivalMessage]) => GeneratedMessage,
+   processRemovals: Boolean,
   ): PartialFunction[(Any, Map[UniqueArrival, A]), Option[GeneratedMessage]] = {
-    case (diff: FeedArrivalsDiff[A], state) =>
-      val validatedDiff = validateDiff(diff, state)
-      val updatesForDiff = arrivalsToMessages(diff, state)
-      val removalsForDiff: Seq[UniqueArrivalMessage] = diff.removals.map(uniqueArrivalToMessage).toSeq
+    case (arrivals: Seq[A], state) =>
+      val diff = createDiff(arrivals, state)
+      val updatesForDiff = arrivalsToMessages(arrivals, state)
+      val removalsForDiff = {
+        if (processRemovals)diff.removals.map(uniqueArrivalToMessage).toSeq
+        else Seq.empty
+      }
 
-      if (validatedDiff.nonEmpty) {
+      if (diff.nonEmpty) {
         val msg = toMessage(now(), updatesForDiff, removalsForDiff)
         Option(msg)
       } else None
@@ -96,10 +106,10 @@ object TerminalDayFeedArrivalActor {
   }
 
   private def arrivalsToMessages[A <: FeedArrival, M](arrivalToMessage: A => M)
-                                                     (diff: FeedArrivalsDiff[A],
+                                                     (arrivals: Seq[A],
                                                       state: Map[UniqueArrival, A],
                                                      ): Seq[M] =
-    diff.updates.foldLeft(Seq.empty[M]) {
+    arrivals.foldLeft(Seq.empty[M]) {
       case (acc, a) =>
         state.get(a.unique) match {
           case Some(existing) if existing == a =>
@@ -109,11 +119,10 @@ object TerminalDayFeedArrivalActor {
         }
     }
 
-  private def validateDiff[A <: FeedArrival](diff: FeedArrivalsDiff[A], state: Map[UniqueArrival, A]): FeedArrivalsDiff[A] = {
-    diff.copy(
-      updates = diff.updates.filterNot(u => state.get(u.unique).contains(u)),
-      removals = diff.removals.filter(state.contains),
-    )
+  private def createDiff[A <: FeedArrival](arrivals: Seq[A], state: Map[UniqueArrival, A]): FeedArrivalsDiff[A] = {
+    val updates = arrivals.filterNot(a => state.get(a.unique).contains(a))
+    val removals = state.keySet -- arrivals.map(_.unique)
+    FeedArrivalsDiff(updates, removals)
   }
 
   def forecast(year: Int,
@@ -124,9 +133,10 @@ object TerminalDayFeedArrivalActor {
                maybePointInTime: Option[Long],
                now: () => Long,
                maxSnapshotInterval: Int = 250,
+               processRemovals: Boolean,
               ): Props = {
     Props(new TerminalDayFeedArrivalActor(year, month, day, terminal, feedSource, maybePointInTime,
-      eventToMaybeMessage = TerminalDayFeedArrivalActor.forecastDiffToMaybeMessage(now),
+      eventToMaybeMessage = TerminalDayFeedArrivalActor.forecastArrivalsToMaybeDiffMessage(now, processRemovals),
       messageToState = TerminalDayFeedArrivalActor.forecastStateFromMessage,
       stateToSnapshotMessage = TerminalDayFeedArrivalActor.forecastStateToSnapshotMessage,
       stateFromSnapshotMessage = TerminalDayFeedArrivalActor.forecastStateFromSnapshotMessage,
@@ -144,7 +154,7 @@ object TerminalDayFeedArrivalActor {
            maxSnapshotInterval: Int = 250,
           ): Props = {
     Props(new TerminalDayFeedArrivalActor(year, month, day, terminal, feedSource, maybePointInTime,
-      eventToMaybeMessage = TerminalDayFeedArrivalActor.liveDiffToMaybeMessage(now),
+      eventToMaybeMessage = TerminalDayFeedArrivalActor.liveArrivalsToMaybeDiffMessage(now, processRemovals = false),
       messageToState = TerminalDayFeedArrivalActor.liveStateFromMessage,
       stateToSnapshotMessage = TerminalDayFeedArrivalActor.liveStateToSnapshotMessage,
       stateFromSnapshotMessage = TerminalDayFeedArrivalActor.liveStateFromSnapshotMessage,
