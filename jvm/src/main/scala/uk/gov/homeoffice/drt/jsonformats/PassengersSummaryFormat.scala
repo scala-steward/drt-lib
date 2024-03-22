@@ -11,7 +11,7 @@ import scala.collection.immutable.SortedMap
 object PassengersSummaryFormat extends DefaultJsonProtocol {
   implicit object JsonFormat extends RootJsonFormat[PassengersSummary] {
 
-    implicit val dt = LocalDateJsonFormat.JsonFormat
+    implicit val dt: LocalDateJsonFormat.JsonFormat.type = LocalDateJsonFormat.JsonFormat
 
     override def read(json: JsValue): PassengersSummary = {
       val obj = json.asJsObject
