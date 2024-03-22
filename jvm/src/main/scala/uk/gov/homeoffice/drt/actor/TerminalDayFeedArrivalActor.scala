@@ -125,7 +125,8 @@ object TerminalDayFeedArrivalActor {
     FeedArrivalsDiff(updates, removals)
   }
 
-  def forecast(year: Int,
+  def forecast(processRemovals: Boolean)
+              (year: Int,
                month: Int,
                day: Int,
                terminal: Terminal,
@@ -133,7 +134,6 @@ object TerminalDayFeedArrivalActor {
                maybePointInTime: Option[Long],
                now: () => Long,
                maxSnapshotInterval: Int = 250,
-               processRemovals: Boolean,
               ): Props = {
     Props(new TerminalDayFeedArrivalActor(year, month, day, terminal, feedSource, maybePointInTime,
       eventToMaybeMessage = TerminalDayFeedArrivalActor.forecastArrivalsToMaybeDiffMessage(now, processRemovals),
