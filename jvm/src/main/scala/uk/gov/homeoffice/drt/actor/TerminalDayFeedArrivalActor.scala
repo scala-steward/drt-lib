@@ -88,17 +88,14 @@ object TerminalDayFeedArrivalActor {
    processRemovals: Boolean,
   ): PartialFunction[(Any, Map[UniqueArrival, A]), Option[GeneratedMessage]] = {
     case (arrivals: Seq[A], state) =>
-      val diff = createDiff(arrivals, state)
+      val diff = createDiff(arrivals, state, processRemovals)
       val updatesForDiff = arrivalsToMessages(arrivals, state)
-      val removalsForDiff = {
-        if (processRemovals)diff.removals.map(uniqueArrivalToMessage).toSeq
-        else Seq.empty
-      }
+      val removalsForDiff = diff.removals.map(uniqueArrivalToMessage).toSeq
 
-      if (diff.nonEmpty) {
-        val msg = toMessage(now(), updatesForDiff, removalsForDiff)
-        Option(msg)
-      } else None
+      if (diff.nonEmpty)
+        Option(toMessage(now(), updatesForDiff, removalsForDiff))
+      else
+        None
 
     case unexpected =>
       log.error(s"Unexpected message: $unexpected")
@@ -119,9 +116,9 @@ object TerminalDayFeedArrivalActor {
         }
     }
 
-  private def createDiff[A <: FeedArrival](arrivals: Seq[A], state: Map[UniqueArrival, A]): FeedArrivalsDiff[A] = {
+  private def createDiff[A <: FeedArrival](arrivals: Seq[A], state: Map[UniqueArrival, A], processRemovals: Boolean): FeedArrivalsDiff[A] = {
     val updates = arrivals.filterNot(a => state.get(a.unique).contains(a))
-    val removals = state.keySet -- arrivals.map(_.unique)
+    val removals = if (processRemovals) state.keySet -- arrivals.map(_.unique) else Set.empty
     FeedArrivalsDiff(updates, removals)
   }
 

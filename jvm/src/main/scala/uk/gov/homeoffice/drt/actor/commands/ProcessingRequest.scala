@@ -15,6 +15,8 @@ sealed trait ProcessingRequest extends Ordered[ProcessingRequest] {
   lazy val duration = (end.millisSinceEpoch - start.millisSinceEpoch).milliseconds
   lazy val minutesInMillis: NumericRange[MillisSinceEpoch] = start.millisSinceEpoch until end.millisSinceEpoch by 60000
 
+  override def toString: String = s"${getClass.getSimpleName}(${date.getClass.getSimpleName} $date)"
+
   override def compare(that: ProcessingRequest): Int =
     if (date < that.date) -1
     else if (date > that.date) 1
