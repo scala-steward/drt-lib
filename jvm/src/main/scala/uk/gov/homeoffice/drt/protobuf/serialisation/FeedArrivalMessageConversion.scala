@@ -18,6 +18,7 @@ object  FeedArrivalMessageConversion {
       operator = fa.operator,
       maxPax = fa.maxPax,
       totalPax = fa.totalPax,
+      transPax = fa.transPax,
       terminal = Option(fa.terminal.toString),
       voyageNumber = Option(fa.voyageNumber),
       carrierCode = Option(fa.carrierCode),
