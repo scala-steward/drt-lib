@@ -5,7 +5,7 @@ import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.DataUpdates.FlightUpdates
 import uk.gov.homeoffice.drt.actor.TerminalDayFeedArrivalActor.{GetState, Query}
 import uk.gov.homeoffice.drt.arrivals._
-import uk.gov.homeoffice.drt.ports.FeedSource
+import uk.gov.homeoffice.drt.ports.{AclFeedSource, FeedSource, ForecastFeedSource}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.protobuf.messages.FeedArrivalsMessage.{ForecastArrivalStateSnapshotMessage, ForecastFeedArrivalsDiffMessage, LiveArrivalStateSnapshotMessage, LiveFeedArrivalsDiffMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage.UniqueArrivalMessage
@@ -158,6 +158,22 @@ object TerminalDayFeedArrivalActor {
       maxSnapshotInterval = maxSnapshotInterval,
     ))
   }
+
+  def props(year: Int,
+            month: Int,
+            day: Int,
+            terminal: Terminal,
+            feedSource: FeedSource,
+            maybePointInTime: Option[Long],
+            now: () => Long,
+            maxSnapshotInterval: Int = 250,
+           ): Props =
+    if (feedSource == AclFeedSource)
+      forecast(processRemovals = true)(year, month, day, terminal, feedSource, maybePointInTime, now, maxSnapshotInterval)
+    else if (feedSource == ForecastFeedSource)
+      forecast(processRemovals = false)(year, month, day, terminal, feedSource, maybePointInTime, now, maxSnapshotInterval)
+    else
+      live(year, month, day, terminal, feedSource, maybePointInTime, now, maxSnapshotInterval)
 }
 
 class TerminalDayFeedArrivalActor[A <: FeedArrival](year: Int,
