@@ -95,7 +95,7 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
 
   "TerminalDayFeedArrivalActor for live arrivals" should {
     val arrival = FeedArrivalGenerator.live()
-    def props(snapshotThreshold: Int) = TerminalDayFeedArrivalActor.live(2024, 6, 1, T1, LiveFeedSource, None, myNow, snapshotThreshold)
+    def props(snapshotThreshold: Int) = TerminalDayFeedArrivalActor.props(2024, 6, 1, T1, LiveFeedSource, None, myNow, snapshotThreshold)
     "respond with an empty map when asked for the latest arrivals" in {
       val terminalDayFeedArrivalActor = system.actorOf(props(2))
       terminalDayFeedArrivalActor ! GetState
@@ -138,7 +138,7 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
 
   "TerminalDayFeedArrivalActor for forecast arrivals" should {
     val arrival = FeedArrivalGenerator.forecast()
-    def props(snapshotThreshold: Int) = TerminalDayFeedArrivalActor.forecast(processRemovals = true)(2024, 6, 1, T1, AclFeedSource, None, myNow, snapshotThreshold)
+    def props(snapshotThreshold: Int) = TerminalDayFeedArrivalActor.props(2024, 6, 1, T1, AclFeedSource, None, myNow, snapshotThreshold)
     "respond with an empty map when asked for the latest arrivals" in {
       val terminalDayFeedArrivalActor = system.actorOf(props(2))
       terminalDayFeedArrivalActor ! GetState
