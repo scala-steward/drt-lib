@@ -5,7 +5,7 @@ import org.slf4j.Logger
 import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 
 trait RecoveryLogging {
-  val log: Logger
+  protected val log: Logger
 
   val prefix = "Recovery"
 
