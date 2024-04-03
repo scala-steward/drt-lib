@@ -22,7 +22,7 @@ object ArrivalsRemoval {
 class ArrivalsRestorer[A <: WithUnique[UniqueArrival] with Updatable[A]] {
   var arrivals: Map[UniqueArrival, A] = Map()
 
-  def removeHashLegacies(removals: Iterable[Int]): Unit = removals.foreach(keyToRemove => arrivals = arrivals.filterKeys(_.legacyUniqueId != keyToRemove).toMap)
+  def removeHashLegacies(removals: Iterable[Int]): Unit = removals.foreach(keyToRemove => arrivals = arrivals.view.filterKeys(_.legacyUniqueId != keyToRemove).toMap)
 
   def applyUpdates(updates: Iterable[A]): Unit = updates.foreach { update =>
     val updated = arrivals.get(update.unique).map(_.update(update)).getOrElse(update)
