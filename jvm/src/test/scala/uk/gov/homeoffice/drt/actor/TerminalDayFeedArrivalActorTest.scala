@@ -45,7 +45,7 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
     "return a diff message containing the arrival not already existing in the state" in {
       val arrival = FeedArrivalGenerator.live()
       val feedArrivals = Seq(arrival)
-      val maybeMessage = TerminalDayFeedArrivalActor.liveArrivalsToMaybeDiffMessage(myNow, processRemovals = false)(feedArrivals, Map.empty)
+      val maybeMessage = FeedArrivalMessageConversion.liveArrivalsToMaybeDiffMessage(myNow, processRemovals = false)(feedArrivals, Map.empty)
       val arrivalMsg = FeedArrivalMessageConversion.liveArrivalToMessage(arrival)
 
       maybeMessage shouldBe Option(LiveFeedArrivalsDiffMessage(Option(1L), List(), List(arrivalMsg)))
@@ -53,7 +53,7 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
     "return an empty diff message when the arrival already exists in the state" in {
       val arrival = FeedArrivalGenerator.live()
       val feedArrivals = Seq(arrival)
-      val maybeMessage = TerminalDayFeedArrivalActor.liveArrivalsToMaybeDiffMessage(myNow, processRemovals = false)(feedArrivals, Map(arrival.unique -> arrival))
+      val maybeMessage = FeedArrivalMessageConversion.liveArrivalsToMaybeDiffMessage(myNow, processRemovals = false)(feedArrivals, Map(arrival.unique -> arrival))
       maybeMessage.isDefined shouldBe false
     }
   }
@@ -62,15 +62,15 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
     "return a diff message containing the arrival not already existing in the state" in {
       val arrival = FeedArrivalGenerator.forecast()
       val feedArrivals = Seq(arrival)
-      val maybeMessage = TerminalDayFeedArrivalActor.forecastArrivalsToMaybeDiffMessage(myNow, processRemovals = false)(feedArrivals, Map.empty)
+      val maybeMessage = FeedArrivalMessageConversion.forecastArrivalsToMaybeDiffMessage(myNow, processRemovals = false)(feedArrivals, Map.empty)
       val arrivalMsg = FeedArrivalMessageConversion.forecastArrivalToMessage(arrival)
 
       maybeMessage shouldBe Option(ForecastFeedArrivalsDiffMessage(Option(1L), List(), List(arrivalMsg)))
     }
-    "return an empty diff message when the arriavl already exists in the state" in {
+    "return an empty diff message when the arrival already exists in the state" in {
       val arrival = FeedArrivalGenerator.forecast()
       val feedArrivals = Seq(arrival)
-      val maybeMessage = TerminalDayFeedArrivalActor.forecastArrivalsToMaybeDiffMessage(myNow, processRemovals = false)(feedArrivals, Map(arrival.unique -> arrival))
+      val maybeMessage = FeedArrivalMessageConversion.forecastArrivalsToMaybeDiffMessage(myNow, processRemovals = false)(feedArrivals, Map(arrival.unique -> arrival))
       maybeMessage.isDefined shouldBe false
     }
   }
@@ -79,7 +79,7 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
     "return a map containing the arrival from the message" in {
       val arrival = FeedArrivalGenerator.forecast()
       val arrivalMsg = ForecastFeedArrivalsDiffMessage(Option(1L), List(), List(FeedArrivalMessageConversion.forecastArrivalToMessage(arrival)))
-      val state = TerminalDayFeedArrivalActor.forecastStateFromMessage(arrivalMsg, Map.empty)
+      val state = FeedArrivalMessageConversion.forecastStateFromMessage(arrivalMsg, Map.empty)
       state shouldBe Map(arrival.unique -> arrival)
     }
   }
@@ -88,7 +88,7 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
     "return a map containing the arrival from the message" in {
       val arrival = FeedArrivalGenerator.live()
       val arrivalMsg = LiveFeedArrivalsDiffMessage(Option(1L), List(), List(FeedArrivalMessageConversion.liveArrivalToMessage(arrival)))
-      val state = TerminalDayFeedArrivalActor.liveStateFromMessage(arrivalMsg, Map.empty)
+      val state = FeedArrivalMessageConversion.liveStateFromMessage(arrivalMsg, Map.empty)
       state shouldBe Map(arrival.unique -> arrival)
     }
   }
