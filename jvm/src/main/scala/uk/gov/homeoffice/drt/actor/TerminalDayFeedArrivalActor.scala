@@ -87,7 +87,7 @@ class TerminalDayFeedArrivalActor[A <: FeedArrival](year: Int,
                                                     override val stateToSnapshotMessage: Map[UniqueArrival, A] => GeneratedMessage,
                                                     override val stateFromSnapshotMessage: GeneratedMessage => Map[UniqueArrival, A],
                                                     override val maxSnapshotInterval: Int = 250,
-                                                   ) extends PartitionActor[Map[UniqueArrival, A], Query] {
+                                                   ) extends PartitionActor[Map[UniqueArrival, A]] {
   override def persistenceId: String = f"${feedSource.id}-feed-arrivals-${terminal.toString.toLowerCase}-$year-$month%02d-$day%02d"
 
   override def emptyState: Map[UniqueArrival, A] = Map.empty

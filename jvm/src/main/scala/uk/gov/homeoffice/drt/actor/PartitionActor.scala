@@ -6,7 +6,7 @@ import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.time.SDate
 
 
-trait PartitionActor[S, Q] extends RecoveryActorLike {
+trait PartitionActor[S] extends RecoveryActorLike {
   def emptyState: S
 
   val eventToMaybeMessage: PartialFunction[(Any, S), Option[GeneratedMessage]]
