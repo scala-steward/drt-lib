@@ -122,7 +122,7 @@ object TerminalDayFeedArrivalActor {
     FeedArrivalsDiff(updates, removals)
   }
 
-  def forecast(processRemovals: Boolean)
+  private def forecast(processRemovals: Boolean)
               (year: Int,
                month: Int,
                day: Int,
@@ -141,7 +141,7 @@ object TerminalDayFeedArrivalActor {
     ))
   }
 
-  def live(year: Int,
+  private def live(year: Int,
            month: Int,
            day: Int,
            terminal: Terminal,
