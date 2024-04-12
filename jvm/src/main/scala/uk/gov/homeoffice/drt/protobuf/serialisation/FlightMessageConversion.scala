@@ -52,7 +52,7 @@ object FlightMessageConversion {
 
   def arrivalsDiffFromMessage(flightsDiffMessage: FlightsDiffMessage): ArrivalsDiff =
     ArrivalsDiff(
-      toUpdate = flightsDiffMessage.updates.map(flightMessageToApiFlight),
+      toUpdate = flightsDiffMessage.updates.map(flightMessageToApiFlight).filter(_.VoyageNumber.numeric > 0),
       toRemove = flightsDiffMessage.removals.map(uniqueArrivalFromMessage)
     )
 
