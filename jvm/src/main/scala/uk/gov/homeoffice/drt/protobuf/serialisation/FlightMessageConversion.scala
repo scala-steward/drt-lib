@@ -52,9 +52,12 @@ object FlightMessageConversion {
 
   def arrivalsDiffFromMessage(flightsDiffMessage: FlightsDiffMessage): ArrivalsDiff =
     ArrivalsDiff(
-      toUpdate = flightsDiffMessage.updates.map(flightMessageToApiFlight).filter(_.VoyageNumber.numeric > 0),
+      toUpdate = validFlightsFromMessages(flightsDiffMessage.updates),
       toRemove = flightsDiffMessage.removals.map(uniqueArrivalFromMessage)
     )
+
+  private def validFlightsFromMessages(messages: Seq[FlightMessage]): Seq[Arrival] =
+    messages.map(flightMessageToApiFlight).filter(_.VoyageNumber.numeric > 0)
 
   def splitsForArrivalsToMessage(splitsForArrivals: SplitsForArrivals, nowMillis: Long): SplitsForArrivalsMessage =
     SplitsForArrivalsMessage(
@@ -104,7 +107,7 @@ object FlightMessageConversion {
 
   def restoreArrivalsFromSnapshot(restorer: ArrivalsRestorer[Arrival],
                                   snMessage: FlightStateSnapshotMessage): Unit = {
-    restorer.applyUpdates(snMessage.flightMessages.map(flightMessageToApiFlight))
+    restorer.applyUpdates(validFlightsFromMessages(snMessage.flightMessages))
   }
 
   def feedStatusesFromSnapshotMessage(snMessage: FlightStateSnapshotMessage): Option[FeedStatuses] = {

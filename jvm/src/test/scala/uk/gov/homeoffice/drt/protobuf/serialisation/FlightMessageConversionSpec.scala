@@ -9,7 +9,7 @@ import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.Historical
 import uk.gov.homeoffice.drt.ports.Terminals.T1
 import uk.gov.homeoffice.drt.ports._
 import uk.gov.homeoffice.drt.prediction.arrival.OffScheduleModelAndFeatures
-import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage.FlightMessage
+import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage.{FlightMessage, FlightsDiffMessage}
 import uk.gov.homeoffice.drt.time.SDate
 
 class FlightMessageConversionSpec extends Specification {
@@ -160,6 +160,17 @@ class FlightMessageConversionSpec extends Specification {
       "Then the converted FlightsWithSplitsDiff should match the original" >> {
         restoredDiff === diff
       }
+    }
+  }
+
+  "Given a flight message with a zero voyage number and one with a non-zero voyage number" >> {
+    "When I ask for an arrivals diff I should only see the non-zero flight" >> {
+      val validArrival = arrival.copy(VoyageNumber = VoyageNumber(0))
+      val invalidArrival = arrival.copy(VoyageNumber = VoyageNumber(1))
+      val flightMessage1 = FlightMessageConversion.apiFlightToFlightMessage(validArrival)
+      val flightMessage2 = FlightMessageConversion.apiFlightToFlightMessage(invalidArrival)
+      val diff = FlightMessageConversion.arrivalsDiffFromMessage(FlightsDiffMessage(Option(1L), Seq(), Seq(flightMessage1, flightMessage2)))
+      diff.toUpdate.keySet === Set(invalidArrival.unique)
     }
   }
 
