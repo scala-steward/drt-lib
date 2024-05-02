@@ -1,10 +1,8 @@
 package uk.gov.homeoffice.drt.arrivals
 
 import uk.gov.homeoffice.drt.DataUpdates.FlightUpdates
-import uk.gov.homeoffice.drt.ports.{ApiFeedSource, FeedSource, HistoricApiFeedSource}
-import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.{ApiSplitsWithHistoricalEGateAndFTPercentages, Historical}
+import uk.gov.homeoffice.drt.ports.FeedSource
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.time.{SDateLike, UtcDate}
 import upickle.default.{macroRW, _}
 
 
@@ -41,23 +39,6 @@ case class ArrivalsDiff(toUpdate: Map[UniqueArrival, Arrival], toRemove: Iterabl
     ArrivalsDiff(updatedFlights, validRemovals)
   }
 
-  def splitByScheduledUtcDate(implicit millisToSdate: Long => SDateLike): List[(UtcDate, ArrivalsDiff)] = {
-    val updatesByDate = toUpdate.values.groupBy(d => millisToSdate(d.Scheduled).toUtcDate)
-    val removalsByDate = toRemove.groupBy(d => millisToSdate(d.scheduled).toUtcDate)
-
-    val dates = updatesByDate.keys ++ removalsByDate.keys
-
-    dates
-      .map { date =>
-        val updates = updatesByDate.getOrElse(date, Seq())
-        val removals = removalsByDate.getOrElse(date, Seq())
-
-        (date, ArrivalsDiff(updates, removals))
-      }
-      .toList
-      .sortBy(_._1)
-  }
-
   def forTerminal(terminal: Terminal): ArrivalsDiff = ArrivalsDiff(
     toUpdate.filter { case (_, arrival) => arrival.Terminal == terminal },
     toRemove.filter(_.terminal == terminal)
@@ -76,35 +57,40 @@ case class ArrivalsDiff(toUpdate: Map[UniqueArrival, Arrival], toRemove: Iterabl
 
   def updateMinutes(sourceOrderPreference: List[FeedSource]): Set[Long] = toUpdate.values.flatMap(_.pcpRange(sourceOrderPreference)).toSet
 
-  def applyTo(flightsWithSplits: FlightsWithSplits, nowMillis: Long, sourceOrderPreference: List[FeedSource]): (FlightsWithSplits, Set[Long]) = {
-    val updated = toUpdate.foldLeft(flightsWithSplits.flights) {
-      case (acc, (key, arrival)) =>
+  def applyTo(existingFlights: FlightsWithSplits, nowMillis: Long, sourceOrderPreference: List[FeedSource]): (FlightsWithSplits, Set[Long]) = {
+    val updated = toUpdate.foldLeft(existingFlights.flights) {
+      case (acc, (key, incomingArrival)) =>
         acc.get(key) match {
-          case Some(fws) =>
-            val (feedSources, paxSources) = fws.splits.foldLeft((arrival.FeedSources, arrival.PassengerSources)) {
-              case ((accFs, accPs), split) if Set(ApiSplitsWithHistoricalEGateAndFTPercentages, Historical).contains(split.source) =>
-                val totalPax = Option(split.totalPax)
-                val transPax = if (split.transPax > 0) Option(split.transPax) else None
-                val fs = if (split.source == ApiSplitsWithHistoricalEGateAndFTPercentages) ApiFeedSource else HistoricApiFeedSource
-                (accFs + fs, accPs + (fs -> Passengers(totalPax, transPax)))
-              case ((accFs, accPs), _) => (accFs, accPs)
-            }
-            val arrivalWithApiSources = arrival.copy(FeedSources = feedSources, PassengerSources = paxSources)
-            acc + (key -> fws.copy(apiFlight = arrivalWithApiSources, lastUpdated = Option(nowMillis)))
+          case Some(existing) =>
+//            val (feedSources, paxSources) = fws.splits.foldLeft((arrival.FeedSources, arrival.PassengerSources)) {
+//              case ((accFs, accPs), split) if Set(ApiSplitsWithHistoricalEGateAndFTPercentages, Historical).contains(split.source) =>
+//                val totalPax = Option(split.totalPax)
+//                val transPax = if (split.transPax > 0) Option(split.transPax) else None
+//                val fs = if (split.source == ApiSplitsWithHistoricalEGateAndFTPercentages) ApiFeedSource else HistoricApiFeedSource
+//                (accFs + fs, accPs + (fs -> Passengers(totalPax, transPax)))
+//              case ((accFs, accPs), _) => (accFs, accPs)
+//            }
+            val arrivalWithApiSources = incomingArrival.copy(
+              FeedSources = existing.apiFlight.FeedSources ++ incomingArrival.FeedSources,
+              PassengerSources = incomingArrival.PassengerSources.foldLeft(existing.apiFlight.PassengerSources) {
+                case (acc, (key, updated)) => acc.updated(key, updated)
+              },
+            )
+            acc + (key -> existing.copy(apiFlight = arrivalWithApiSources, lastUpdated = Option(nowMillis)))
           case None =>
-            acc + (key -> ApiFlightWithSplits(arrival, Set(), Option(nowMillis)))
+            acc + (key -> ApiFlightWithSplits(incomingArrival, Set(), Option(nowMillis)))
         }
     }
 
     val minusRemovals: Map[UniqueArrival, ApiFlightWithSplits] = ArrivalsRemoval.removeArrivals(toRemove, updated)
 
     val minutesFromRemovalsInExistingState: Set[Long] = toRemove
-      .flatMap { r => flightsWithSplits.flights.get(r).map(_.apiFlight.pcpRange(sourceOrderPreference)).getOrElse(List()) }
+      .flatMap { r => existingFlights.flights.get(r).map(_.apiFlight.pcpRange(sourceOrderPreference)).getOrElse(List()) }
       .toSet
 
     val minutesFromExistingStateUpdatedFlights = toUpdate
       .flatMap { case (unique, _) =>
-        flightsWithSplits.flights.get(unique) match {
+        existingFlights.flights.get(unique) match {
           case None => Set()
           case Some(f) => f.apiFlight.pcpRange(sourceOrderPreference)
         }
