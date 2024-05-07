@@ -62,21 +62,13 @@ case class ArrivalsDiff(toUpdate: Map[UniqueArrival, Arrival], toRemove: Iterabl
       case (acc, (key, incomingArrival)) =>
         acc.get(key) match {
           case Some(existing) =>
-//            val (feedSources, paxSources) = fws.splits.foldLeft((arrival.FeedSources, arrival.PassengerSources)) {
-//              case ((accFs, accPs), split) if Set(ApiSplitsWithHistoricalEGateAndFTPercentages, Historical).contains(split.source) =>
-//                val totalPax = Option(split.totalPax)
-//                val transPax = if (split.transPax > 0) Option(split.transPax) else None
-//                val fs = if (split.source == ApiSplitsWithHistoricalEGateAndFTPercentages) ApiFeedSource else HistoricApiFeedSource
-//                (accFs + fs, accPs + (fs -> Passengers(totalPax, transPax)))
-//              case ((accFs, accPs), _) => (accFs, accPs)
-//            }
             val arrivalWithApiSources = incomingArrival.copy(
               FeedSources = existing.apiFlight.FeedSources ++ incomingArrival.FeedSources,
               PassengerSources = incomingArrival.PassengerSources.foldLeft(existing.apiFlight.PassengerSources) {
                 case (acc, (key, updated)) => acc.updated(key, updated)
               },
             )
-            acc + (key -> existing.copy(apiFlight = arrivalWithApiSources, lastUpdated = Option(nowMillis)))
+            acc + (key -> existing.copy(apiFlight = existing.apiFlight.update(incomingArrival), lastUpdated = Option(nowMillis)))
           case None =>
             acc + (key -> ApiFlightWithSplits(incomingArrival, Set(), Option(nowMillis)))
         }

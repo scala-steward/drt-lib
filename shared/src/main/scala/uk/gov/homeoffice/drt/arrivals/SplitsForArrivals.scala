@@ -2,7 +2,7 @@ package uk.gov.homeoffice.drt.arrivals
 
 import uk.gov.homeoffice.drt.DataUpdates.FlightUpdates
 import uk.gov.homeoffice.drt.arrivals.SplitsForArrivals.updateFlightWithSplits
-import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages
+import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.{ApiSplitsWithHistoricalEGateAndFTPercentages, Historical}
 import uk.gov.homeoffice.drt.ports.{ApiFeedSource, FeedSource}
 import upickle.default.{macroRW, _}
 
@@ -60,11 +60,12 @@ case class SplitsForArrivals(splits: Map[UniqueArrival, Set[Splits]]) extends Fl
   }
 
   def applyTo(flightsWithSplits: FlightsWithSplits, nowMillis: Long, sourceOrderPreference: List[FeedSource]): (FlightsWithSplits, Set[Long]) = {
-    val minutesFromUpdates = splits.keys.flatMap { key =>
-      flightsWithSplits.flights.get(key) match {
-        case Some(fws) => fws.apiFlight.pcpRange(sourceOrderPreference)
-        case None => Iterable()
-      }
+    val minutesFromUpdates = splits.flatMap {
+      case (key, splits) =>
+        flightsWithSplits.flights.get(key) match {
+          case Some(fws) if splits.exists(_.source == ApiSplitsWithHistoricalEGateAndFTPercentages) => fws.apiFlight.pcpRange(sourceOrderPreference)
+          case _ => Iterable()
+        }
     }.toSet
     val updatedFlights = splits.foldLeft(flightsWithSplits.flights) {
       case (acc, (key, incoming)) =>
