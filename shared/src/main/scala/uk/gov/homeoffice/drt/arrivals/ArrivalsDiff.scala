@@ -62,12 +62,6 @@ case class ArrivalsDiff(toUpdate: Map[UniqueArrival, Arrival], toRemove: Iterabl
       case (acc, (key, incomingArrival)) =>
         acc.get(key) match {
           case Some(existing) =>
-            val arrivalWithApiSources = incomingArrival.copy(
-              FeedSources = existing.apiFlight.FeedSources ++ incomingArrival.FeedSources,
-              PassengerSources = incomingArrival.PassengerSources.foldLeft(existing.apiFlight.PassengerSources) {
-                case (acc, (key, updated)) => acc.updated(key, updated)
-              },
-            )
             acc + (key -> existing.copy(apiFlight = existing.apiFlight.update(incomingArrival), lastUpdated = Option(nowMillis)))
           case None =>
             acc + (key -> ApiFlightWithSplits(incomingArrival, Set(), Option(nowMillis)))
