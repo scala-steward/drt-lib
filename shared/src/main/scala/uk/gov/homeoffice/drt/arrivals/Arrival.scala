@@ -221,6 +221,10 @@ case class Arrival(Operator: Option[Operator],
       Gate = if (incoming.Gate.exists(_.nonEmpty)) incoming.Gate else this.Gate,
       RedListPax = if (incoming.RedListPax.nonEmpty) incoming.RedListPax else this.RedListPax,
       MaxPax = if (incoming.MaxPax.nonEmpty) incoming.MaxPax else this.MaxPax,
+      FeedSources = FeedSources ++ incoming.FeedSources,
+      PassengerSources = incoming.PassengerSources.foldLeft(PassengerSources) {
+        case (acc, (key, updated)) => acc.updated(key, updated)
+      },
     )
 
   lazy val hasNoPaxSource: Boolean = !PassengerSources.values.exists(_.actual.nonEmpty)

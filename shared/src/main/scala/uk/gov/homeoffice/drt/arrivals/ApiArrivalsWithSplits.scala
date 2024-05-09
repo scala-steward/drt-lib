@@ -1,5 +1,6 @@
 package uk.gov.homeoffice.drt.arrivals
 
+import uk.gov.homeoffice.drt.arrivals.ApiFlightWithSplits.liveApiTolerance
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages
 import uk.gov.homeoffice.drt.ports._
@@ -15,6 +16,8 @@ object ApiFlightWithSplits {
   implicit val rw: ReadWriter[ApiFlightWithSplits] = macroRW
 
   def fromArrival(arrival: Arrival): ApiFlightWithSplits = ApiFlightWithSplits(arrival, Set())
+
+  val liveApiTolerance: Double = 0.05
 }
 
 case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpdated: Option[Long] = None)
@@ -63,16 +66,9 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
     (maybeApiSplits, hasLiveSource, hasSimulationSource) match {
       case (Some(_), _, true) => true
       case (Some(_), false, _) => true
-      case (Some(api), true, _) if isWithinThreshold(api) => true
+      case (Some(api), true, _) if api.isWithinThreshold(apiFlight.PassengerSources.get(LiveFeedSource), liveApiTolerance) => true
       case _ => false
     }
-  }
-
-  def isWithinThreshold(apiSplits: Splits): Boolean = {
-    val apiPaxNo = apiSplits.totalExcludingTransferPax
-    val threshold: Double = 0.05
-    val portDirectPax = apiFlight.PassengerSources.get(LiveFeedSource).flatMap(_.getPcpPax).getOrElse(0)
-    apiPaxNo != 0 && (Math.abs(apiPaxNo - portDirectPax) / apiPaxNo) < threshold
   }
 
   override val unique: UniqueArrival = apiFlight.unique
