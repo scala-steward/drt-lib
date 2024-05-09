@@ -73,8 +73,8 @@ class SplitsForArrivalsSpec extends Specification {
         val updated = splitsForArrivals.applyTo(flights, now, List())._1
 
         updated === FlightsWithSplits(Seq(ApiFlightWithSplits(arrival.copy(
-          FeedSources = Set(ApiFeedSource/*, LiveFeedSource*/),
-          PassengerSources = Map(ApiFeedSource -> Passengers(Option(1), Some(0))/*, LiveFeedSource -> Passengers(Option(1), Some(0))*/)),
+          FeedSources = Set(ApiFeedSource),
+          PassengerSources = Map(ApiFeedSource -> Passengers(Option(1), Some(0)))),
           Set(newSplits, existingSplits1), Option(now))))
       }
     }
