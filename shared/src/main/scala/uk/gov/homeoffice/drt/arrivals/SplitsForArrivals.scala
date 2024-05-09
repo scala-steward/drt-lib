@@ -2,8 +2,8 @@ package uk.gov.homeoffice.drt.arrivals
 
 import uk.gov.homeoffice.drt.DataUpdates.FlightUpdates
 import uk.gov.homeoffice.drt.arrivals.SplitsForArrivals.updateFlightWithSplits
-import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.{ApiSplitsWithHistoricalEGateAndFTPercentages, Historical}
-import uk.gov.homeoffice.drt.ports.{ApiFeedSource, FeedSource}
+import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages
+import uk.gov.homeoffice.drt.ports.{ApiFeedSource, FeedSource, LiveFeedSource}
 import upickle.default.{macroRW, _}
 
 
@@ -68,10 +68,10 @@ case class SplitsForArrivals(splits: Map[UniqueArrival, Set[Splits]]) extends Fl
         }
     }.toSet
     val updatedFlights = splits.foldLeft(flightsWithSplits.flights) {
-      case (acc, (key, incoming)) =>
+      case (acc, (key, incomingSplits)) =>
         acc.get(key) match {
-          case Some(flightWithSplits) =>
-            val updatedFlightWithSplits = updateFlightWithSplits(flightWithSplits, incoming, nowMillis)
+          case Some(existingFws) =>
+            val updatedFlightWithSplits = updateFlightWithSplits(existingFws, incomingSplits, nowMillis)
             acc + (key -> updatedFlightWithSplits)
           case None => acc
         }

@@ -67,21 +67,22 @@ class SplitsForArrivalsSpec extends Specification {
         val existingSplits2 = Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, EGate, 1, None, None)), ApiSplitsWithHistoricalEGateAndFTPercentages, None, PaxNumbers)
         val newSplits = Splits(Set(ApiPaxTypeAndQueueCount(EeaNonMachineReadable, EeaDesk, 1, None, None)), ApiSplitsWithHistoricalEGateAndFTPercentages, None, PaxNumbers)
         val splitsForArrivals = SplitsForArrivals(Map(uniqueArrival -> Set(newSplits)))
-        val arrival = ArrivalGenerator.arrival(iata = "BA0001", terminal = T1, origin = PortCode("JFK"))
+        val arrival = ArrivalGenerator.arrival(iata = "BA0001", terminal = T1, origin = PortCode("JFK"))//, passengerSources = Map(LiveFeedSource -> Passengers(Option(1), Some(0))), feedSources = Set(LiveFeedSource))
         val flights = FlightsWithSplits(Seq(ApiFlightWithSplits(arrival, Set(existingSplits1, existingSplits2))))
 
         val updated = splitsForArrivals.applyTo(flights, now, List())._1
 
-        updated === FlightsWithSplits(Seq(ApiFlightWithSplits(arrival.copy(FeedSources = Set(ApiFeedSource),
-          PassengerSources = Map(ApiFeedSource -> Passengers(Option(1), Some(0)))),
+        updated === FlightsWithSplits(Seq(ApiFlightWithSplits(arrival.copy(
+          FeedSources = Set(ApiFeedSource/*, LiveFeedSource*/),
+          PassengerSources = Map(ApiFeedSource -> Passengers(Option(1), Some(0))/*, LiveFeedSource -> Passengers(Option(1), Some(0))*/)),
           Set(newSplits, existingSplits1), Option(now))))
       }
     }
 
     "Given 2 splits and two arrivals, one with a new source and one with the same source" >> {
       "Then I should get a FlightsWithSplits containing the arrivals updated with the correct new splits" >> {
-        val arrival1 = ArrivalGenerator.arrival(iata = "BA0001", terminal = T1, origin = PortCode("JFK"))
-        val arrival2 = ArrivalGenerator.arrival(iata = "FR1234", terminal = T1, origin = PortCode("JFK"))
+        val arrival1 = ArrivalGenerator.arrival(iata = "BA0001", terminal = T1, origin = PortCode("JFK"), passengerSources = Map(LiveFeedSource -> Passengers(Option(1), Some(0))))
+        val arrival2 = ArrivalGenerator.arrival(iata = "FR1234", terminal = T1, origin = PortCode("JFK"), passengerSources = Map(LiveFeedSource -> Passengers(Option(1), Some(0))))
         val existingSplits1 = Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, NonEeaDesk, 1, None, None)), Historical, None, PaxNumbers)
         val existingSplits2 = Splits(Set(ApiPaxTypeAndQueueCount(EeaMachineReadable, EGate, 1, None, None)), Historical, None, PaxNumbers)
         val newSplits1 = Splits(Set(ApiPaxTypeAndQueueCount(EeaNonMachineReadable, EeaDesk, 1, None, None)), Historical, None, PaxNumbers)

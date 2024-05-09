@@ -15,6 +15,14 @@ case class Splits(splits: Set[ApiPaxTypeAndQueueCount],
   lazy val totalPax: Int = Math.round(Splits.totalPax(splits)).toInt
   lazy val transPax: Int = Math.round(Splits.transferPax(splits)).toInt
   lazy val totalExcludingTransferPax: Double = totalPax - transPax
+
+  def isWithinThreshold(maybeLivePassengers: Option[Passengers], threshold: Double): Boolean = {
+    val portDirectPax = maybeLivePassengers.flatMap(_.getPcpPax).getOrElse(0)
+    if (totalExcludingTransferPax != 0) {
+      val diffPct = Math.abs(totalExcludingTransferPax - portDirectPax) / totalExcludingTransferPax
+      diffPct < threshold
+    } else false
+  }
 }
 
 object Splits {
