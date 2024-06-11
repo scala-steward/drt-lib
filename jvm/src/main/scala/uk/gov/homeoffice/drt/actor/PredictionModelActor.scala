@@ -88,6 +88,7 @@ object PredictionModelActor {
 class PredictionModelActor(val now: () => SDateLike,
                            modelCategory: ModelCategory,
                            identifier: WithId,
+                           override val maybePointInTime: Option[Long],
                           ) extends RecoveryActorLike {
 
   import uk.gov.homeoffice.drt.protobuf.serialisation.ModelAndFeaturesConversion._
