@@ -14,15 +14,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 
 trait ModelPersistence {
-  def getModels(validModelNames: Seq[String]): WithId => Future[Models]
+  def getModels(validModelNames: Seq[String], maybePointInTime: Option[Long]): WithId => Future[Models]
   val persist: (WithId, Int, LinearRegressionModel, FeaturesWithOneToManyValues, Int, Double, String) => Future[Done]
   val clear: (WithId, String) => Future[Done]
 }
 
 trait ActorModelPersistence extends ModelPersistence {
   val modelCategory: ModelCategory
-  val actorProvider: (ModelCategory, WithId) => ActorRef =
-    (modelCategory, identifier) => system.actorOf(Props(new PredictionModelActor(() => SDate.now(), modelCategory, identifier)))
+  val actorProvider: (ModelCategory, WithId, Option[Long]) => ActorRef =
+    (modelCategory, identifier, maybePointInTime) => system.actorOf(Props(new PredictionModelActor(() => SDate.now(), modelCategory, identifier, maybePointInTime)))
 
   implicit val ec: ExecutionContext
   implicit val timeout: Timeout
@@ -30,7 +30,7 @@ trait ActorModelPersistence extends ModelPersistence {
 
   private val updateModel: (WithId, String, Option[ModelUpdate]) => Future[Done] =
     (identifier, modelName, maybeModelUpdate) => {
-      val actor = actorProvider(modelCategory, identifier)
+      val actor = actorProvider(modelCategory, identifier, None)
       val msg = maybeModelUpdate match {
         case Some(modelUpdate) => modelUpdate
         case None => RemoveModel(modelName)
@@ -41,9 +41,9 @@ trait ActorModelPersistence extends ModelPersistence {
       }
     }
 
-  override def getModels(validModelNames: Seq[String]): WithId => Future[Models] =
+  override def getModels(validModelNames: Seq[String], maybePointInTime: Option[Long]): WithId => Future[Models] =
     identifier => {
-      val actor = actorProvider(modelCategory, identifier)
+      val actor = actorProvider(modelCategory, identifier, maybePointInTime)
       actor
         .ask(GetState).mapTo[Models]
         .map { models =>
