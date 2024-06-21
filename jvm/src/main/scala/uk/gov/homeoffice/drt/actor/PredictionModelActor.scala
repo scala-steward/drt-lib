@@ -108,13 +108,23 @@ class PredictionModelActor(val now: () => SDateLike,
   override def logSnapshotOffer(md: SnapshotMetadata): Unit = log.info(snapshotOfferLogMessage(md))
 
   override def processRecoveryMessage: PartialFunction[Any, Unit] = {
-    case RemoveModelMessage(targetName, _) =>
-      targetName.foreach(tn => state = state - tn)
+    case RemoveModelMessage(targetName, Some(createdAt)) =>
+      maybePointInTime match {
+        case Some(pit) if pit < createdAt =>
+          log.debug(s"Ignoring message created more recently than the recovery point in time")
+        case _ =>
+          targetName.foreach(tn => state = state - tn)
+      }
 
     case msg: ModelAndFeaturesMessage =>
-      modelAndFeaturesFromMessage(msg).foreach(modelAndFeatures =>
-        state = state.updated(modelAndFeatures.targetName, modelAndFeatures)
-      )
+      (maybePointInTime, msg.timestamp) match {
+        case (Some(pit), Some(createdAt)) if pit < createdAt =>
+          log.debug(s"Ignoring message created more recently than the recovery point in time")
+        case _ =>
+          modelAndFeaturesFromMessage(msg).foreach(modelAndFeatures =>
+            state = state.updated(modelAndFeatures.targetName, modelAndFeatures)
+          )
+      }
   }
 
   override def processSnapshotMessage: PartialFunction[Any, Unit] = {
