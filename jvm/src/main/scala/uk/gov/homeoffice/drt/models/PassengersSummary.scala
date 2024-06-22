@@ -15,6 +15,7 @@ object PassengersSummaries {
 case class PassengersSummary(regionName: String,
                              portCode: String,
                              terminalName: Option[String],
+                             totalCapacity: Int,
                              totalPcpPax: Int,
                              queueCounts: Map[Queue, Int],
                              maybeDate: Option[LocalDate],
