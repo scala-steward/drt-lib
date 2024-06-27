@@ -194,16 +194,6 @@ case class Arrival(Operator: Option[Operator],
     pcpStart until pcpEnd by oneMinuteMillis
   }
 
-//  def paxDeparturesByMinute(departRate: Int, sourceOrderPreference: List[FeedSource]): Iterable[(Long, Int)] = {
-//    val bestPax = bestPaxEstimate(sourceOrderPreference).passengers.actual.getOrElse(0)
-//    val maybeRemainingPax = bestPax % departRate match {
-//      case 0 => None
-//      case someLeftovers => Option(someLeftovers)
-//    }
-//    val paxByMinute = List.fill(bestPax / departRate)(departRate) ::: maybeRemainingPax.toList
-//    pcpRange(sourceOrderPreference).zip(paxByMinute)
-//  }
-
   lazy val unique: UniqueArrival = UniqueArrival(VoyageNumber.numeric, Terminal, Scheduled, Origin)
 
   def isCancelled: Boolean = Status.description match {

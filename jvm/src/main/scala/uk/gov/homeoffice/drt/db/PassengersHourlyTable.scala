@@ -15,6 +15,7 @@ case class PassengersHourly(portCode: PortCode,
                             dateUtc: UtcDate,
                             hour: Int,
                             passengers: Int,
+                            capacity: Int,
                            )
 
 case class PassengersHourlyRow(portCode: String,
@@ -23,6 +24,7 @@ case class PassengersHourlyRow(portCode: String,
                                dateUtc: String,
                                hour: Int,
                                passengers: Int,
+                               capacity: Int,
                                updatedAt: Timestamp,
                               )
 
@@ -41,11 +43,21 @@ class PassengersHourlyTable(tag: Tag)
 
   def passengers: Rep[Int] = column[Int]("passengers")
 
+  def capacity: Rep[Int] = column[Int]("capacity")
+
   def updatedAt: Rep[Timestamp] = column[java.sql.Timestamp]("updated_at")
 
   def pk = primaryKey("pk_port_terminal_queue_dateutc_hour", (port, terminal, queue, dateUtc, hour))
 
-  def * = (port, terminal, queue, dateUtc, hour, passengers, updatedAt) <> (PassengersHourlyRow.tupled, PassengersHourlyRow.unapply)
+  def * = (
+    port,
+    terminal,
+    queue,
+    dateUtc,
+    hour,
+    passengers,
+    capacity,
+    updatedAt) <> (PassengersHourlyRow.tupled, PassengersHourlyRow.unapply)
 }
 
 

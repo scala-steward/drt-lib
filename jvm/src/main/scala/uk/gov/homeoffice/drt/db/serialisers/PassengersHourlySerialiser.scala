@@ -10,7 +10,7 @@ import java.sql.Timestamp
 
 object PassengersHourlySerialiser {
   val toRow: (PassengersHourly, Long) => PassengersHourlyRow = {
-    case (PassengersHourly(portCode, terminal, queue, dateUtc, hour, passengers), updatedAt) =>
+    case (PassengersHourly(portCode, terminal, queue, dateUtc, hour, passengers, capacity), updatedAt) =>
       PassengersHourlyRow(
         portCode.iata,
         terminal.toString,
@@ -18,12 +18,13 @@ object PassengersHourlySerialiser {
         dateUtc.toISOString,
         hour,
         passengers,
+        capacity,
         new Timestamp(updatedAt),
       )
   }
 
   val fromRow: PassengersHourlyRow => PassengersHourly = {
-    case PassengersHourlyRow(portCode, terminal, queue, dateUtc, hour, passengers, _) =>
+    case PassengersHourlyRow(portCode, terminal, queue, dateUtc, hour, passengers, capacity, _) =>
       PassengersHourly(
         PortCode(portCode),
         Terminal(terminal),
@@ -31,6 +32,7 @@ object PassengersHourlySerialiser {
         UtcDate.parse(dateUtc).getOrElse(throw new Exception(s"Could not parse date $dateUtc")),
         hour,
         passengers,
+        capacity
       )
   }
 }
