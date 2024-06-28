@@ -1,11 +1,12 @@
-package uk.gov.homeoffice.drt.db
+package uk.gov.homeoffice.drt.db.dao
 
 import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.homeoffice.drt.db.queries.PassengersHourlyDao
+import uk.gov.homeoffice.drt.db.dao.PassengersHourlyDao
 import uk.gov.homeoffice.drt.db.serialisers.PassengersHourlySerialiser
+import uk.gov.homeoffice.drt.db.{PassengersHourly, TestDatabase}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.{EGate, EeaDesk, FastTrack, NonEeaDesk}
 import uk.gov.homeoffice.drt.ports.Terminals.{T1, T2, T3, Terminal}
