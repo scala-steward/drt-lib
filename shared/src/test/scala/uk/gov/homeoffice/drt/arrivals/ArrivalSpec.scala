@@ -170,17 +170,17 @@ class ArrivalSpec extends Specification {
   }
 
   "pcpRange" >> {
-    "should return 0L to 0L given an arrival with scheduled time 0L and 0 total passengers" >> {
-      ArrivalGenerator.arrival(sch = 0L,  passengerSources = Map(ApiFeedSource -> Passengers(Option(0), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
+    "should return 0L until 0L given an arrival with scheduled time 0L and 0 total passengers" >> {
+      ArrivalGenerator.arrival(sch = 0L,  passengerSources = Map(ApiFeedSource -> Passengers(Option(0), None))).pcpRange(List(ApiFeedSource)) === (0L until 0L by 60000)
     }
-    "should return 0L to 0L given an arrival with scheduled time 0L and 1 total passengers" >> {
-      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(1), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
+    "should return 0L until 60000L given an arrival with scheduled time 0L and 1 total passengers" >> {
+      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(1), None))).pcpRange(List(ApiFeedSource)) === (0L until 60000L by 60000)
     }
-    "should return 0L to 0L given an arrival with scheduled time 0L and 20 total passengers" >> {
-      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(20), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
+    "should return 0L until 60000L given an arrival with scheduled time 0L and 20 total passengers" >> {
+      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(20), None))).pcpRange(List(ApiFeedSource)) === (0L until 60000L by 60000)
     }
-    "should return 0L to 60000L given an arrival with scheduled time 0L and 21 total passengers" >> {
-      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(21), None))).pcpRange(List(ApiFeedSource)) === (0L to 60000L by 60000)
+    "should return 0L until 120000L given an arrival with scheduled time 0L and 21 total passengers" >> {
+      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(21), None))).pcpRange(List(ApiFeedSource)) === (0L until 120000L by 60000)
     }
   }
 }

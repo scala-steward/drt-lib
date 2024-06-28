@@ -21,7 +21,7 @@ object PassengersHourlyDao {
 
       if (validRows.nonEmpty) {
         val dateHours = validRows.map {
-          case PassengersHourlyRow(_, _, _, dateUtc, hour, _, _, _) => (dateUtc, hour)
+          case PassengersHourlyRow(_, _, _, dateUtc, hour, _, _) => (dateUtc, hour)
         }.toSet
 
         val deleteAction: FixedSqlAction[Int, NoStream, Effect.Write] = table
