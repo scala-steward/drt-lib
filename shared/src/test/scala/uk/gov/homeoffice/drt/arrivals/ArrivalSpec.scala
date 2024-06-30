@@ -118,11 +118,11 @@ class ArrivalSpec extends Specification {
     }
 
     "Give api total pax minus the api transit pax when there is a live feed with undefined pax and api with pax" >> {
-        val arrival = arrivalBase.copy(PassengerSources = Map(
-          LiveFeedSource -> Passengers(None, Option(0)),
-          ApiFeedSource -> Passengers(Option(10), Option(3))
-        ))
-        arrival.bestPcpPaxEstimate(sourceOrderPreference) must beSome(10 - 3)
+      val arrival = arrivalBase.copy(PassengerSources = Map(
+        LiveFeedSource -> Passengers(None, Option(0)),
+        ApiFeedSource -> Passengers(Option(10), Option(3))
+      ))
+      arrival.bestPcpPaxEstimate(sourceOrderPreference) must beSome(10 - 3)
     }
 
     "Give zero pcp when the flight is domestic" >> {
@@ -171,7 +171,7 @@ class ArrivalSpec extends Specification {
 
   "pcpRange" >> {
     "should return 0L until 0L given an arrival with scheduled time 0L and 0 total passengers" >> {
-      ArrivalGenerator.arrival(sch = 0L,  passengerSources = Map(ApiFeedSource -> Passengers(Option(0), None))).pcpRange(List(ApiFeedSource)) === (0L until 0L by 60000)
+      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(0), None))).pcpRange(List(ApiFeedSource)) === (0L until 0L by 60000)
     }
     "should return 0L until 60000L given an arrival with scheduled time 0L and 1 total passengers" >> {
       ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(1), None))).pcpRange(List(ApiFeedSource)) === (0L until 60000L by 60000)

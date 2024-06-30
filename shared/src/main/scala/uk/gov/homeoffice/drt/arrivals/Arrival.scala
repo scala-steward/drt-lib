@@ -189,9 +189,10 @@ case class Arrival(Operator: Option[Operator],
     val pcpStart = MilliTimes.timeToNearestMinute(PcpTime.getOrElse(0L))
 
     val minutes = minutesOfPaxArrivals(sourceOrderPreference)
-    val pcpEnd = pcpStart + minutes * oneMinuteMillis
+    val minutesToAdd = if (minutes > 0) minutes - 1 else 0
+    val pcpEnd = pcpStart + minutesToAdd * oneMinuteMillis
 
-    pcpStart until pcpEnd by oneMinuteMillis
+    pcpStart to pcpEnd by oneMinuteMillis
   }
 
   lazy val unique: UniqueArrival = UniqueArrival(VoyageNumber.numeric, Terminal, Scheduled, Origin)
