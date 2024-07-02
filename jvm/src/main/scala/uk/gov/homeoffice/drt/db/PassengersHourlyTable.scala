@@ -45,7 +45,14 @@ class PassengersHourlyTable(tag: Tag)
 
   def pk = primaryKey("pk_port_terminal_queue_dateutc_hour", (port, terminal, queue, dateUtc, hour))
 
-  def * = (port, terminal, queue, dateUtc, hour, passengers, updatedAt) <> (PassengersHourlyRow.tupled, PassengersHourlyRow.unapply)
+  def * = (
+    port,
+    terminal,
+    queue,
+    dateUtc,
+    hour,
+    passengers,
+    updatedAt) <> (PassengersHourlyRow.tupled, PassengersHourlyRow.unapply)
 }
 
 

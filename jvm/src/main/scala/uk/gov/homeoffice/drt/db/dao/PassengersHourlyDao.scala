@@ -1,4 +1,4 @@
-package uk.gov.homeoffice.drt.db.queries
+package uk.gov.homeoffice.drt.db.dao
 
 import slick.dbio.Effect
 import slick.sql.FixedSqlAction

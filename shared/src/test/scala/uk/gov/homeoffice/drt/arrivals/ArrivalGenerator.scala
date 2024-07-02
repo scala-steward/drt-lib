@@ -5,9 +5,11 @@ import uk.gov.homeoffice.drt.ports.{FeedSource, PortCode}
 import uk.gov.homeoffice.drt.time.SDateLike
 
 object ArrivalGenerator {
+  val midnight20220515Bst: Long = 1655247600000L
+
   def arrival(iata: String = "",
               icao: String = "",
-              sch: Long = 0L,
+              sch: Long = midnight20220515Bst,
               maxPax: Option[Int] = None,
               terminal: Terminal = Terminal("T1"),
               origin: PortCode = PortCode(""),

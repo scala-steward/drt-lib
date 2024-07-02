@@ -21,6 +21,7 @@ object ArrivalExportHeadings {
     "Act Chox",
     "Minutes off scheduled",
     "Est PCP",
+    "Capacity",
     "Total Pax",
     "PCP Pax",
     "Invalid API"
