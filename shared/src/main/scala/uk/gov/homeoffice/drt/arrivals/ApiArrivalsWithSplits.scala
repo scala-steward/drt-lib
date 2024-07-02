@@ -4,7 +4,6 @@ import uk.gov.homeoffice.drt.arrivals.ApiFlightWithSplits.liveApiTolerance
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages
 import uk.gov.homeoffice.drt.ports._
-import uk.gov.homeoffice.drt.time.SDateLike
 import upickle.default.{ReadWriter, macroRW}
 
 
@@ -35,12 +34,12 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
 
 
   def bestSplits: Option[Splits] = {
-    val apiSplitsDc = splits.find(s => s.source == SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages)
-    val scenarioSplits = splits.find(s => s.source == SplitSources.ScenarioSimulationSplits)
-    val historicalSplits = splits.find(_.source == SplitSources.Historical)
+    val apiSplitsDc = splits.find(s => s.source == SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages && (s.totalPax == 0 || s.totalPax != s.transPax))
+    val scenarioSplits = splits.find(s => s.source == SplitSources.ScenarioSimulationSplits && (s.totalPax == 0 || s.totalPax != s.transPax))
+    val historicalSplits = splits.find(s => s.source == SplitSources.Historical && (s.totalPax == 0 || s.totalPax != s.transPax))
     val terminalSplits = splits.find(_.source == SplitSources.TerminalAverage)
 
-    val apiSplits: List[Option[Splits]] = if (hasValidApi) List(apiSplitsDc) else List(scenarioSplits)
+    val apiSplits = if (hasValidApi) List(apiSplitsDc) else List(scenarioSplits)
 
     val splitsForConsideration: List[Option[Splits]] = apiSplits ::: List(historicalSplits, terminalSplits)
 
@@ -63,6 +62,7 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
       apiFlight.FeedSources.contains(LiveFeedSource)
 
     val hasSimulationSource = apiFlight.FeedSources.contains(ScenarioSimulationSource)
+    println(s"($maybeApiSplits, $hasLiveSource, $hasSimulationSource)")
     (maybeApiSplits, hasLiveSource, hasSimulationSource) match {
       case (Some(_), _, true) => true
       case (Some(_), false, _) => true
