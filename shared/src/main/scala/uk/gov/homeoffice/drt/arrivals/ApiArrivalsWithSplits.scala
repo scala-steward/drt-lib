@@ -62,7 +62,6 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
       apiFlight.FeedSources.contains(LiveFeedSource)
 
     val hasSimulationSource = apiFlight.FeedSources.contains(ScenarioSimulationSource)
-    println(s"($maybeApiSplits, $hasLiveSource, $hasSimulationSource)")
     (maybeApiSplits, hasLiveSource, hasSimulationSource) match {
       case (Some(_), _, true) => true
       case (Some(_), false, _) => true
