@@ -14,6 +14,9 @@ class PortRegionTest extends AnyWordSpec with Matchers {
     "Find the correct region for a port" in {
       PortRegion.fromPort(PortCode("LHR")) should ===(PortRegion.Heathrow)
     }
+    "Find the correct region for a port regardless of case" in {
+      PortRegion.fromPort(PortCode("lhr")) should ===(PortRegion.Heathrow)
+    }
     "Throw an exception if the port is not found" in {
       an[Exception] should be thrownBy PortRegion.fromPort(PortCode("XXX"))
     }
