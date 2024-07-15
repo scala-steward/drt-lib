@@ -2,7 +2,7 @@ CREATE TABLE passengers_hourly
 (
     port       varchar(3)  NOT NULL,
     terminal   varchar(3)  NOT NULL,
-    queue      varchar(10)  NOT NULL,
+    queue      varchar(10) NOT NULL,
     date_utc   varchar(10) NOT NULL,
     hour       smallint    NOT NULL,
     passengers smallint    NOT NULL,
