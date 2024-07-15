@@ -3,6 +3,7 @@ package uk.gov.homeoffice.drt.db.dao
 import org.scalatest.BeforeAndAfter
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import specs2.arguments.sequential
 import uk.gov.homeoffice.drt.db.{StatusDaily, TestDatabase}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.{T1, T2}
@@ -13,6 +14,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 
 class StatusDailyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
+  sequential
+
   private val db = TestDatabase.db
 
   import TestDatabase.profile.api._
