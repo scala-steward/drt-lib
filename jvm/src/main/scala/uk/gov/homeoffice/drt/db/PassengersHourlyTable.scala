@@ -43,7 +43,7 @@ class PassengersHourlyTable(tag: Tag)
 
   def updatedAt: Rep[Timestamp] = column[java.sql.Timestamp]("updated_at")
 
-  def pk = primaryKey("pk_port_terminal_queue_dateutc_hour", (port, terminal, queue, dateUtc, hour))
+  def pk = primaryKey("pk_passengers_hourly_port_terminal_queue_dateutc_hour", (port, terminal, queue, dateUtc, hour))
 
   def * = (
     port,

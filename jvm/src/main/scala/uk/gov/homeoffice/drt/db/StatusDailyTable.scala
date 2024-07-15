@@ -39,7 +39,7 @@ class StatusDailyTable(tag: Tag)
 
   def deskDeploymentsUpdatedAt: Rep[Timestamp] = column[Timestamp]("desk_deployments_updated_at")
 
-  def pk = primaryKey("pk_port_terminal_queue_dateutc_hour", (port, terminal, dateUtc))
+  def pk = primaryKey("pk_status_daily_port_terminal_queue_dateutc_hour", (port, terminal, dateUtc))
 
   def * = (
     port,
