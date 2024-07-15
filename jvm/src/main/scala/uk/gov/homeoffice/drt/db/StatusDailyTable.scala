@@ -4,13 +4,13 @@ import slick.lifted.Tag
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.time.UtcDate
+import uk.gov.homeoffice.drt.time.LocalDate
 
 import java.sql.Timestamp
 
 case class StatusDaily(portCode: PortCode,
                        terminal: Terminal,
-                       dateLocal: UtcDate,
+                       dateLocal: LocalDate,
                        paxLoadsUpdatedAt: Option[Long],
                        deskRecommendationsUpdatedAt: Option[Long],
                        deskDeploymentsUpdatedAt: Option[Long],
