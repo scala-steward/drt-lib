@@ -20,14 +20,14 @@ object StatusDailyDao {
       if (row.portCode == portCode) table.insertOrUpdate(StatusDailySerialiser.toRow(row))
       else DBIO.successful(0)
 
-  def setUpdatedAt(portCode: PortCode): (StatusDailyTable => Rep[Timestamp]) => (Terminal, LocalDate, Long) => DBIOAction[Int, NoStream, Effect.Write] =
+  def setUpdatedAt(portCode: PortCode): (StatusDailyTable => Rep[Option[Timestamp]]) => (Terminal, LocalDate, Long) => DBIOAction[Int, NoStream, Effect.Write] =
     columnToSet => (terminal, date, updatedAt) =>
       table
         .filter(_.port === portCode.iata)
         .filter(_.terminal === terminal.toString)
         .filter(_.dateLocal === date.toISOString)
         .map(columnToSet)
-        .update(new Timestamp(updatedAt))
+        .update(Option(new Timestamp(updatedAt)))
 
   def get(portCode: PortCode)
          (implicit ec: ExecutionContext): (Terminal, LocalDate) => DBIOAction[Option[StatusDaily], NoStream, Effect.Read] =
