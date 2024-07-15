@@ -9,6 +9,7 @@ import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.LocalDate
 
+import java.sql.Timestamp
 import scala.concurrent.ExecutionContext
 
 
@@ -19,6 +20,15 @@ object StatusDailyDao {
     row =>
       if (row.portCode == portCode) table.insertOrUpdate(StatusDailySerialiser.toRow(row))
       else DBIO.successful(0)
+
+  def setUpdatedAt(portCode: PortCode): (Terminal, LocalDate, Long, StatusDailyTable => Rep[Timestamp]) => DBIOAction[Int, NoStream, Effect.Write] =
+    (terminal, date, updatedAt, column) =>
+      table
+        .filter(_.port === portCode.iata)
+        .filter(_.terminal === terminal.toString)
+        .filter(_.dateUtc === date.toISOString)
+        .map(column)
+        .update(new Timestamp(updatedAt))
 
   def get(portCode: PortCode)
          (implicit ec: ExecutionContext): (Terminal, LocalDate) => DBIOAction[Option[StatusDaily], NoStream, Effect.Read] =

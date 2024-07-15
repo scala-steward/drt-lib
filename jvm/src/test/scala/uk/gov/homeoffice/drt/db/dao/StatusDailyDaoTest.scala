@@ -62,5 +62,22 @@ class StatusDailyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
       val maybeStatus = Await.result(db.run(get(terminal, LocalDate(2020, 1, 1))), 1.second)
       maybeStatus should be (Some(StatusDaily(portCode, terminal, UtcDate(2020, 1, 1), 3, 3, 3)))
     }
+
+    "update the updatedAt fields" in {
+      val portCode = PortCode("LHR")
+      val terminal = T2
+      val statusDaily = StatusDaily(portCode, terminal, UtcDate(2020, 1, 1), 1, 1, 1)
+
+      val insert = StatusDailyDao.insertOrUpdate(portCode)
+      Await.result(db.run(insert(statusDaily)), 2.second)
+
+      val update = StatusDailyDao.setUpdatedAt(portCode)
+      Await.result(db.run(update(terminal, LocalDate(2020, 1, 1), 2, _.paxLoadsUpdatedAt)), 2.second)
+
+      val get = StatusDailyDao.get(portCode)
+      val maybeStatusDaily = Await.result(db.run(get(terminal, LocalDate(2020, 1, 1))), 1.second)
+
+      maybeStatusDaily should be(Some(statusDaily.copy(paxLoadsUpdatedAt = 2)))
+    }
   }
 }
