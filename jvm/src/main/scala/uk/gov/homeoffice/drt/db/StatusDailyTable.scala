@@ -10,7 +10,7 @@ import java.sql.Timestamp
 
 case class StatusDaily(portCode: PortCode,
                        terminal: Terminal,
-                       dateUtc: UtcDate,
+                       dateLocal: UtcDate,
                        paxLoadsUpdatedAt: Option[Long],
                        deskRecommendationsUpdatedAt: Option[Long],
                        deskDeploymentsUpdatedAt: Option[Long],
@@ -18,7 +18,7 @@ case class StatusDaily(portCode: PortCode,
 
 case class StatusDailyRow(portCode: String,
                           terminal: String,
-                          dateUtc: String,
+                          dateLocal: String,
                           paxLoadsUpdatedAt: Option[Timestamp],
                           deskRecommendationsUpdatedAt: Option[Timestamp],
                           deskDeploymentsUpdatedAt: Option[Timestamp],
@@ -31,7 +31,7 @@ class StatusDailyTable(tag: Tag)
 
   def terminal: Rep[String] = column[String]("terminal")
 
-  def dateUtc: Rep[String] = column[String]("date_utc")
+  def dateLocal: Rep[String] = column[String]("date_local")
 
   def paxLoadsUpdatedAt: Rep[Option[Timestamp]] = column[Option[Timestamp]]("pax_loads_updated_at")
 
@@ -39,12 +39,12 @@ class StatusDailyTable(tag: Tag)
 
   def deskDeploymentsUpdatedAt: Rep[Option[Timestamp]] = column[Option[Timestamp]]("desk_deployments_updated_at")
 
-  def pk = primaryKey("pk_status_daily_port_terminal_queue_dateutc_hour", (port, terminal, dateUtc))
+  def pk = primaryKey("pk_status_daily_port_terminal_queue_datelocal_hour", (port, terminal, dateLocal))
 
   def * = (
     port,
     terminal,
-    dateUtc,
+    dateLocal,
     paxLoadsUpdatedAt,
     deskRecommendationsUpdatedAt,
     deskDeploymentsUpdatedAt) <> (StatusDailyRow.tupled, StatusDailyRow.unapply)

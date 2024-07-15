@@ -14,9 +14,9 @@ object StatusDailySerialiser {
         portCode.iata,
         terminal.toString,
         dateUtc.toISOString,
-        new Timestamp(paxUpdated),
-        new Timestamp(deskRecsUpdated),
-        new Timestamp(deploymentsUpdated),
+        paxUpdated.map(new Timestamp(_)),
+        deskRecsUpdated.map(new Timestamp(_)),
+        deploymentsUpdated.map(new Timestamp(_)),
       )
   }
 
@@ -26,9 +26,9 @@ object StatusDailySerialiser {
         PortCode(portCode),
         Terminal(terminal),
         UtcDate.parse(dateUtc).getOrElse(throw new Exception(s"Could not parse date $dateUtc")),
-        paxUpdatedAt.getTime,
-        deskRecsUpdatedAt.getTime,
-        deploymentsUpdatedAt.getTime,
+        paxUpdatedAt.map(_.getTime),
+        deskRecsUpdatedAt.map(_.getTime),
+        deploymentsUpdatedAt.map(_.getTime),
       )
   }
 }

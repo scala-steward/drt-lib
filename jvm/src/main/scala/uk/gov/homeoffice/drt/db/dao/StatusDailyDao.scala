@@ -25,7 +25,7 @@ object StatusDailyDao {
       table
         .filter(_.port === portCode.iata)
         .filter(_.terminal === terminal.toString)
-        .filter(_.dateUtc === date.toISOString)
+        .filter(_.dateLocal === date.toISOString)
         .map(columnToSet)
         .update(new Timestamp(updatedAt))
 
@@ -34,7 +34,7 @@ object StatusDailyDao {
     (terminal, date) => table
       .filter(_.port === portCode.iata)
       .filter(_.terminal === terminal.toString)
-      .filter(_.dateUtc === date.toISOString)
+      .filter(_.dateLocal === date.toISOString)
       .result
       .map { rows =>
         rows.map(StatusDailySerialiser.fromRow).headOption
