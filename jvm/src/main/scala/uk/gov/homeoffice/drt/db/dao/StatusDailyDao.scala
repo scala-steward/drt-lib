@@ -1,7 +1,6 @@
 package uk.gov.homeoffice.drt.db.dao
 
 import slick.dbio.Effect
-import slick.sql.FixedSqlAction
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
 import uk.gov.homeoffice.drt.db.serialisers.StatusDailySerialiser
 import uk.gov.homeoffice.drt.db.{StatusDaily, StatusDailyTable}
@@ -21,13 +20,13 @@ object StatusDailyDao {
       if (row.portCode == portCode) table.insertOrUpdate(StatusDailySerialiser.toRow(row))
       else DBIO.successful(0)
 
-  def setUpdatedAt(portCode: PortCode): (Terminal, LocalDate, Long, StatusDailyTable => Rep[Timestamp]) => DBIOAction[Int, NoStream, Effect.Write] =
-    (terminal, date, updatedAt, column) =>
+  def setUpdatedAt(portCode: PortCode): (StatusDailyTable => Rep[Timestamp]) => (Terminal, LocalDate, Long) => DBIOAction[Int, NoStream, Effect.Write] =
+    columnToSet => (terminal, date, updatedAt) =>
       table
         .filter(_.port === portCode.iata)
         .filter(_.terminal === terminal.toString)
         .filter(_.dateUtc === date.toISOString)
-        .map(column)
+        .map(columnToSet)
         .update(new Timestamp(updatedAt))
 
   def get(portCode: PortCode)

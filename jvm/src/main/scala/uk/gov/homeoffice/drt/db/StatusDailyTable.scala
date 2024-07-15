@@ -11,17 +11,17 @@ import java.sql.Timestamp
 case class StatusDaily(portCode: PortCode,
                        terminal: Terminal,
                        dateUtc: UtcDate,
-                       paxLoadsUpdatedAt: Long,
-                       deskRecommendationsUpdatedAt: Long,
-                       deskDeploymentsUpdatedAt: Long,
+                       paxLoadsUpdatedAt: Option[Long],
+                       deskRecommendationsUpdatedAt: Option[Long],
+                       deskDeploymentsUpdatedAt: Option[Long],
                       )
 
 case class StatusDailyRow(portCode: String,
                           terminal: String,
                           dateUtc: String,
-                          paxLoadsUpdatedAt: Timestamp,
-                          deskRecommendationsUpdatedAt: Timestamp,
-                          deskDeploymentsUpdatedAt: Timestamp,
+                          paxLoadsUpdatedAt: Option[Timestamp],
+                          deskRecommendationsUpdatedAt: Option[Timestamp],
+                          deskDeploymentsUpdatedAt: Option[Timestamp],
                          )
 
 class StatusDailyTable(tag: Tag)
@@ -33,11 +33,11 @@ class StatusDailyTable(tag: Tag)
 
   def dateUtc: Rep[String] = column[String]("date_utc")
 
-  def paxLoadsUpdatedAt: Rep[Timestamp] = column[Timestamp]("pax_loads_updated_at")
+  def paxLoadsUpdatedAt: Rep[Option[Timestamp]] = column[Option[Timestamp]]("pax_loads_updated_at")
 
-  def deskRecommendationsUpdatedAt: Rep[Timestamp] = column[Timestamp]("desk_recommendations_updated_at")
+  def deskRecommendationsUpdatedAt: Rep[Option[Timestamp]] = column[Option[Timestamp]]("desk_recommendations_updated_at")
 
-  def deskDeploymentsUpdatedAt: Rep[Timestamp] = column[Timestamp]("desk_deployments_updated_at")
+  def deskDeploymentsUpdatedAt: Rep[Option[Timestamp]] = column[Option[Timestamp]]("desk_deployments_updated_at")
 
   def pk = primaryKey("pk_status_daily_port_terminal_queue_dateutc_hour", (port, terminal, dateUtc))
 
