@@ -6,6 +6,7 @@ CREATE TABLE status_daily
     pax_loads_updated_at timestamp,
     desk_recommendations_updated_at timestamp,
     desk_deployments_updated_at timestamp,
+    staff_updated_at timestamp,
     PRIMARY KEY (port, terminal, date_utc)
 );
 

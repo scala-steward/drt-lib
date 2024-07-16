@@ -9,19 +9,20 @@ import java.sql.Timestamp
 
 object StatusDailySerialiser {
   val toRow: StatusDaily => StatusDailyRow = {
-    case StatusDaily(portCode, terminal, dateLocal, paxUpdated, deskRecsUpdated, deploymentsUpdated) =>
+    case StatusDaily(portCode, terminal, dateLocal, paxUpdated, deskRecsUpdatedAt, deploymentsUpdatedAt, staffUpdatedAt) =>
       StatusDailyRow(
         portCode.iata,
         terminal.toString,
         dateLocal.toISOString,
         paxUpdated.map(new Timestamp(_)),
-        deskRecsUpdated.map(new Timestamp(_)),
-        deploymentsUpdated.map(new Timestamp(_)),
+        deskRecsUpdatedAt.map(new Timestamp(_)),
+        deploymentsUpdatedAt.map(new Timestamp(_)),
+        staffUpdatedAt.map(new Timestamp(_)),
       )
   }
 
   val fromRow: StatusDailyRow => StatusDaily = {
-    case StatusDailyRow(portCode, terminal, dateLocal, paxUpdatedAt, deskRecsUpdatedAt, deploymentsUpdatedAt) =>
+    case StatusDailyRow(portCode, terminal, dateLocal, paxUpdatedAt, deskRecsUpdatedAt, deploymentsUpdatedAt, staffUpdatedAt) =>
       StatusDaily(
         PortCode(portCode),
         Terminal(terminal),
@@ -29,6 +30,7 @@ object StatusDailySerialiser {
         paxUpdatedAt.map(_.getTime),
         deskRecsUpdatedAt.map(_.getTime),
         deploymentsUpdatedAt.map(_.getTime),
+        staffUpdatedAt.map(_.getTime),
       )
   }
 }

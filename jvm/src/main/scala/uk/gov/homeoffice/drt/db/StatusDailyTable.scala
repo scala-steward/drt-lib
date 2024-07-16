@@ -14,6 +14,7 @@ case class StatusDaily(portCode: PortCode,
                        paxLoadsUpdatedAt: Option[Long],
                        deskRecommendationsUpdatedAt: Option[Long],
                        deskDeploymentsUpdatedAt: Option[Long],
+                       staffUpdatedAt: Option[Long],
                       )
 
 case class StatusDailyRow(portCode: String,
@@ -22,6 +23,7 @@ case class StatusDailyRow(portCode: String,
                           paxLoadsUpdatedAt: Option[Timestamp],
                           deskRecommendationsUpdatedAt: Option[Timestamp],
                           deskDeploymentsUpdatedAt: Option[Timestamp],
+                          staffUpdatedAt: Option[Timestamp],
                          )
 
 class StatusDailyTable(tag: Tag)
@@ -39,6 +41,8 @@ class StatusDailyTable(tag: Tag)
 
   def deskDeploymentsUpdatedAt: Rep[Option[Timestamp]] = column[Option[Timestamp]]("desk_deployments_updated_at")
 
+  def staffUpdatedAt: Rep[Option[Timestamp]] = column[Option[Timestamp]]("staff_updated_at")
+
   def pk = primaryKey("pk_status_daily_port_terminal_queue_datelocal_hour", (port, terminal, dateLocal))
 
   def * = (
@@ -47,7 +51,9 @@ class StatusDailyTable(tag: Tag)
     dateLocal,
     paxLoadsUpdatedAt,
     deskRecommendationsUpdatedAt,
-    deskDeploymentsUpdatedAt) <> (StatusDailyRow.tupled, StatusDailyRow.unapply)
+    deskDeploymentsUpdatedAt,
+    staffUpdatedAt
+  ) <> (StatusDailyRow.tupled, StatusDailyRow.unapply)
 }
 
 

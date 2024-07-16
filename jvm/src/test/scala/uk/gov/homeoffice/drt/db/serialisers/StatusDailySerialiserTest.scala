@@ -5,16 +5,16 @@ import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.homeoffice.drt.db.{StatusDaily, StatusDailyRow}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.time.UtcDate
+import uk.gov.homeoffice.drt.time.LocalDate
 
 import java.sql.Timestamp
 
 class StatusDailySerialiserTest extends AnyWordSpec with Matchers {
   "StatusDailySerialiser" should {
     "convert to and from a row" in {
-      val statusDaily = StatusDaily(PortCode("LHR"), Terminal("T1"), UtcDate(2020, 1, 1), 1L, 2L, 3L)
+      val statusDaily = StatusDaily(PortCode("LHR"), Terminal("T1"), LocalDate(2020, 1, 1), Option(1L), Option(2L), Option(3L), Option(4L))
       val row = StatusDailySerialiser.toRow(statusDaily)
-      val expectedRow = StatusDailyRow("LHR", "T1", "2020-01-01", new Timestamp(1L), new Timestamp(2L), new Timestamp(3L))
+      val expectedRow = StatusDailyRow("LHR", "T1", "2020-01-01", Option(new Timestamp(1L)), Option(new Timestamp(2L)), Option(new Timestamp(3L)), Option(new Timestamp(4L)))
       row should be(expectedRow)
       val fromRow = StatusDailySerialiser.fromRow(row)
       fromRow should be(statusDaily)
