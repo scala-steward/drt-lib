@@ -39,7 +39,7 @@ class UrlsSpec extends Specification {
       "I should get port url with the logout path appended" >> {
         val logoutUrl = urls.logoutUrlForPort("lhr")
 
-        val expected = "https://lhr." + rootDomain + "/oauth/logout?redirect=https://lhr." + rootDomain
+        val expected = "https://lhr." + rootDomain + "/oauth2/sign_out?redirect=https://lhr." + rootDomain
 
         logoutUrl === expected
       }
