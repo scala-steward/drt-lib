@@ -18,7 +18,7 @@ case class Urls(rootDomain: String, useHttps: Boolean) {
 
   def logoutUrlForPort(port: String): String = {
     val portUrl = urlForPort(port)
-    s"$portUrl/oauth/logout?redirect=$portUrl"
+    s"$portUrl/oauth2/sign_out?redirect=$portUrl"
   }
 
   def urlForPort(port: String): String = s"$protocol${port.toLowerCase}.$rootDomain"
