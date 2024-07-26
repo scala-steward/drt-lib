@@ -53,13 +53,8 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
 
   def hasValidApi: Boolean = {
     val maybeApiSplits = splits.find(_.source == SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages)
-    val totalPaxSourceIntroductionMillis = 1655247600000L // 2022-06-15 midnight BST
 
-    val paxSourceAvailable = apiFlight.Scheduled >= totalPaxSourceIntroductionMillis
-    val hasLiveSource = if (paxSourceAvailable)
-      apiFlight.PassengerSources.get(LiveFeedSource).exists(_.actual.nonEmpty)
-    else
-      apiFlight.FeedSources.contains(LiveFeedSource)
+    val hasLiveSource: Boolean = hasLivePaxSource
 
     val hasSimulationSource = apiFlight.FeedSources.contains(ScenarioSimulationSource)
     (maybeApiSplits, hasLiveSource, hasSimulationSource) match {
@@ -68,6 +63,15 @@ case class ApiFlightWithSplits(apiFlight: Arrival, splits: Set[Splits], lastUpda
       case (Some(api), true, _) if api.isWithinThreshold(apiFlight.PassengerSources.get(LiveFeedSource), liveApiTolerance) => true
       case _ => false
     }
+  }
+
+  def hasLivePaxSource: Boolean = {
+    val totalPaxSourceIntroductionMillis = 1655247600000L // 2022-06-15 midnight BST
+    val paxSourceAvailable = apiFlight.Scheduled >= totalPaxSourceIntroductionMillis
+    if (paxSourceAvailable)
+      apiFlight.PassengerSources.get(LiveFeedSource).exists(_.actual.nonEmpty)
+    else
+      apiFlight.FeedSources.contains(LiveFeedSource)
   }
 
   override val unique: UniqueArrival = apiFlight.unique
