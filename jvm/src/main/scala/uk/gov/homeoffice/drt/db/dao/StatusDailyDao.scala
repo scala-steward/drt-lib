@@ -3,7 +3,7 @@ package uk.gov.homeoffice.drt.db.dao
 import slick.dbio.Effect
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
 import uk.gov.homeoffice.drt.db.serialisers.StatusDailySerialiser
-import uk.gov.homeoffice.drt.db.{StatusDaily, StatusDailyTable}
+import uk.gov.homeoffice.drt.db.{StatusDaily, StatusDailyRow, StatusDailyTable}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.LocalDate
@@ -22,21 +22,24 @@ object StatusDailyDao {
 
   def setUpdatedAt(portCode: PortCode): (StatusDailyTable => Rep[Option[Timestamp]]) => (Terminal, LocalDate, Long) => DBIOAction[Int, NoStream, Effect.Write] =
     columnToSet => (terminal, date, updatedAt) =>
-      table
-        .filter(_.port === portCode.iata)
-        .filter(_.terminal === terminal.toString)
-        .filter(_.dateLocal === date.toISOString)
+      filterPortTerminalDate(portCode, terminal, date)
         .map(columnToSet)
         .update(Option(new Timestamp(updatedAt)))
 
   def get(portCode: PortCode)
          (implicit ec: ExecutionContext): (Terminal, LocalDate) => DBIOAction[Option[StatusDaily], NoStream, Effect.Read] =
-    (terminal, date) => table
-      .filter(_.port === portCode.iata)
-      .filter(_.terminal === terminal.toString)
-      .filter(_.dateLocal === date.toISOString)
-      .result
-      .map { rows =>
-        rows.map(StatusDailySerialiser.fromRow).headOption
-      }
+    (terminal, date) =>
+      filterPortTerminalDate(portCode, terminal, date)
+        .result
+        .map { rows =>
+          rows.map(StatusDailySerialiser.fromRow).headOption
+        }
+
+  private def filterPortTerminalDate(portCode: PortCode, terminal: Terminal, date: LocalDate): Query[StatusDailyTable, StatusDailyRow, Seq] =
+    table
+      .filter(row =>
+        row.port === portCode.iata &&
+          row.terminal === terminal.toString &&
+          row.dateLocal === date.toISOString
+      )
 }
