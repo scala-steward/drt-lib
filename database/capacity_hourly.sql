@@ -4,7 +4,7 @@ CREATE TABLE capacity_hourly
     terminal   varchar(3)  NOT NULL,
     date_utc   varchar(10) NOT NULL,
     hour       smallint    NOT NULL,
-    capacity smallint    NOT NULL,
+    capacity   smallint    NOT NULL,
     updated_at timestamp   NOT NULL,
     PRIMARY KEY (port, terminal, date_utc, hour)
 );

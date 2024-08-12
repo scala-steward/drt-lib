@@ -4,6 +4,7 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import specs2.arguments.sequential
 import uk.gov.homeoffice.drt.db.serialisers.CapacityHourlySerialiser
 import uk.gov.homeoffice.drt.db.{CapacityHourly, TestDatabase}
 import uk.gov.homeoffice.drt.ports.PortCode
@@ -15,6 +16,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 
 class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
+  sequential
+
   private val db = TestDatabase.db
 
   import TestDatabase.profile.api._
