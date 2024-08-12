@@ -13,7 +13,7 @@ case class StatusDaily(portCode: PortCode,
                        dateLocal: LocalDate,
                        paxLoadsUpdatedAt: Option[Long],
                        deskRecommendationsUpdatedAt: Option[Long],
-                       deskDeploymentsUpdatedAt: Option[Long],
+                       staffDeploymentsUpdatedAt: Option[Long],
                        staffUpdatedAt: Option[Long],
                       )
 
@@ -22,7 +22,7 @@ case class StatusDailyRow(portCode: String,
                           dateLocal: String,
                           paxLoadsUpdatedAt: Option[Timestamp],
                           deskRecommendationsUpdatedAt: Option[Timestamp],
-                          deskDeploymentsUpdatedAt: Option[Timestamp],
+                          staffDeploymentsUpdatedAt: Option[Timestamp],
                           staffUpdatedAt: Option[Timestamp],
                          )
 
@@ -39,7 +39,7 @@ class StatusDailyTable(tag: Tag)
 
   def deskRecommendationsUpdatedAt: Rep[Option[Timestamp]] = column[Option[Timestamp]]("desk_recommendations_updated_at")
 
-  def deskDeploymentsUpdatedAt: Rep[Option[Timestamp]] = column[Option[Timestamp]]("desk_deployments_updated_at")
+  def staffDeploymentsUpdatedAt: Rep[Option[Timestamp]] = column[Option[Timestamp]]("staff_deployments_updated_at")
 
   def staffUpdatedAt: Rep[Option[Timestamp]] = column[Option[Timestamp]]("staff_updated_at")
 
@@ -51,7 +51,7 @@ class StatusDailyTable(tag: Tag)
     dateLocal,
     paxLoadsUpdatedAt,
     deskRecommendationsUpdatedAt,
-    deskDeploymentsUpdatedAt,
+    staffDeploymentsUpdatedAt,
     staffUpdatedAt
   ) <> (StatusDailyRow.tupled, StatusDailyRow.unapply)
 }
