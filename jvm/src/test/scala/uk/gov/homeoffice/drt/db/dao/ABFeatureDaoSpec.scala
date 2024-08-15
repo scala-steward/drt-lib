@@ -1,10 +1,10 @@
-package uk.gov.homeoffice.drt.db
+package uk.gov.homeoffice.drt.db.dao
 
 import org.specs2.mutable.Specification
 import org.specs2.specification.BeforeEach
 import slick.dbio.DBIO
 import slick.jdbc.PostgresProfile.api._
-import uk.gov.homeoffice.drt.db.dao.ABFeatureDao
+import uk.gov.homeoffice.drt.db.TestDatabase
 import uk.gov.homeoffice.drt.db.tables.ABFeatureRow
 
 import java.sql.Timestamp

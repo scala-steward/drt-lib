@@ -1,10 +1,10 @@
-package uk.gov.homeoffice.drt.db
+package uk.gov.homeoffice.drt.db.dao
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
 import org.specs2.mutable.Specification
 import org.specs2.specification.BeforeEach
-import uk.gov.homeoffice.drt.db.dao.UserFeedbackDao
+import uk.gov.homeoffice.drt.db.TestDatabase
 import uk.gov.homeoffice.drt.db.tables.UserFeedbackRow
 
 import java.sql.Timestamp
@@ -28,7 +28,7 @@ class UserFeedbackDaoSpec extends Specification with BeforeEach {
       ), 2.second)
   }
 
-  def getUserFeedBackRow(createdAt: Timestamp) = {
+  def getUserFeedBackRow(createdAt: Timestamp): UserFeedbackRow = {
     UserFeedbackRow(email = "test@test.com",
       createdAt = createdAt,
       bfRole = "test",
