@@ -3,14 +3,14 @@ package uk.gov.homeoffice.drt.db
 import org.specs2.mutable.Specification
 import org.specs2.specification.BeforeEach
 import slick.dbio.DBIO
-
-import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
 import slick.jdbc.PostgresProfile.api._
+import uk.gov.homeoffice.drt.db.dao.ABFeatureDao
 import uk.gov.homeoffice.drt.db.tables.ABFeatureRow
 
 import java.sql.Timestamp
 import java.time.Instant
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
 class ABFeatureDaoSpec extends Specification with BeforeEach {
 
