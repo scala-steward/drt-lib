@@ -1,9 +1,8 @@
-package uk.gov.homeoffice.drt.db
+package uk.gov.homeoffice.drt.db.tables
 
 import slick.lifted.Tag
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
 import uk.gov.homeoffice.drt.ports.PortCode
-import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.UtcDate
 

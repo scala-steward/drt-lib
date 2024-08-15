@@ -7,7 +7,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import specs2.arguments.sequential
 import uk.gov.homeoffice.drt.db.dao.PassengersHourlyDao
 import uk.gov.homeoffice.drt.db.serialisers.PassengersHourlySerialiser
-import uk.gov.homeoffice.drt.db.{PassengersHourly, TestDatabase}
+import uk.gov.homeoffice.drt.db.TestDatabase
+import uk.gov.homeoffice.drt.db.tables.PassengersHourly
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.{EGate, EeaDesk, FastTrack, NonEeaDesk}
 import uk.gov.homeoffice.drt.ports.Terminals.{T1, T2, T3, Terminal}

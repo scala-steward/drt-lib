@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
 import org.specs2.mutable.Specification
 import org.specs2.specification.BeforeEach
+import uk.gov.homeoffice.drt.db.tables.UserFeedbackRow
 
 import java.sql.Timestamp
 import java.time.Instant

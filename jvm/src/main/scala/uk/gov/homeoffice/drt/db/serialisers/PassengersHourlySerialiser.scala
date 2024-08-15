@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.db.serialisers
 
-import uk.gov.homeoffice.drt.db.{PassengersHourly, PassengersHourlyRow}
+import uk.gov.homeoffice.drt.db.tables.{PassengersHourly, PassengersHourlyRow}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
