@@ -28,7 +28,7 @@ class PortTerminalConfigDaoTest extends AnyWordSpec with Matchers with BeforeAnd
       ), 2.second)
   }
 
-  "replaceHours" should {
+  "insertOrUpdate" should {
     "insert records into an empty table" in {
       val portCode = PortCode("LHR")
       val terminal = T2
