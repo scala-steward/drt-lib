@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.db.serialisers
 
-import uk.gov.homeoffice.drt.db.{StatusDaily, StatusDailyRow}
+import uk.gov.homeoffice.drt.db.tables.{StatusDaily, StatusDailyRow}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.LocalDate

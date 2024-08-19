@@ -4,7 +4,8 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import specs2.arguments.sequential
-import uk.gov.homeoffice.drt.db.{StatusDaily, TestDatabase}
+import uk.gov.homeoffice.drt.db.TestDatabase
+import uk.gov.homeoffice.drt.db.tables.StatusDaily
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.{T1, T2}
 import uk.gov.homeoffice.drt.time.LocalDate

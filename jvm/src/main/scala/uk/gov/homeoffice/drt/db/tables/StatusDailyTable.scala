@@ -1,4 +1,4 @@
-package uk.gov.homeoffice.drt.db
+package uk.gov.homeoffice.drt.db.tables
 
 import slick.lifted.Tag
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._

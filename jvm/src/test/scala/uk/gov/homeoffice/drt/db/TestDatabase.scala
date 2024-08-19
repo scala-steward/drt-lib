@@ -2,6 +2,7 @@ package uk.gov.homeoffice.drt.db
 
 import slick.jdbc.JdbcProfile
 import slick.lifted.TableQuery
+import uk.gov.homeoffice.drt.db.tables.{ABFeatureTable, UserFeedbackTable}
 
 object TestDatabase {
   val profile: JdbcProfile = slick.jdbc.H2Profile

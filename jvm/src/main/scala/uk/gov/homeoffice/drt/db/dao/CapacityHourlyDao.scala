@@ -3,7 +3,7 @@ package uk.gov.homeoffice.drt.db.dao
 import slick.dbio.Effect
 import slick.sql.FixedSqlAction
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
-import uk.gov.homeoffice.drt.db.{CapacityHourlyRow, CapacityHourlyTable}
+import uk.gov.homeoffice.drt.db.tables.{CapacityHourlyRow, CapacityHourlyTable}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.{LocalDate, SDate, UtcDate}

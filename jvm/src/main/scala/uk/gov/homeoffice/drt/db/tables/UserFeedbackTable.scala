@@ -1,11 +1,8 @@
-package uk.gov.homeoffice.drt.db
+package uk.gov.homeoffice.drt.db.tables
 
-import akka.stream.scaladsl.Source
 import slick.jdbc.PostgresProfile.api._
-import slick.lifted.{TableQuery, Tag}
+import slick.lifted.Tag
 import uk.gov.homeoffice.drt.feedback.UserFeedback
-
-import scala.concurrent.{ExecutionContext, Future}
 
 case class UserFeedbackRow(email: String,
                            createdAt: java.sql.Timestamp,
@@ -45,31 +42,3 @@ class UserFeedbackTable(tag: Tag) extends Table[UserFeedbackRow](tag, "user_feed
   def * = (email, createdAt, feedbackType, bfRole, drtQuality, drtLikes, drtImprovements, participationInterest, abVersion) <> (UserFeedbackRow.tupled, UserFeedbackRow.unapply)
 }
 
-trait IUserFeedbackDao {
-  def insertOrUpdate(userFeedbackRow: UserFeedbackRow): Future[Int]
-
-  def selectAllAsStream(): Source[UserFeedbackRow, _]
-
-  def selectAll()(implicit executionContext: ExecutionContext): Future[Seq[UserFeedbackRow]]
-
-  def selectByEmail(email: String): Future[Seq[UserFeedbackRow]]
-
-}
-
-case class UserFeedbackDao(db: Database) extends IUserFeedbackDao {
-  val userFeedbackTable: TableQuery[UserFeedbackTable] = TableQuery[UserFeedbackTable]
-
-  override def insertOrUpdate(userFeedbackRow: UserFeedbackRow): Future[Int] = {
-    db.run(userFeedbackTable insertOrUpdate userFeedbackRow)
-  }
-
-  override def selectAllAsStream(): Source[UserFeedbackRow, _] = {
-    Source.fromPublisher(db.stream(userFeedbackTable.result))
-  }
-
-  override def selectAll()(implicit executionContext: ExecutionContext): Future[Seq[UserFeedbackRow]] = {
-    db.run(userFeedbackTable.result).mapTo[Seq[UserFeedbackRow]]
-  }
-
-  override def selectByEmail(email: String): Future[Seq[UserFeedbackRow]] = db.run(userFeedbackTable.filter(_.email === email).result)
-}

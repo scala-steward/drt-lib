@@ -6,7 +6,8 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import specs2.arguments.sequential
 import uk.gov.homeoffice.drt.db.serialisers.CapacityHourlySerialiser
-import uk.gov.homeoffice.drt.db.{CapacityHourly, TestDatabase}
+import uk.gov.homeoffice.drt.db.TestDatabase
+import uk.gov.homeoffice.drt.db.tables.CapacityHourly
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.{T1, T2, T3, Terminal}
 import uk.gov.homeoffice.drt.time.{LocalDate, SDate, UtcDate}
