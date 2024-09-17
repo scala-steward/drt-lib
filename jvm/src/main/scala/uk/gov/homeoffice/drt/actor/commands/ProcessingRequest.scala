@@ -13,7 +13,7 @@ sealed trait ProcessingRequest extends Ordered[ProcessingRequest] {
   lazy val start: SDateLike = SDate(date)
   lazy val end: SDateLike = start.addDays(1).addMinutes(-1)
   lazy val duration = (end.millisSinceEpoch - start.millisSinceEpoch).milliseconds
-  lazy val minutesInMillis: NumericRange[MillisSinceEpoch] = start.millisSinceEpoch until end.millisSinceEpoch by 60000
+  lazy val minutesInMillis: NumericRange[MillisSinceEpoch] = start.millisSinceEpoch to end.millisSinceEpoch by 60000
 
   override def toString: String = s"${getClass.getSimpleName}(${date.getClass.getSimpleName} $date)"
 
