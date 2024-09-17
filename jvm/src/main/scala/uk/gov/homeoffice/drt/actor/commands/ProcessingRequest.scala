@@ -1,5 +1,6 @@
 package uk.gov.homeoffice.drt.actor.commands
 
+import uk.gov.homeoffice.drt.ports.AirportConfig
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch
 import uk.gov.homeoffice.drt.time.TimeZoneHelper.europeLondonTimeZone
@@ -32,6 +33,11 @@ sealed trait LoadProcessingRequest extends ProcessingRequest {
 }
 
 case class TerminalUpdateRequest(terminal: Terminal, date: LocalDate, offsetMinutes: Int, durationMinutes: Int) extends LoadProcessingRequest
+
+object TerminalUpdateRequest {
+  def apply(airportConfig: AirportConfig): (Terminal, LocalDate) => TerminalUpdateRequest =
+    (terminal, date) => TerminalUpdateRequest(terminal, date, airportConfig.crunchOffsetMinutes, airportConfig.minutesToCrunch)
+}
 
 case class RemoveProcessingRequest(request: ProcessingRequest)
 
