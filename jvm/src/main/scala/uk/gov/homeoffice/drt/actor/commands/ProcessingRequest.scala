@@ -15,7 +15,7 @@ sealed trait ProcessingRequest extends Ordered[ProcessingRequest] {
   lazy val duration = (end.millisSinceEpoch - start.millisSinceEpoch).milliseconds
   lazy val minutesInMillis: NumericRange[MillisSinceEpoch] = start.millisSinceEpoch to end.millisSinceEpoch by 60000
 
-  override def toString: String = s"${getClass.getSimpleName}(${date.getClass.getSimpleName} $date)"
+//  override def toString: String = s"${getClass.getSimpleName}(${date.getClass.getSimpleName} $date)"
 
   override def compare(that: ProcessingRequest): Int =
     if (date < that.date) -1
@@ -31,7 +31,7 @@ sealed trait LoadProcessingRequest extends ProcessingRequest {
 //  override lazy val end: SDateLike = start.addMinutes(durationMinutes)
 }
 
-case class TerminalUpdateRequest(terminal: Terminal, date: LocalDate/*, offsetMinutes: Int, durationMinutes: Int*/) extends LoadProcessingRequest
+case class TerminalUpdateRequest(terminal: Terminal, date: LocalDate) extends LoadProcessingRequest
 
 //object TerminalUpdateRequest {
 //  def apply(airportConfig: AirportConfig): (Terminal, LocalDate) => TerminalUpdateRequest =
