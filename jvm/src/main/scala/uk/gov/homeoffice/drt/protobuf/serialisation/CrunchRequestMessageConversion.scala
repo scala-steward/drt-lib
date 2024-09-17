@@ -29,8 +29,8 @@ object CrunchRequestMessageConversion {
       year = Option(cr.date.year),
       month = Option(cr.date.month),
       day = Option(cr.date.day),
-      offsetMinutes = Option(cr.offsetMinutes),
-      durationMinutes = Option(cr.durationMinutes),
+      offsetMinutes = None,
+      durationMinutes = None,
       terminalName = maybeTerminalName,
     )
   }
@@ -44,12 +44,12 @@ object CrunchRequestMessageConversion {
   }
 
   val loadProcessingRequestFromMessage: CrunchRequestMessage => LoadProcessingRequest = {
-    case CrunchRequestMessage(Some(year), Some(month), Some(day), Some(offsetMinutes), Some(durationMinutes), maybeTerminalName) =>
+    case CrunchRequestMessage(Some(year), Some(month), Some(day), _, _, maybeTerminalName) =>
       maybeTerminalName match {
         case None =>
-          CrunchRequest(LocalDate(year, month, day), offsetMinutes, durationMinutes)
+          CrunchRequest(LocalDate(year, month, day))
         case Some(terminalName) =>
-          TerminalUpdateRequest(Terminal(terminalName), LocalDate(year, month, day), offsetMinutes, durationMinutes)
+          TerminalUpdateRequest(Terminal(terminalName), LocalDate(year, month, day))
       }
   }
 

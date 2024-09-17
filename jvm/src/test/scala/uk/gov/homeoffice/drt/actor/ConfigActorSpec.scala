@@ -26,7 +26,7 @@ class ConfigActorSpec
   }
 
   val myNow: () => SDateLike = () => SDate("2023-10-10T00:00")
-  val crunchRequest: LocalDate => CrunchRequest = date => CrunchRequest(SDate(date).toLocalDate, 0, 1440)
+  val crunchRequest: LocalDate => CrunchRequest = date => CrunchRequest(SDate(date).toLocalDate)
 
   "A new config actor" must {
     "have empty state" in {
@@ -86,8 +86,8 @@ class ConfigActorSpec
       actor ! Commands.AddUpdatesSubscriber(testProbe.ref)
       actor ! ConfigActor.SetUpdate(update)
 
-      testProbe.expectMsg(CrunchRequest(LocalDate(2023, 10, 11), 0, 1440))
-      testProbe.expectMsg(CrunchRequest(LocalDate(2023, 10, 12), 0, 1440))
+      testProbe.expectMsg(CrunchRequest(LocalDate(2023, 10, 11)))
+      testProbe.expectMsg(CrunchRequest(LocalDate(2023, 10, 12)))
     }
   }
 }

@@ -1,6 +1,5 @@
 package uk.gov.homeoffice.drt.actor.commands
 
-import uk.gov.homeoffice.drt.ports.AirportConfig
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch
 import uk.gov.homeoffice.drt.time.TimeZoneHelper.europeLondonTimeZone
@@ -26,33 +25,33 @@ sealed trait ProcessingRequest extends Ordered[ProcessingRequest] {
 
 sealed trait LoadProcessingRequest extends ProcessingRequest {
   val date: LocalDate
-  val offsetMinutes: Int
-  val durationMinutes: Int
-  override lazy val start: SDateLike = SDate(date).addMinutes(offsetMinutes)
-  override lazy val end: SDateLike = start.addMinutes(durationMinutes)
+//  val offsetMinutes: Int
+//  val durationMinutes: Int
+//  override lazy val start: SDateLike = SDate(date).addMinutes(offsetMinutes)
+//  override lazy val end: SDateLike = start.addMinutes(durationMinutes)
 }
 
-case class TerminalUpdateRequest(terminal: Terminal, date: LocalDate, offsetMinutes: Int, durationMinutes: Int) extends LoadProcessingRequest
+case class TerminalUpdateRequest(terminal: Terminal, date: LocalDate/*, offsetMinutes: Int, durationMinutes: Int*/) extends LoadProcessingRequest
 
-object TerminalUpdateRequest {
-  def apply(airportConfig: AirportConfig): (Terminal, LocalDate) => TerminalUpdateRequest =
-    (terminal, date) => TerminalUpdateRequest(terminal, date, airportConfig.crunchOffsetMinutes, airportConfig.minutesToCrunch)
-}
+//object TerminalUpdateRequest {
+//  def apply(airportConfig: AirportConfig): (Terminal, LocalDate) => TerminalUpdateRequest =
+//    (terminal, date) => TerminalUpdateRequest(terminal, date, airportConfig.crunchOffsetMinutes, airportConfig.minutesToCrunch)
+//}
 
 case class RemoveProcessingRequest(request: ProcessingRequest)
 
-case class CrunchRequest(date: LocalDate, offsetMinutes: Int, durationMinutes: Int) extends LoadProcessingRequest
+case class CrunchRequest(date: LocalDate/*, offsetMinutes: Int, durationMinutes: Int*/) extends LoadProcessingRequest
 
 case class MergeArrivalsRequest(date: UtcDate) extends ProcessingRequest
 
-object CrunchRequest {
-  def apply(millis: MillisSinceEpoch, offsetMinutes: Int, durationMinutes: Int): CrunchRequest = {
-    val midnight = SDate(millis, europeLondonTimeZone)
-      .addMinutes(-1 * offsetMinutes)
-      .getLocalLastMidnight
-    val localDate = midnight
-      .toLocalDate
-
-    CrunchRequest(localDate, offsetMinutes, durationMinutes)
-  }
-}
+//object CrunchRequest {
+//  def apply(millis: MillisSinceEpoch, offsetMinutes: Int, durationMinutes: Int): CrunchRequest = {
+//    val midnight = SDate(millis, europeLondonTimeZone)
+//      .addMinutes(-1 * offsetMinutes)
+//      .getLocalLastMidnight
+//    val localDate = midnight
+//      .toLocalDate
+//
+//    CrunchRequest(localDate, offsetMinutes, durationMinutes)
+//  }
+//}

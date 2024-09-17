@@ -8,7 +8,7 @@ import uk.gov.homeoffice.drt.time.{LocalDate, UtcDate}
 class CrunchRequestMessageConversionTest extends AnyWordSpec with Matchers {
   "loadProcessingRequestToMessage" should {
     "Serialise and deserialise a CrunchRequest without losing anything" in {
-      val request = CrunchRequest(LocalDate(2021, 1, 1), 1, 1)
+      val request = CrunchRequest(LocalDate(2021, 1, 1))
       val result = CrunchRequestMessageConversion.loadProcessingRequestToMessage(request)
       val deserialised = CrunchRequestMessageConversion.loadProcessingRequestFromMessage(result)
 
