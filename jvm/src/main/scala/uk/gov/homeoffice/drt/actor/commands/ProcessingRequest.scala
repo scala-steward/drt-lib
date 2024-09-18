@@ -6,22 +6,22 @@ import uk.gov.homeoffice.drt.time.TimeZoneHelper.europeLondonTimeZone
 import uk.gov.homeoffice.drt.time._
 
 import scala.collection.immutable.NumericRange
-import scala.concurrent.duration.DurationLong
+import scala.concurrent.duration.{DurationLong, FiniteDuration}
 
-sealed trait ProcessingRequest extends Ordered[ProcessingRequest] {
-  val date: DateLike
-  lazy val start: SDateLike = SDate(date)
-  lazy val end: SDateLike = start.addDays(1).addMinutes(-1)
-  lazy val duration = (end.millisSinceEpoch - start.millisSinceEpoch).milliseconds
-  lazy val minutesInMillis: NumericRange[MillisSinceEpoch] = start.millisSinceEpoch to end.millisSinceEpoch by 60000
-
-//  override def toString: String = s"${getClass.getSimpleName}(${date.getClass.getSimpleName} $date)"
-
-  override def compare(that: ProcessingRequest): Int =
-    if (date < that.date) -1
-    else if (date > that.date) 1
-    else 0
-}
+//sealed trait ProcessingRequest extends Ordered[ProcessingRequest] {
+//  val date: DateLike
+//  lazy val start: SDateLike = SDate(date)
+//  lazy val end: SDateLike = start.addDays(1).addMinutes(-1)
+//  lazy val duration = (end.millisSinceEpoch - start.millisSinceEpoch).milliseconds
+//  lazy val minutesInMillis: NumericRange[MillisSinceEpoch] = start.millisSinceEpoch to end.millisSinceEpoch by 60000
+//
+////  override def toString: String = s"${getClass.getSimpleName}(${date.getClass.getSimpleName} $date)"
+//
+//  override def compare(that: ProcessingRequest): Int =
+//    if (date < that.date) -1
+//    else if (date > that.date) 1
+//    else 0
+//}
 
 //sealed trait LoadProcessingRequest extends ProcessingRequest {
 //  val date: LocalDate
@@ -32,6 +32,11 @@ sealed trait ProcessingRequest extends Ordered[ProcessingRequest] {
 //}
 
 case class TerminalUpdateRequest(terminal: Terminal, date: LocalDate) extends Ordered[TerminalUpdateRequest] {
+  lazy val start: SDateLike = SDate(date)
+  lazy val end: SDateLike = start.addDays(1).addMinutes(-1)
+  lazy val duration: FiniteDuration = (end.millisSinceEpoch - start.millisSinceEpoch).milliseconds
+  lazy val minutesInMillis: NumericRange[MillisSinceEpoch] = start.millisSinceEpoch to end.millisSinceEpoch by 60000
+
   override def compare(that: TerminalUpdateRequest): Int = {
     val dateVal = date.compareTo(that.date) * 10
     val terminalVal = terminal.compare(that.terminal)
@@ -48,7 +53,7 @@ case class RemoveProcessingRequest(request: TerminalUpdateRequest)
 
 case class CrunchRequest(date: LocalDate/*, offsetMinutes: Int, durationMinutes: Int*/)// extends LoadProcessingRequest
 
-case class MergeArrivalsRequest(date: UtcDate) extends ProcessingRequest
+case class MergeArrivalsRequest(date: UtcDate)// extends ProcessingRequest
 
 //object CrunchRequest {
 //  def apply(millis: MillisSinceEpoch, offsetMinutes: Int, durationMinutes: Int): CrunchRequest = {
