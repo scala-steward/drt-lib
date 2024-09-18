@@ -20,20 +20,15 @@ object CrunchRequestMessageConversion {
     }
   }
 
-  def loadProcessingRequestToMessage(cr: LoadProcessingRequest): CrunchRequestMessage = {
-    val maybeTerminalName = cr match {
-      case _: CrunchRequest => None
-      case tur: TerminalUpdateRequest => Option(tur.terminal.toString)
-    }
+  def terminalUpdateRequestToMessage(cr: TerminalUpdateRequest): CrunchRequestMessage =
     CrunchRequestMessage(
       year = Option(cr.date.year),
       month = Option(cr.date.month),
       day = Option(cr.date.day),
       offsetMinutes = None,
       durationMinutes = None,
-      terminalName = maybeTerminalName,
+      terminalName = Option(cr.terminal.toString),
     )
-  }
 
   def mergeArrivalRequestToMessage(mar: MergeArrivalsRequest): MergeArrivalsRequestMessage = {
     MergeArrivalsRequestMessage(
@@ -43,13 +38,13 @@ object CrunchRequestMessageConversion {
     )
   }
 
-  val loadProcessingRequestFromMessage: CrunchRequestMessage => LoadProcessingRequest = {
+  def terminalUpdateRequestsFromMessage(terminals: Iterable[Terminal]): CrunchRequestMessage => Seq[TerminalUpdateRequest] = {
     case CrunchRequestMessage(Some(year), Some(month), Some(day), _, _, maybeTerminalName) =>
       maybeTerminalName match {
         case None =>
-          CrunchRequest(LocalDate(year, month, day))
+          terminals.map(TerminalUpdateRequest(_, LocalDate(year, month, day))).toSeq
         case Some(terminalName) =>
-          TerminalUpdateRequest(Terminal(terminalName), LocalDate(year, month, day))
+          Seq(TerminalUpdateRequest(Terminal(terminalName), LocalDate(year, month, day)))
       }
   }
 
