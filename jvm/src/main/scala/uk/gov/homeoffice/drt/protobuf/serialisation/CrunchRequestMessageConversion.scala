@@ -12,12 +12,7 @@ object CrunchRequestMessageConversion {
 
   def removeProcessingRequestToMessage(request: RemoveProcessingRequest): GeneratedMessage = {
     val date = request.request.date
-    request.request match {
-      case _: CrunchRequest =>
-        RemoveCrunchRequestMessage(Option(date.year), Option(date.month), Option(date.day))
-      case _: MergeArrivalsRequest =>
-        RemoveMergeArrivalsRequestMessage(Option(date.year), Option(date.month), Option(date.day))
-    }
+    RemoveCrunchRequestMessage(Option(date.year), Option(date.month), Option(date.day), Option(request.request.terminal.toString))
   }
 
   def terminalUpdateRequestToMessage(cr: TerminalUpdateRequest): CrunchRequestMessage =
