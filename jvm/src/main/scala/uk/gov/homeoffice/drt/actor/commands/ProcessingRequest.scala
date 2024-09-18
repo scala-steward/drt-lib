@@ -23,15 +23,21 @@ sealed trait ProcessingRequest extends Ordered[ProcessingRequest] {
     else 0
 }
 
-sealed trait LoadProcessingRequest extends ProcessingRequest {
-  val date: LocalDate
-//  val offsetMinutes: Int
-//  val durationMinutes: Int
-//  override lazy val start: SDateLike = SDate(date).addMinutes(offsetMinutes)
-//  override lazy val end: SDateLike = start.addMinutes(durationMinutes)
-}
+//sealed trait LoadProcessingRequest extends ProcessingRequest {
+//  val date: LocalDate
+////  val offsetMinutes: Int
+////  val durationMinutes: Int
+////  override lazy val start: SDateLike = SDate(date).addMinutes(offsetMinutes)
+////  override lazy val end: SDateLike = start.addMinutes(durationMinutes)
+//}
 
-case class TerminalUpdateRequest(terminal: Terminal, date: LocalDate) extends LoadProcessingRequest
+case class TerminalUpdateRequest(terminal: Terminal, date: LocalDate) extends Ordered[TerminalUpdateRequest] {
+  override def compare(that: TerminalUpdateRequest): Int = {
+    val dateVal = date.compareTo(that.date) * 10
+    val terminalVal = terminal.compare(that.terminal)
+    dateVal + terminalVal
+  }
+}
 
 //object TerminalUpdateRequest {
 //  def apply(airportConfig: AirportConfig): (Terminal, LocalDate) => TerminalUpdateRequest =
@@ -40,7 +46,7 @@ case class TerminalUpdateRequest(terminal: Terminal, date: LocalDate) extends Lo
 
 case class RemoveProcessingRequest(request: ProcessingRequest)
 
-case class CrunchRequest(date: LocalDate/*, offsetMinutes: Int, durationMinutes: Int*/) extends LoadProcessingRequest
+case class CrunchRequest(date: LocalDate/*, offsetMinutes: Int, durationMinutes: Int*/)// extends LoadProcessingRequest
 
 case class MergeArrivalsRequest(date: UtcDate) extends ProcessingRequest
 
