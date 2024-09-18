@@ -44,7 +44,7 @@ case class TerminalUpdateRequest(terminal: Terminal, date: LocalDate) extends Or
 //    (terminal, date) => TerminalUpdateRequest(terminal, date, airportConfig.crunchOffsetMinutes, airportConfig.minutesToCrunch)
 //}
 
-case class RemoveProcessingRequest(request: ProcessingRequest)
+case class RemoveProcessingRequest(request: TerminalUpdateRequest)
 
 case class CrunchRequest(date: LocalDate/*, offsetMinutes: Int, durationMinutes: Int*/)// extends LoadProcessingRequest
 
