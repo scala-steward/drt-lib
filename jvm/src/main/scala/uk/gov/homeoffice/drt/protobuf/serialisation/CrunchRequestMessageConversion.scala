@@ -12,28 +12,18 @@ object CrunchRequestMessageConversion {
 
   def removeProcessingRequestToMessage(request: RemoveProcessingRequest): GeneratedMessage = {
     val date = request.request.date
-    request.request match {
-      case _: CrunchRequest =>
-        RemoveCrunchRequestMessage(Option(date.year), Option(date.month), Option(date.day))
-      case _: MergeArrivalsRequest =>
-        RemoveMergeArrivalsRequestMessage(Option(date.year), Option(date.month), Option(date.day))
-    }
+    RemoveCrunchRequestMessage(Option(date.year), Option(date.month), Option(date.day), Option(request.request.terminal.toString))
   }
 
-  def loadProcessingRequestToMessage(cr: LoadProcessingRequest): CrunchRequestMessage = {
-    val maybeTerminalName = cr match {
-      case _: CrunchRequest => None
-      case tur: TerminalUpdateRequest => Option(tur.terminal.toString)
-    }
+  def terminalUpdateRequestToMessage(cr: TerminalUpdateRequest): CrunchRequestMessage =
     CrunchRequestMessage(
       year = Option(cr.date.year),
       month = Option(cr.date.month),
       day = Option(cr.date.day),
-      offsetMinutes = Option(cr.offsetMinutes),
-      durationMinutes = Option(cr.durationMinutes),
-      terminalName = maybeTerminalName,
+      offsetMinutes = None,
+      durationMinutes = None,
+      terminalName = Option(cr.terminal.toString),
     )
-  }
 
   def mergeArrivalRequestToMessage(mar: MergeArrivalsRequest): MergeArrivalsRequestMessage = {
     MergeArrivalsRequestMessage(
@@ -43,13 +33,13 @@ object CrunchRequestMessageConversion {
     )
   }
 
-  val loadProcessingRequestFromMessage: CrunchRequestMessage => LoadProcessingRequest = {
-    case CrunchRequestMessage(Some(year), Some(month), Some(day), Some(offsetMinutes), Some(durationMinutes), maybeTerminalName) =>
+  def terminalUpdateRequestsFromMessage(terminals: Iterable[Terminal]): CrunchRequestMessage => Seq[TerminalUpdateRequest] = {
+    case CrunchRequestMessage(Some(year), Some(month), Some(day), _, _, maybeTerminalName) =>
       maybeTerminalName match {
         case None =>
-          CrunchRequest(LocalDate(year, month, day), offsetMinutes, durationMinutes)
+          terminals.map(TerminalUpdateRequest(_, LocalDate(year, month, day))).toSeq
         case Some(terminalName) =>
-          TerminalUpdateRequest(Terminal(terminalName), LocalDate(year, month, day), offsetMinutes, durationMinutes)
+          Seq(TerminalUpdateRequest(Terminal(terminalName), LocalDate(year, month, day)))
       }
   }
 
