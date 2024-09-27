@@ -29,6 +29,7 @@ object PortCode {
 }
 
 case class AirportConfig(portCode: PortCode,
+                         portName: String,
                          queuesByTerminal: SortedMap[Terminal, Seq[Queue]],
                          divertedQueues: Map[Queue, Queue] = Map(),
                          flexedQueues: Set[Queue] = Set(),

@@ -16,6 +16,7 @@ object Bfs extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("BFS"),
+    portName = "Belfast International",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.NonEeaDesk, Queues.EeaDesk)
     ),

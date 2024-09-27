@@ -16,6 +16,7 @@ object Sen extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("SEN"),
+    portName = "London Southend",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.EeaDesk, Queues.NonEeaDesk)
     ),

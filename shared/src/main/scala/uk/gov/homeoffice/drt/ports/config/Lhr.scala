@@ -26,6 +26,7 @@ object Lhr extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("LHR"),
+    portName = "London Heathrow",
     queuesByTerminal = SortedMap(
       T2 -> Seq(EeaDesk, EGate, NonEeaDesk, FastTrack, Transfer),
       T3 -> Seq(EeaDesk, EGate, NonEeaDesk, FastTrack, Transfer),

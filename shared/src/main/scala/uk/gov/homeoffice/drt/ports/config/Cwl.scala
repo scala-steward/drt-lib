@@ -13,6 +13,7 @@ object Cwl extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("CWL"),
+    portName = "Cardiff",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.NonEeaDesk, Queues.EeaDesk, Queues.EGate)
     ),

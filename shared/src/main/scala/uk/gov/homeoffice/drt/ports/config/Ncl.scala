@@ -16,6 +16,7 @@ object Ncl extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("NCL"),
+    portName = "Newcastle International",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.NonEeaDesk, Queues.EeaDesk, Queues.EGate)
     ),

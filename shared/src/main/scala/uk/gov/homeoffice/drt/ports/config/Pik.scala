@@ -13,6 +13,7 @@ object Pik extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("PIK"),
+    portName = "Glasgow Prestwick",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.QueueDesk)
     ),
