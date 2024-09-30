@@ -15,6 +15,7 @@ object Edi extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("EDI"),
+    portName = "Edinburgh",
     queuesByTerminal = SortedMap(
       A1 -> Seq(EeaDesk, EGate, NonEeaDesk),
       A2 -> Seq(EeaDesk, EGate, NonEeaDesk)

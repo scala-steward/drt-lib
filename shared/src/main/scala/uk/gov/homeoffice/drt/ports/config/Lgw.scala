@@ -16,6 +16,7 @@ object Lgw extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("LGW"),
+    portName = "London Gatwick",
     queuesByTerminal = SortedMap(
       N -> Seq(EeaDesk, EGate, NonEeaDesk),
       S -> Seq(EeaDesk, EGate, NonEeaDesk)

@@ -16,6 +16,7 @@ object Ltn extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("LTN"),
+    portName = "Luton",
     queuesByTerminal = SortedMap(
       T1 -> Seq(EeaDesk, EGate, NonEeaDesk)
     ),

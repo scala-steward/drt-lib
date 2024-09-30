@@ -16,6 +16,7 @@ object Brs extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("BRS"),
+    portName = "Bristol",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.EeaDesk, Queues.NonEeaDesk, Queues.EGate)
     ),

@@ -16,6 +16,7 @@ object Huy extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("HUY"),
+    portName = "Humberside",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.EeaDesk, Queues.NonEeaDesk)
     ),

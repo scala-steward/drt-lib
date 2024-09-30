@@ -15,6 +15,7 @@ object Abz extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("ABZ"),
+    portName = "Aberdeen",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.NonEeaDesk, Queues.EeaDesk)
     ),

@@ -16,6 +16,7 @@ object Bhx extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("BHX"),
+    portName = "Birmingham",
     queuesByTerminal = SortedMap(
       T1 -> Seq(EeaDesk, EGate, NonEeaDesk),
       T2 -> Seq(EeaDesk, NonEeaDesk)
