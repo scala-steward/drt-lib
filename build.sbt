@@ -28,7 +28,7 @@ lazy val specs2Version = "4.20.3"
 lazy val csvCommonsVersion = "1.10.0"
 lazy val catsVersion = "2.10.0"
 lazy val scribeSlf4jVersion = "3.12.2"
-lazy val slickVersion = "3.4.1"
+lazy val slickVersion = "3.5.2"
 lazy val h2Version = "2.2.220"
 lazy val sprayJsonVersion = "1.3.6"
 
