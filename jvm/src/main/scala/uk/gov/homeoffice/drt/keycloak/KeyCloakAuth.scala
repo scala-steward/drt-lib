@@ -1,6 +1,5 @@
 package uk.gov.homeoffice.drt.keycloak
 
-import akka.actor.ActorSystem
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.Accept
@@ -9,13 +8,11 @@ import akka.stream.Materializer
 import org.slf4j.{Logger, LoggerFactory}
 import spray.json.{DefaultJsonProtocol, JsNumber, JsObject, JsString, JsValue, RootJsonFormat}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-abstract case class KeyCloakAuth(tokenUrl: String, clientId: String, clientSecret: String, sendHttpRequest: HttpRequest => Future[HttpResponse])
-                                (implicit val system: ActorSystem, mat: Materializer)
+case class KeyCloakAuth(tokenUrl: String, clientId: String, clientSecret: String, sendHttpRequest: HttpRequest => Future[HttpResponse])
+                                (implicit ec: ExecutionContext, mat: Materializer)
   extends KeyCloakAuthTokenParserProtocol {
-
-  import system.dispatcher
 
   val log: Logger = LoggerFactory.getLogger(getClass)
 
@@ -54,8 +51,6 @@ case class KeyCloakAuthToken(accessToken: String,
                              scope: String) extends KeyCloakAuthResponse
 
 case class KeyCloakAuthError(error: String, errorDescription: String) extends KeyCloakAuthResponse
-
-object KeyCloakAuthTokenParserProtocol extends KeyCloakAuthTokenParserProtocol
 
 
 trait KeyCloakAuthTokenParserProtocol extends SprayJsonSupport with DefaultJsonProtocol {

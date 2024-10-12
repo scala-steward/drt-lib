@@ -1,6 +1,5 @@
 package uk.gov.homeoffice.drt.keycloak
 
-import akka.actor.ActorSystem
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.{Accept, Authorization, OAuth2BearerToken}
@@ -11,15 +10,14 @@ import org.slf4j.{Logger, LoggerFactory}
 import spray.json.{DefaultJsonProtocol, JsObject, JsValue, RootJsonFormat}
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 
-abstract case class KeyCloakClient(token: String, keyCloakUrl: String, sendHttpRequest: HttpRequest => Future[HttpResponse])
-                                  (implicit val system: ActorSystem, mat: Materializer)
+case class KeyCloakClient(token: String, keyCloakUrl: String, sendHttpRequest: HttpRequest => Future[HttpResponse])
+                         (implicit val ec: ExecutionContext, mat: Materializer)
   extends KeyCloakUserParserProtocol {
 
-  import system.dispatcher
-  import KeyCloakUserParserProtocol.KeyCloakUserFormatParser._
+//  import KeyCloakUserParserProtocol.KeyCloakUserFormatParser._
 
   def log: Logger = LoggerFactory.getLogger(getClass)
 
@@ -43,7 +41,7 @@ abstract case class KeyCloakClient(token: String, keyCloakUrl: String, sendHttpR
     }
   }
 
-  def getUsersForEmail(email: String): Future[Option[KeyCloakUser]] = {
+  def getUserForEmail(email: String): Future[Option[KeyCloakUser]] = {
     val uri = keyCloakUrl + s"/users?email=$email"
     log.info(s"Calling key cloak: $uri")
     pipeline(HttpMethods.GET, uri, "getUsersForEmail")
@@ -56,11 +54,28 @@ abstract case class KeyCloakClient(token: String, keyCloakUrl: String, sendHttpR
     pipeline(HttpMethods.GET, uri, "getUsers").flatMap { r => Unmarshal(r).to[List[KeyCloakUser]] }
   }
 
+  def getUserByUsername(username: String): Future[Option[KeyCloakUser]] = {
+    val uri = keyCloakUrl + s"/users?username=$username"
+    log.info(s"Calling key cloak: $uri")
+    pipeline(HttpMethods.GET, uri, "getUsersForUsername")
+      .flatMap { r => Unmarshal(r).to[List[KeyCloakUser]] }.map(_.headOption)
+  }
+
   def getAllUsers(offset: Int = 0): Seq[KeyCloakUser] = {
-
     val users = Await.result(getUsers(50, offset), 2 seconds)
-
     if (users.isEmpty) Nil else users ++ getAllUsers(offset + 50)
+  }
+
+  def removeUser(userId: String): Future[HttpResponse] = {
+    log.info(s"Removing $userId")
+    val uri = s"$keyCloakUrl/users/$userId"
+    pipeline(HttpMethods.DELETE, uri, "removeUserFromGroup")
+  }
+
+  def logUserOut(userId: String): Future[HttpResponse] = {
+    log.info(s"Logout $userId")
+    val uri = s"$keyCloakUrl/users/$userId/logout"
+    pipeline(HttpMethods.POST, uri, "logoutUser")
   }
 
   def getUserGroups(userId: String): Future[List[KeyCloakGroup]] = {
@@ -133,6 +148,6 @@ trait KeyCloakUserParserProtocol extends DefaultJsonProtocol with SprayJsonSuppo
 }
 
 
-object KeyCloakUserParserProtocol extends KeyCloakUserParserProtocol
+//object KeyCloakUserParserProtocol extends KeyCloakUserParserProtocol
 
 
