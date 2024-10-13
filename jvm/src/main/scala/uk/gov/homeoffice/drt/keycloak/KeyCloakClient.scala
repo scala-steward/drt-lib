@@ -17,7 +17,7 @@ case class KeyCloakClient(token: String, keyCloakUrl: String, sendHttpRequest: H
                          (implicit val ec: ExecutionContext, mat: Materializer)
   extends KeyCloakUserParserProtocol {
 
-//  import KeyCloakUserParserProtocol.KeyCloakUserFormatParser._
+  import KeyCloakUserFormatParser._
 
   def log: Logger = LoggerFactory.getLogger(getClass)
 
@@ -146,8 +146,3 @@ trait KeyCloakUserParserProtocol extends DefaultJsonProtocol with SprayJsonSuppo
 
   implicit val keyCloakGroupFormat: RootJsonFormat[KeyCloakGroup] = jsonFormat3(KeyCloakGroup)
 }
-
-
-//object KeyCloakUserParserProtocol extends KeyCloakUserParserProtocol
-
-
