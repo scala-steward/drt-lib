@@ -7,7 +7,7 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
 import akka.util.Timeout
 import org.slf4j.{Logger, LoggerFactory}
-import spray.json.{DefaultJsonProtocol, JsObject, JsValue, RootJsonFormat}
+import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -16,8 +16,6 @@ import scala.language.postfixOps
 case class KeyCloakClient(token: String, keyCloakUrl: String, sendHttpRequest: HttpRequest => Future[HttpResponse])
                          (implicit val ec: ExecutionContext, mat: Materializer)
   extends KeyCloakUserParserProtocol {
-
-  import KeyCloakUserFormatParser._
 
   def log: Logger = LoggerFactory.getLogger(getClass)
 
@@ -127,22 +125,7 @@ case class KeyCloakClient(token: String, keyCloakUrl: String, sendHttpRequest: H
 
 trait KeyCloakUserParserProtocol extends DefaultJsonProtocol with SprayJsonSupport {
 
-  implicit object KeyCloakUserFormatParser extends RootJsonFormat[KeyCloakUser] {
-    override def write(obj: KeyCloakUser): JsValue = throw new Exception("KeyCloakUser writer not implemented")
-
-    override def read(json: JsValue): KeyCloakUser = json match {
-      case JsObject(fields) =>
-        KeyCloakUser(
-          fields.get("id").map(_.convertTo[String]).getOrElse(""),
-          fields.get("username").map(_.convertTo[String]).getOrElse(""),
-          fields.get("enabled").exists(_.convertTo[Boolean]),
-          fields.get("emailVerified").exists(_.convertTo[Boolean]),
-          fields.get("firstName").map(_.convertTo[String]).getOrElse(""),
-          fields.get("lastName").map(_.convertTo[String]).getOrElse(""),
-          fields.get("email").map(_.convertTo[String]).getOrElse("")
-        )
-    }
-  }
+  implicit val keyCloakUserFormatParser: RootJsonFormat[KeyCloakUser] = jsonFormat7(KeyCloakUser)
 
   implicit val keyCloakGroupFormat: RootJsonFormat[KeyCloakGroup] = jsonFormat3(KeyCloakGroup)
 }
