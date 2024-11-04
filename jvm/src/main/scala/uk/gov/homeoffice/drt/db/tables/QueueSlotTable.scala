@@ -52,7 +52,7 @@ class QueueSlotTable(tag: Tag)
 
   def updatedAt: Rep[Timestamp] = column[Timestamp]("updated_at")
 
-  def pk = primaryKey("pk_flight", (port, terminal, queue, slotStart, slotLengthMinutes))
+  def pk = primaryKey("pk_queue_slot", (port, terminal, queue, slotStart, slotLengthMinutes))
 
   def * = (
     port,
