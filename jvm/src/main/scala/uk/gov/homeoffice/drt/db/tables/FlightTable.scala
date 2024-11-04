@@ -35,7 +35,7 @@ case class FlightTimings(scheduled: Timestamp,
                        )
 
 class FlightTable(tag: Tag)
-  extends Table[FlightRow](tag, "capacity_hourly") {
+  extends Table[FlightRow](tag, "flight") {
 
   def port: Rep[String] = column[String]("port")
 

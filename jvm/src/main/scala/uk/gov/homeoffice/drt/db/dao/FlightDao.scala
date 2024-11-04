@@ -17,11 +17,11 @@ case class FlightDao(portCode: PortCode)
 
   val toRow: ApiFlightWithSplits => FlightRow = FlightSerialiser.toRow(portCode)
 
-  def get(destination: String, origin: String, terminal: String, scheduled: Long, voyageNumber: Int): DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
+  def get(port: String, origin: String, terminal: String, scheduled: Long, voyageNumber: Int): DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
     table
       .filter(f =>
         f.origin === origin &&
-          f.port === destination &&
+          f.port === port &&
           f.terminal === terminal &&
           f.scheduled === new Timestamp(scheduled) &&
           f.voyageNumber === voyageNumber)
