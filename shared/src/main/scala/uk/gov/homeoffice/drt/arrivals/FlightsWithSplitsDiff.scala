@@ -52,8 +52,12 @@ case class FlightsWithSplitsDiff(flightsToUpdate: Iterable[ApiFlightWithSplits],
 
   def updateMinutes(sourceOrderPreference: List[FeedSource]): Set[Long] = flightsToUpdate.flatMap(_.apiFlight.pcpRange(sourceOrderPreference)).toSet
 
-  def applyTo(flightsWithSplits: FlightsWithSplits, nowMillis: Long, sourceOrderPreference: List[FeedSource]): (FlightsWithSplits, Set[Long]) = {
-    val updated = flightsWithSplits.flights ++ flightsToUpdate.map(f => (f.apiFlight.unique, f.copy(lastUpdated = Option(nowMillis))))
+  def applyTo(flightsWithSplits: FlightsWithSplits,
+              nowMillis: Long,
+              sourceOrderPreference: List[FeedSource],
+             ): (FlightsWithSplits, Set[Long], Iterable[ApiFlightWithSplits]) = {
+    val updatedFlights = flightsToUpdate.map(_.copy(lastUpdated = Option(nowMillis)))
+    val updated = flightsWithSplits.flights ++ updatedFlights.map(f => f.unique -> f)
 
     val minusRemovals: Map[UniqueArrival, ApiFlightWithSplits] = ArrivalsRemoval.removeArrivals(arrivalsToRemove, updated)
 
@@ -79,7 +83,7 @@ case class FlightsWithSplitsDiff(flightsToUpdate: Iterable[ApiFlightWithSplits],
       updateMinutes(sourceOrderPreference) ++
       minutesFromExistingStateUpdatedFlights
 
-    (FlightsWithSplits(minusRemovals), updatedMinutesFromFlights)
+    (FlightsWithSplits(minusRemovals), updatedMinutesFromFlights, updatedFlights)
   }
 
   lazy val terminals: Set[Terminal] = flightsToUpdate.map(_.apiFlight.Terminal).toSet ++

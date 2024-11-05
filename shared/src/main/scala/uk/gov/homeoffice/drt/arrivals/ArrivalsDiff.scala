@@ -57,16 +57,21 @@ case class ArrivalsDiff(toUpdate: Map[UniqueArrival, Arrival], toRemove: Iterabl
 
   def updateMinutes(sourceOrderPreference: List[FeedSource]): Set[Long] = toUpdate.values.flatMap(_.pcpRange(sourceOrderPreference)).toSet
 
-  def applyTo(existingFlights: FlightsWithSplits, nowMillis: Long, sourceOrderPreference: List[FeedSource]): (FlightsWithSplits, Set[Long]) = {
-    val updated = toUpdate.foldLeft(existingFlights.flights) {
-      case (acc, (key, incomingArrival)) =>
-        acc.get(key) match {
+  def applyTo(existingFlights: FlightsWithSplits,
+              nowMillis: Long,
+              sourceOrderPreference: List[FeedSource],
+             ): (FlightsWithSplits, Set[Long], Iterable[ApiFlightWithSplits]) = {
+    val updatedFlights = toUpdate.map {
+      case (key, incomingArrival) =>
+        existingFlights.flights.get(key) match {
           case Some(existing) =>
-            acc + (key -> existing.copy(apiFlight = existing.apiFlight.update(incomingArrival), lastUpdated = Option(nowMillis)))
+            existing.copy(apiFlight = existing.apiFlight.update(incomingArrival), lastUpdated = Option(nowMillis))
           case None =>
-            acc + (key -> ApiFlightWithSplits(incomingArrival, Set(), Option(nowMillis)))
+            ApiFlightWithSplits(incomingArrival, Set(), Option(nowMillis))
         }
     }
+
+    val updated = existingFlights.flights ++ updatedFlights.map(f => f.unique -> f)
 
     val minusRemovals: Map[UniqueArrival, ApiFlightWithSplits] = ArrivalsRemoval.removeArrivals(toRemove, updated)
 
@@ -86,6 +91,6 @@ case class ArrivalsDiff(toUpdate: Map[UniqueArrival, Arrival], toRemove: Iterabl
       updateMinutes(sourceOrderPreference) ++
       minutesFromExistingStateUpdatedFlights
 
-    (FlightsWithSplits(minusRemovals), updatedMinutesFromFlights)
+    (FlightsWithSplits(minusRemovals), updatedMinutesFromFlights, updatedFlights)
   }
 }
