@@ -29,6 +29,27 @@ case class QueueSlotDao(portCode: PortCode)
       .result
       .map(_.map(QueueSlotSerialiser.fromRow))
 
+  def getForDatePortTerminalDate(port: String, terminal: String, date: String): DBIOAction[Seq[CrunchMinute], NoStream, Effect.Read] =
+    table
+      .filter(f =>
+        f.port === port &&
+          f.terminal === terminal &&
+          f.slotDateUtc === date
+      )
+      .result
+      .map(_.map(QueueSlotSerialiser.fromRow))
+
+  def getForDatePortDate(port: String, date: String): DBIOAction[Seq[CrunchMinute], NoStream, Effect.Read] =
+    table
+      .filter(f => f.port === port && f.slotDateUtc === date)
+      .result
+      .map(_.map(QueueSlotSerialiser.fromRow))
+
   def insertOrUpdate(crunchMinute: CrunchMinute, slotLengthMinutes: Int): DBIOAction[Int, NoStream, Effect.Write with Effect.Transactional] =
     table.insertOrUpdate(toRow(crunchMinute, slotLengthMinutes))
+
+  def insertOrUpdate(crunchMinutes: Iterable[CrunchMinute], slotLengthMinutes: Int): DBIOAction[Int, NoStream, Effect.Write] = {
+    val inserts = crunchMinutes.map(f => table.insertOrUpdate(toRow(f, slotLengthMinutes)))
+    DBIO.sequence(inserts).map(_.sum)
+  }
 }
