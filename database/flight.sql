@@ -21,9 +21,9 @@ create table "flight"
     "stand"               VARCHAR,
     "max_pax"             INTEGER,
     "baggage_reclaim_id"  VARCHAR,
-    "pax_sources"         VARCHAR   NOT NULL,
+    "pax_sources"         bytea     NOT NULL,
     "red_list_pax"        INTEGER,
-    "splits"              VARCHAR   NOT NULL,
+    "splits"              bytea     NOT NULL,
     "updated_at"          TIMESTAMP NOT NULL
 );
 alter table "flight"

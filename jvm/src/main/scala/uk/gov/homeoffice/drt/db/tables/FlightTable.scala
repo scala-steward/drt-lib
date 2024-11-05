@@ -19,9 +19,9 @@ case class FlightRow(port: String,
                      stand: Option[String],
                      maxPax: Option[Int],
                      baggageReclaimId: Option[String],
-                     paxSources: String,
+                     paxSources: Array[Byte],
                      redListPax: Option[Int],
-                     splits: String,
+                     splits: Array[Byte],
                      updatedAt: Timestamp,
                     )
 
@@ -76,7 +76,7 @@ class FlightTable(tag: Tag)
 
   def pcpTime: Rep[Option[Timestamp]] = column[Option[Timestamp]]("pcp_time")
 
-  def paxSources: Rep[String] = column[String]("pax_sources")
+  def paxSources: Rep[Array[Byte]] = column[Array[Byte]]("pax_sources", O.SqlType("bytea"))
 
   def carrierScheduled: Rep[Option[Timestamp]] = column[Option[Timestamp]]("carrier_scheduled")
 
@@ -84,7 +84,7 @@ class FlightTable(tag: Tag)
 
   def redListPax: Rep[Option[Int]] = column[Option[Int]]("red_list_pax")
 
-  def splits: Rep[String] = column[String]("splits")
+  def splits: Rep[Array[Byte]] = column[Array[Byte]]("splits", O.SqlType("bytea"))
 
   def updatedAt: Rep[Timestamp] = column[Timestamp]("updated_at")
 
