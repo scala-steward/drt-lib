@@ -5,6 +5,7 @@ import uk.gov.homeoffice.drt.model.CrunchMinute
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
+import uk.gov.homeoffice.drt.time.SDate
 
 import java.sql.Timestamp
 
@@ -18,6 +19,7 @@ object QueueSlotSerialiser {
           queue = cm.queue.stringValue,
           slotStart = new Timestamp(cm.minute),
           slotLengthMinutes = slotLengthMinutes,
+          slotDateUtc = SDate(cm.minute).toUtcDate.toISOString,
           paxLoad = cm.paxLoad,
           workLoad = cm.workLoad,
           deskRec = cm.deskRec,

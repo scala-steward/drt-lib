@@ -12,6 +12,7 @@ case class FlightRow(port: String,
                      carrierCode: String,
                      flightCodeSuffix: Option[String],
                      status: String,
+                     scheduledDateUtc: String,
                      timings: FlightTimings,
                      predictions: String,
                      gate: Option[String],
@@ -53,6 +54,8 @@ class FlightTable(tag: Tag)
 
   def status: Rep[String] = column[String]("status")
 
+  def scheduledDateUtc: Rep[String] = column[String]("scheduled_date_utc")
+
   def estimated: Rep[Option[Timestamp]] = column[Option[Timestamp]]("estimated")
 
   def actual: Rep[Option[Timestamp]] = column[Option[Timestamp]]("actual")
@@ -87,6 +90,10 @@ class FlightTable(tag: Tag)
 
   def pk = primaryKey("pk_flight", (port, origin, terminal, voyageNumber, scheduled))
 
+  def flightsForPortAndDateIndex = index("idx_flight_port_date", (port, scheduledDateUtc), unique = false)
+
+  def flightsForPortDateAndTerminalIndex = index("idx_flight_port_date_terminal", (port, scheduledDateUtc, terminal), unique = false)
+
   private def timingProjection = (
     scheduled,
     estimated,
@@ -106,6 +113,7 @@ class FlightTable(tag: Tag)
     carrierCode,
     flightCodeSuffix,
     status,
+    scheduledDateUtc,
     timingProjection,
     predictions,
     gate,

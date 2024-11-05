@@ -10,6 +10,7 @@ case class QueueSlotRow(port: String,
                         queue: String,
                         slotStart: Timestamp,
                         slotLengthMinutes: Int,
+                        slotDateUtc: String,
                         paxLoad: Double,
                         workLoad: Double,
                         deskRec: Int,
@@ -34,9 +35,11 @@ class QueueSlotTable(tag: Tag)
 
   def slotLengthMinutes: Rep[Int] = column[Int]("slot_length_minutes")
 
-  def paxLoad: Rep[Double] = column[Double]("pax_load")
+  def slotDateUtc: Rep[String] = column[String]("slot_date_utc")
 
-  def workLoad: Rep[Double] = column[Double]("work_load")
+  def paxLoad: Rep[Double] = column[Double]("pax_load", O.SqlType("NUMERIC(14, 4)"))
+
+  def workLoad: Rep[Double] = column[Double]("work_load", O.SqlType("NUMERIC(14, 4)"))
 
   def deskRec: Rep[Int] = column[Int]("desk_rec")
 
@@ -54,12 +57,19 @@ class QueueSlotTable(tag: Tag)
 
   def pk = primaryKey("pk_queue_slot", (port, terminal, queue, slotStart, slotLengthMinutes))
 
+  def portTerminalQueueDateIndex = index("idx_queue_slot_port_terminal_queue_date", (port, terminal, queue, slotDateUtc), unique = false)
+
+  def portTerminalDateIndex = index("idx_queue_slot_port_terminal_date", (port, terminal, slotDateUtc), unique = false)
+
+  def portDateIndex = index("idx_queue_slot_port_date", (port, slotDateUtc), unique = false)
+
   def * = (
     port,
     terminal,
     queue,
     slotStart,
     slotLengthMinutes,
+    slotDateUtc,
     paxLoad,
     workLoad,
     deskRec,

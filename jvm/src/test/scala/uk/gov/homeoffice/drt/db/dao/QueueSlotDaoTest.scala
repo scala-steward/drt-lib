@@ -23,6 +23,8 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
 
   val dao: QueueSlotDao = QueueSlotDao(PortCode("LHR"))
 
+  println(dao.table.schema.createStatements.mkString("\n"))
+
   before {
     Await.result(
       db.run(DBIO.seq(
@@ -37,8 +39,8 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
         terminal = T2,
         queue = EeaDesk,
         minute = 1L,
-        paxLoad = 100,
-        workLoad = 99,
+        paxLoad = 100.11,
+        workLoad = 99.22,
         deskRec = 98,
         waitTime = 97,
         maybePaxInQueue = Option(100),

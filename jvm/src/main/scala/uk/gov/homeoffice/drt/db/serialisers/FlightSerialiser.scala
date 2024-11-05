@@ -7,6 +7,7 @@ import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSource
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.time.SDate
 import uk.gov.homeoffice.drt.{Nationality, arrivals}
 
 import java.sql.Timestamp
@@ -108,6 +109,7 @@ object FlightSerialiser extends FlightJsonFormats {
           carrierCode = flight.CarrierCode.code,
           flightCodeSuffix = flight.FlightCodeSuffix.map(_.suffix),
           status = flight.Status.description,
+          scheduledDateUtc = SDate(flight.Scheduled).toUtcDate.toISOString,
           timings = timings,
           predictions = flight.Predictions.toJson.compactPrint,
           gate = flight.Gate,
