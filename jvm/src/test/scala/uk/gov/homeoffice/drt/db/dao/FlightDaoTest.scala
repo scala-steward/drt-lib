@@ -42,7 +42,7 @@ class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
       Await.result(db.run(dao.insertOrUpdate(portCode)(flight)), 2.second)
 
       val rows = Await.result(db.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 123)), 1.second)
-      rows should be(Seq(flight))
+      rows should be(Option(flight))
     }
 
     "replace existing queues are replaced with new records for same time periods" in {
@@ -53,7 +53,7 @@ class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
       Await.result(db.run(dao.insertOrUpdate(portCode)(flight2)), 2.second)
 
       val rows = Await.result(db.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 123)), 1.second)
-      rows should be(Seq(flight2))
+      rows should be(Option(flight2))
     }
   }
 
@@ -65,7 +65,7 @@ class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
       Await.result(db.run(dao.remove(portCode)(UniqueArrival(123, T1, 1L, PortCode("JFK")))), 2.second)
 
       val rows = Await.result(db.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 123)), 1.second)
-      rows should be(Seq())
+      rows should be(None)
     }
   }
 
