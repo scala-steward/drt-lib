@@ -37,7 +37,6 @@ object SplitsForArrivals {
     )
     updatedFlightWithSplits
   }
-
 }
 
 case class SplitsForArrivals(splits: Map[UniqueArrival, Set[Splits]]) extends FlightUpdates {
@@ -62,7 +61,7 @@ case class SplitsForArrivals(splits: Map[UniqueArrival, Set[Splits]]) extends Fl
   def applyTo(flightsWithSplits: FlightsWithSplits,
               nowMillis: Long,
               sourceOrderPreference: List[FeedSource],
-             ): (FlightsWithSplits, Set[Long], Iterable[ApiFlightWithSplits]) = {
+             ): (FlightsWithSplits, Set[Long], Iterable[ApiFlightWithSplits], Iterable[UniqueArrival]) = {
     val minutesFromUpdates = splits.flatMap {
       case (key, splits) =>
         flightsWithSplits.flights.get(key) match {
@@ -85,9 +84,8 @@ case class SplitsForArrivals(splits: Map[UniqueArrival, Set[Splits]]) extends Fl
 
     val updated = flightsWithSplits.flights ++ updatedFlights.map(f => f.unique -> f)
 
-    (FlightsWithSplits(updated), minutesFromUpdates, updatedFlights)
+    (FlightsWithSplits(updated), minutesFromUpdates, updatedFlights, Seq.empty)
   }
-
 
   def ++(tuple: (UniqueArrival, Set[Splits])): Map[UniqueArrival, Set[Splits]] = splits + tuple
 }

@@ -14,7 +14,6 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
 class ABFeatureDaoSpec extends Specification with BeforeEach {
-
   sequential
 
   lazy val db = TestDatabase.db

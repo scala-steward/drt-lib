@@ -60,7 +60,7 @@ case class ArrivalsDiff(toUpdate: Map[UniqueArrival, Arrival], toRemove: Iterabl
   def applyTo(existingFlights: FlightsWithSplits,
               nowMillis: Long,
               sourceOrderPreference: List[FeedSource],
-             ): (FlightsWithSplits, Set[Long], Iterable[ApiFlightWithSplits]) = {
+             ): (FlightsWithSplits, Set[Long], Iterable[ApiFlightWithSplits], Iterable[UniqueArrival]) = {
     val updatedFlights = toUpdate.map {
       case (key, incomingArrival) =>
         existingFlights.flights.get(key) match {
@@ -91,6 +91,6 @@ case class ArrivalsDiff(toUpdate: Map[UniqueArrival, Arrival], toRemove: Iterabl
       updateMinutes(sourceOrderPreference) ++
       minutesFromExistingStateUpdatedFlights
 
-    (FlightsWithSplits(minusRemovals), updatedMinutesFromFlights, updatedFlights)
+    (FlightsWithSplits(minusRemovals), updatedMinutesFromFlights, updatedFlights, Seq.empty)
   }
 }
