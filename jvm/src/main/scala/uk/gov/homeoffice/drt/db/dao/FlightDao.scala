@@ -53,12 +53,10 @@ case class FlightDao()
       table.insertOrUpdate(toRow(flight))
   }
 
-  def insertOrUpdateMulti(port: PortCode): Iterable[ApiFlightWithSplits] => DBIOAction[Int, NoStream, Effect.Write] = {
-    val toRow: ApiFlightWithSplits => FlightRow = FlightSerialiser.toRow(port)
-    flights => {
-      val inserts = flights.map(f => table.insertOrUpdate(toRow(f)))
-      DBIO.sequence(inserts).map(_.sum)
-    }
+  def insertOrUpdateMulti(port: PortCode): Iterable[ApiFlightWithSplits] => DBIOAction[Int, NoStream, Effect.Write with Effect.Transactional] = {
+    val insertOrUpdateSingle = insertOrUpdate(port)
+    flights =>
+      DBIO.sequence(flights.map(insertOrUpdateSingle)).map(_.sum)
   }
 
   def remove(port: PortCode): UniqueArrival => DBIOAction[Int, NoStream, Effect.Write] =
