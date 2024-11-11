@@ -234,4 +234,41 @@ class PassengersHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAf
       resultT3 should be(Map(EeaDesk -> 100, EGate -> 50))
     }
   }
+
+  "PassengersHourlyDao removeAllBefore" should {
+    "only remove rows with a date earlier than the data specified" in {
+      val portCode = PortCode("LHR")
+      val terminal = T2
+
+      val paxHourly = List(
+        PassengersHourly(portCode, terminal, EeaDesk, UtcDate(2020, 1, 1), 1, 1),
+        PassengersHourly(portCode, terminal, EeaDesk, UtcDate(2020, 1, 2), 2, 2),
+        PassengersHourly(portCode, terminal, EeaDesk, UtcDate(2020, 1, 3), 3, 3),
+      ).map(ph => PassengersHourlySerialiser.toRow(ph, 0L))
+      Await.result(db.run(dao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
+
+      Seq(
+        (1, Seq(PassengersHourly(portCode, terminal, EeaDesk, UtcDate(2020, 1, 1), 1, 1))),
+        (2, Seq(PassengersHourly(portCode, terminal, EeaDesk, UtcDate(2020, 1, 2), 2, 2))),
+        (3, Seq(PassengersHourly(portCode, terminal, EeaDesk, UtcDate(2020, 1, 3), 3, 3))),
+      ).map {
+        case (day, expected) =>
+          val result = db.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, day).toISOString)).futureValue
+          result.toSet.map(PassengersHourlySerialiser.fromRow) should be(expected.toSet)
+      }
+
+      val date = UtcDate(2020, 1, 3)
+      Await.result(db.run(dao.removeAllBefore(date)), 2.second)
+
+      Seq(
+        (1, Seq.empty),
+        (2, Seq.empty),
+        (3, Seq(PassengersHourly(portCode, terminal, EeaDesk, UtcDate(2020, 1, 3), 3, 3))),
+      ).map {
+        case (day, expected) =>
+          val result = db.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, day).toISOString)).futureValue
+          result.toSet.map(PassengersHourlySerialiser.fromRow) should be(expected.toSet)
+      }
+    }
+  }
 }

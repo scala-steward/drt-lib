@@ -142,7 +142,7 @@ class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
     Await.result(db.run(dao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
   }
 
-  "PassengerHourlyQueries totalForPortAndDate" should {
+  "CapacityHourlyQueries totalForPortAndDate" should {
     "return the total passengers for a port and local date (spanning 2 utc dates)" in {
       insertHourlyPax(T2, 50, 25, LocalDate(2023, 6, 10))
 
@@ -183,6 +183,42 @@ class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         SDate(2023, 6, 9, 23, 0).millisSinceEpoch -> 100,
         SDate(2023, 6, 10, 1, 0).millisSinceEpoch -> 50,
       ))
+    }
+  }
+
+  "CapacityHourlyQueries removeAllBefore" should {
+    "only remove rows with a date earlier than the data specified" in {
+      val portCode = PortCode("LHR")
+      val terminal = T2
+      val capHourly = List(
+        CapacityHourly(portCode, terminal, UtcDate(2020, 1, 1), 1, 1),
+        CapacityHourly(portCode, terminal, UtcDate(2020, 1, 2), 2, 2),
+        CapacityHourly(portCode, terminal, UtcDate(2020, 1, 3), 3, 3),
+      ).map(ph => CapacityHourlySerialiser.toRow(ph, 0L))
+      Await.result(db.run(dao.replaceHours(portCode)(terminal, capHourly)), 2.second)
+
+      Seq(
+        (1, Seq(CapacityHourly(portCode, terminal, UtcDate(2020, 1, 1), 1, 1))),
+        (2, Seq(CapacityHourly(portCode, terminal, UtcDate(2020, 1, 2), 2, 2))),
+        (3, Seq(CapacityHourly(portCode, terminal, UtcDate(2020, 1, 3), 3, 3))),
+      ).map {
+        case (date, expected) =>
+          val rows = db.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, date).toISOString)).futureValue
+          rows.toSet.map(CapacityHourlySerialiser.fromRow) should be(expected.toSet)
+      }
+
+      val date = UtcDate(2020, 1, 3)
+      Await.result(db.run(dao.removeAllBefore(date)), 2.second)
+
+      Seq(
+        (1, Seq.empty),
+        (2, Seq.empty),
+        (3, Seq(CapacityHourly(portCode, terminal, UtcDate(2020, 1, 3), 3, 3))),
+      ).map {
+        case (date, expected) =>
+          val rows = db.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, date).toISOString)).futureValue
+          rows.toSet.map(CapacityHourlySerialiser.fromRow) should be(expected.toSet)
+      }
     }
   }
 }

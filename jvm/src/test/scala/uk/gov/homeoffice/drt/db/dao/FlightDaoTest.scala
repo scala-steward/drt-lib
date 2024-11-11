@@ -9,6 +9,7 @@ import uk.gov.homeoffice.drt.db.TestDatabase
 import uk.gov.homeoffice.drt.db.serialisers.FlightRowHelper.generateFlight
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.T1
+import uk.gov.homeoffice.drt.time.{SDate, UtcDate}
 
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -100,6 +101,28 @@ class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
       rows should be(None)
       val rows2 = Await.result(db.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 124)), 1.second)
       rows2 should be(Option(flight2))
+    }
+  }
+
+  "removeAllBefore" should {
+    "remove all records before the given date" in {
+      Seq(
+        generateFlight(125, SDate("2024-11-11").millisSinceEpoch, PortCode("JFK")),
+        generateFlight(125, SDate("2024-11-12").millisSinceEpoch, PortCode("JFK")),
+        generateFlight(125, SDate("2024-11-13").millisSinceEpoch, PortCode("JFK")),
+      ).map(flight => Await.result(db.run(dao.insertOrUpdate(portCode)(flight)), 2.second))
+
+      Await.result(db.run(dao.removeAllBefore(UtcDate(2024, 11,13))), 2.second)
+
+      Seq(
+        (SDate("2024-11-11").millisSinceEpoch, None),
+        (SDate("2024-11-12").millisSinceEpoch, None),
+        (SDate("2024-11-13").millisSinceEpoch, Option(generateFlight(125, SDate("2024-11-13").millisSinceEpoch, PortCode("JFK")))),
+      ).map {
+        case (minute, expected) =>
+          val rows = Await.result(db.run(dao.get(portCode)(PortCode("JFK"), T1, minute, 125)), 1.second)
+          rows should be(expected)
+      }
     }
   }
 }

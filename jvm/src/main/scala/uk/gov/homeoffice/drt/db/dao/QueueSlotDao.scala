@@ -64,6 +64,6 @@ case class QueueSlotDao()
 
   def removeAllBefore: UtcDate => DBIOAction[Int, NoStream, Effect.Write] = date =>
     table
-      .filter(qs => qs.slotDateUtc < date.toISOString)
+      .filter(_.slotDateUtc < date.toISOString)
       .delete
 }

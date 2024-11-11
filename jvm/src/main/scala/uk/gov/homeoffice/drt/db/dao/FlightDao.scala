@@ -80,6 +80,6 @@ case class FlightDao()
 
   def removeAllBefore: UtcDate => DBIOAction[Int, NoStream, Effect.Write] = date =>
     table
-      .filter(f => f.scheduledDateUtc < date.toISOString)
+      .filter(_.scheduledDateUtc < date.toISOString)
       .delete
 }
