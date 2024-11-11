@@ -77,4 +77,9 @@ case class FlightDao()
           f.scheduled === new Timestamp(ua.scheduled) &&
           f.voyageNumber === ua.number)
       .delete
+
+  private def removeAllBefore: UtcDate => DBIOAction[Int, NoStream, Effect.Write] = date =>
+    table
+      .filter(f => f.scheduledDateUtc < date.toISOString)
+      .delete
 }

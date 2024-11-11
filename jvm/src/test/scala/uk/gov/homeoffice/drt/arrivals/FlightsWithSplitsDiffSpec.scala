@@ -28,7 +28,7 @@ class FlightsWithSplitsDiffSpec extends Specification {
 
     result === false
   }
-  
+
   "Given a FlightsWithSplitsDiff with one update and one removal on the filter day then I should get both" >> {
     val date = SDate("2020-09-21")
     val diff = FlightsWithSplitsDiff(List(ArrivalGenerator.flightWithSplitsForDayAndTerminal(date)))

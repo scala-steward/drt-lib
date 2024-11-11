@@ -94,6 +94,8 @@ class FlightTable(tag: Tag)
 
   def flightsForPortDateAndTerminalIndex = index("idx_flight_port_date_terminal", (port, scheduledDateUtc, terminal), unique = false)
 
+  def flightsScheduleIndex = index("idx_flight_schedule", scheduled, unique = false)
+
   private def timingProjection = (
     scheduled,
     estimated,
