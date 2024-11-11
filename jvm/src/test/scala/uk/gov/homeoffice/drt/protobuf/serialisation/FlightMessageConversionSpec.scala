@@ -153,7 +153,7 @@ class FlightMessageConversionSpec extends Specification {
         Historical,
         None,
         PaxNumbers
-      )))), List(arrival.unique))
+      )))))
     "When I convert it to a protobuf message and then back to an FlightsWithSplitsDiff" >> {
       val diffMessage = FlightMessageConversion.flightWithSplitsDiffToMessage(diff, 100L)
       val restoredDiff = FlightMessageConversion.flightWithSplitsDiffFromMessage(diffMessage)
