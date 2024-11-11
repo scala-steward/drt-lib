@@ -61,4 +61,9 @@ case class QueueSlotDao()
     crunchMinutes =>
       DBIO.sequence(crunchMinutes.map(insertOrUpdateSingle)).map(_.sum)
   }
+
+  def removeAllBefore: UtcDate => DBIOAction[Int, NoStream, Effect.Write] = date =>
+    table
+      .filter(qs => qs.slotDateUtc < date.toISOString)
+      .delete
 }

@@ -30,3 +30,4 @@ alter table "flight"
     add constraint "pk_flight" primary key ("port", "origin", "terminal", "voyage_number", "scheduled");
 create index "idx_flight_port_date" on "flight" ("port", "scheduled_date_utc");
 create index "idx_flight_port_date_terminal" on "flight" ("port", "scheduled_date_utc", "terminal");
+create index "idx_flight_schedule" on "flight" ("scheduled");

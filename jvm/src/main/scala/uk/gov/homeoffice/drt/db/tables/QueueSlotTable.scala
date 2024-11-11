@@ -63,6 +63,8 @@ class QueueSlotTable(tag: Tag)
 
   def portDateIndex = index("idx_queue_slot_port_date", (port, slotDateUtc), unique = false)
 
+  def dateIndex = index("idx_queue_slot_date", slotDateUtc, unique = false)
+
   def * = (
     port,
     terminal,

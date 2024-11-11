@@ -18,6 +18,7 @@ create table "queue_slot"
 );
 alter table "queue_slot"
     add constraint "pk_queue_slot" primary key ("port", "terminal", "queue", "slot_start", "slot_length_minutes");
+create index "idx_queue_slot_date" on "queue_slot" ("slot_date_utc");
 create index "idx_queue_slot_port_date" on "queue_slot" ("port", "slot_date_utc");
 create index "idx_queue_slot_port_terminal_date" on "queue_slot" ("port", "terminal", "slot_date_utc");
 create index "idx_queue_slot_port_terminal_queue_date" on "queue_slot" ("port", "terminal", "queue", "slot_date_utc");
