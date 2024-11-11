@@ -91,6 +91,6 @@ case class ArrivalsDiff(toUpdate: Map[UniqueArrival, Arrival], toRemove: Iterabl
       updateMinutes(sourceOrderPreference) ++
       minutesFromExistingStateUpdatedFlights
 
-    (FlightsWithSplits(minusRemovals), updatedMinutesFromFlights, updatedFlights, Seq.empty)
+    (FlightsWithSplits(minusRemovals), updatedMinutesFromFlights, updatedFlights, toRemove)
   }
 }
