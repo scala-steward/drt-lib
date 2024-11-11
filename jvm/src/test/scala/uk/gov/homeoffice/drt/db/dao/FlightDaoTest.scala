@@ -25,7 +25,7 @@ class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
 
   val dao: FlightDao = FlightDao()
 
-  println(dao.table.schema.createStatements.mkString("\n"))
+  println(dao.table.schema.createStatements.mkString(";\n") + ";")
 
   before {
     Await.result(

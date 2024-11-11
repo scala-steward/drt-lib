@@ -1,14 +1,15 @@
-CREATE TABLE capacity_hourly
+create table "capacity_hourly"
 (
-    port       varchar(3)  NOT NULL,
-    terminal   varchar(3)  NOT NULL,
-    date_utc   varchar(10) NOT NULL,
-    hour       smallint    NOT NULL,
-    capacity   smallint    NOT NULL,
-    updated_at timestamp   NOT NULL,
-    PRIMARY KEY (port, terminal, date_utc, hour)
+    "port"       VARCHAR   NOT NULL,
+    "terminal"   VARCHAR   NOT NULL,
+    "date_utc"   VARCHAR   NOT NULL,
+    "hour"       smallint  NOT NULL,
+    "capacity"   smallint  NOT NULL,
+    "updated_at" TIMESTAMP NOT NULL
 );
-
-CREATE INDEX capacity_hourly_port_terminal_date_hour ON public.capacity_hourly (port, terminal, date_utc, hour);
-CREATE INDEX capacity_hourly_port_terminal_date ON public.capacity_hourly (port, terminal, date_utc);
-CREATE INDEX capacity_hourly_port_date ON public.capacity_hourly (port, date_utc);
+alter table "capacity_hourly"
+    add constraint "pk_capacity_hourly_port_terminal_dateutc_hour" primary key ("port", "terminal", "date_utc", "hour");
+create index "idx_capacity_hourly_date" on "capacity_hourly" ("date_utc");
+create index "idx_capacity_hourly_port_date" on "capacity_hourly" ("port", "date_utc");
+create index "idx_capacity_hourly_port_terminal_date" on "capacity_hourly" ("port", "terminal", "date_utc");
+create index "idx_capacity_hourly_port_terminal_date_hour" on "capacity_hourly" ("port", "terminal", "date_utc", "hour");

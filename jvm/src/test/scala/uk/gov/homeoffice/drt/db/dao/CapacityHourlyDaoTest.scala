@@ -23,11 +23,16 @@ class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
 
   import TestDatabase.profile.api._
 
+
+  private val dao: CapacityHourlyDao.type = CapacityHourlyDao
+
+  println(dao.table.schema.createStatements.mkString(";\n") + ";")
+
   before {
     Await.result(
       db.run(DBIO.seq(
-        CapacityHourlyDao.table.schema.dropIfExists,
-        CapacityHourlyDao.table.schema.createIfNotExists)
+        dao.table.schema.dropIfExists,
+        dao.table.schema.createIfNotExists)
       ), 2.second)
   }
 
@@ -42,9 +47,9 @@ class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
       )
       val paxHourlyToInsert = paxHourly.map(ph => CapacityHourlySerialiser.toRow(ph, 0L))
 
-      Await.result(db.run(CapacityHourlyDao.replaceHours(portCode)(terminal, paxHourlyToInsert)), 2.second)
+      Await.result(db.run(dao.replaceHours(portCode)(terminal, paxHourlyToInsert)), 2.second)
 
-      val rows = db.run(CapacityHourlyDao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
+      val rows = db.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
       rows.toSet.map(CapacityHourlySerialiser.fromRow) should be(paxHourly.toSet)
     }
 
@@ -56,13 +61,13 @@ class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         CapacityHourly(portCode, terminal, UtcDate(2020, 1, 1), 1, 1),
         CapacityHourly(portCode, terminal, UtcDate(2020, 1, 1), 3, 3),
       ).map(ph => CapacityHourlySerialiser.toRow(ph, 0L))
-      Await.result(db.run(CapacityHourlyDao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
+      Await.result(db.run(dao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
 
       val paxHourlyUpdate = List(
         CapacityHourly(portCode, terminal, UtcDate(2020, 1, 1), 1, 1),
         CapacityHourly(portCode, terminal, UtcDate(2020, 1, 1), 2, 2),
       ).map(ph => CapacityHourlySerialiser.toRow(ph, 0L))
-      Await.result(db.run(CapacityHourlyDao.replaceHours(portCode)(terminal, paxHourlyUpdate)), 2.second)
+      Await.result(db.run(dao.replaceHours(portCode)(terminal, paxHourlyUpdate)), 2.second)
 
       val expected = List(
         CapacityHourly(portCode, terminal, UtcDate(2020, 1, 1), 1, 1),
@@ -70,7 +75,7 @@ class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         CapacityHourly(portCode, terminal, UtcDate(2020, 1, 1), 3, 3),
       )
 
-      val rows = db.run(CapacityHourlyDao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
+      val rows = db.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
       rows.toSet.map(ph => CapacityHourlySerialiser.fromRow(ph)) should be(expected.toSet)
     }
 
@@ -85,8 +90,8 @@ class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         CapacityHourly(otherPortCode, otherTerminal, UtcDate(2020, 1, 1), 3, 3),
       ).map(ph => CapacityHourlySerialiser.toRow(ph, 0L))
 
-      Await.result(db.run(CapacityHourlyDao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
-      val rows = db.run(CapacityHourlyDao.get(otherPortCode.iata, otherTerminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
+      Await.result(db.run(dao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
+      val rows = db.run(dao.get(otherPortCode.iata, otherTerminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
       rows.toSet.map(ph => CapacityHourlySerialiser.fromRow(ph)) should be(Set())
     }
 
@@ -100,8 +105,8 @@ class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         CapacityHourly(otherPortCode, terminal, UtcDate(2020, 1, 1), 3, 3),
       ).map(ph => CapacityHourlySerialiser.toRow(ph, 0L))
 
-      Await.result(db.run(CapacityHourlyDao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
-      val rows = db.run(CapacityHourlyDao.get(otherPortCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
+      Await.result(db.run(dao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
+      val rows = db.run(dao.get(otherPortCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
       rows.toSet.map(ph => CapacityHourlySerialiser.fromRow(ph)) should be(Set())
     }
 
@@ -115,8 +120,8 @@ class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         CapacityHourly(portCode, otherTerminal, UtcDate(2020, 1, 1), 3, 3),
       ).map(ph => CapacityHourlySerialiser.toRow(ph, 0L))
 
-      Await.result(db.run(CapacityHourlyDao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
-      val rows = db.run(CapacityHourlyDao.get(portCode.iata, otherTerminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
+      Await.result(db.run(dao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
+      val rows = db.run(dao.get(portCode.iata, otherTerminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
       rows.toSet.map(ph => CapacityHourlySerialiser.fromRow(ph)) should be(Set())
     }
   }
@@ -134,14 +139,14 @@ class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
       CapacityHourly(portCode, terminal, utcDate, 1, egatePax),
       CapacityHourly(portCode, terminal, utcDate, 23, 10),
     ).map(ph => CapacityHourlySerialiser.toRow(ph, 0L))
-    Await.result(db.run(CapacityHourlyDao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
+    Await.result(db.run(dao.replaceHours(portCode)(terminal, paxHourly)), 2.second)
   }
 
   "PassengerHourlyQueries totalForPortAndDate" should {
     "return the total passengers for a port and local date (spanning 2 utc dates)" in {
       insertHourlyPax(T2, 50, 25, LocalDate(2023, 6, 10))
 
-      val result = db.run(CapacityHourlyDao.totalForPortAndDate(portCode.iata, None)(global)(LocalDate(2023, 6, 10))).futureValue
+      val result = db.run(dao.totalForPortAndDate(portCode.iata, None)(global)(LocalDate(2023, 6, 10))).futureValue
 
       result should be(75)
     }
@@ -151,11 +156,11 @@ class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
       insertHourlyPax(T2, 50, 25, LocalDate(2023, 6, 10))
       insertHourlyPax(T3, 50, 25, LocalDate(2023, 6, 10))
 
-      val resultT2 = db.run(CapacityHourlyDao.totalForPortAndDate(portCode.iata, Option(T2.toString))(global)(LocalDate(2023, 6, 10))).futureValue
+      val resultT2 = db.run(dao.totalForPortAndDate(portCode.iata, Option(T2.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
       resultT2 should be(75)
 
-      val resultT3 = db.run(CapacityHourlyDao.totalForPortAndDate(portCode.iata, Option(T3.toString))(global)(LocalDate(2023, 6, 10))).futureValue
+      val resultT3 = db.run(dao.totalForPortAndDate(portCode.iata, Option(T3.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
       resultT3 should be(75)
     }
@@ -165,14 +170,14 @@ class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
       insertHourlyPax(T2, 50, 25, LocalDate(2023, 6, 10))
       insertHourlyPax(T3, 100, 50, LocalDate(2023, 6, 10))
 
-      val resultT2 = db.run(CapacityHourlyDao.hourlyForPortAndDate(portCode.iata, Option(T2.toString))(global)(LocalDate(2023, 6, 10))).futureValue
+      val resultT2 = db.run(dao.hourlyForPortAndDate(portCode.iata, Option(T2.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
       resultT2 should be(Map(
         SDate(2023, 6, 9, 23, 0).millisSinceEpoch -> 50,
         SDate(2023, 6, 10, 1, 0).millisSinceEpoch -> 25,
       ))
 
-      val resultT3 = db.run(CapacityHourlyDao.hourlyForPortAndDate(portCode.iata, Option(T3.toString))(global)(LocalDate(2023, 6, 10))).futureValue
+      val resultT3 = db.run(dao.hourlyForPortAndDate(portCode.iata, Option(T3.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
       resultT3 should be(Map(
         SDate(2023, 6, 9, 23, 0).millisSinceEpoch -> 100,
