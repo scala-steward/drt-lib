@@ -45,8 +45,26 @@ trait FlightJsonFormats extends DefaultJsonProtocol {
     override def write(obj: PaxType): JsValue = obj.id.toJson
   }
 
-  implicit val nationalityJsonFormat: RootJsonFormat[Nationality] = jsonFormat1(Nationality.apply)
-  implicit val paxAgeJsonFormat: RootJsonFormat[PaxAge] = jsonFormat1(PaxAge.apply)
+  implicit object NationalityJsonFormat extends RootJsonFormat[Nationality] {
+
+    override def read(json: JsValue): Nationality = json match {
+      case JsString(nat) => Nationality(nat)
+      case invalid => throw new Exception(s"Invalid nationality code format: ${invalid.getClass.getSimpleName}")
+    }
+
+    override def write(obj: Nationality): JsValue = obj.code.toJson
+  }
+
+  implicit object PxAgeJsonFormat extends RootJsonFormat[PaxAge] {
+
+    override def read(json: JsValue): PaxAge = json match {
+      case JsString(nat) => PaxAge(nat.toInt)
+      case invalid => throw new Exception(s"Invalid pax age code format: ${invalid.getClass.getSimpleName}")
+    }
+
+    override def write(obj: PaxAge): JsValue = obj.years.toString.toJson
+  }
+
   implicit val paxTypeAndQueueCountJsonFormat: RootJsonFormat[ApiPaxTypeAndQueueCount] = jsonFormat(
     ApiPaxTypeAndQueueCount.apply,
     "passengerType",

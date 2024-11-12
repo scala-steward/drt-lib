@@ -2,6 +2,7 @@ package uk.gov.homeoffice.drt.db.serialisers
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import uk.gov.homeoffice.drt.Nationality
 import uk.gov.homeoffice.drt.arrivals._
 import uk.gov.homeoffice.drt.db.serialisers.FlightRowHelper.generateFlight
 import uk.gov.homeoffice.drt.ports.PaxTypes.VisaNational
@@ -40,9 +41,17 @@ object FlightRowHelper {
       ForecastFeedSource -> Passengers(Option(101), Option(51)),
     ),
   )
+  val nats = Map(
+    Nationality("GB") -> 10d,
+    Nationality("FR") -> 11d,
+  )
+  val ages = Map(
+    PaxAge(1) -> 10d,
+    PaxAge(2) -> 11d,
+  )
   val splits: Set[Splits] = Set(
-    Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, Queues.NonEeaDesk, 100, None, None)), SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages, Option(EventTypes.DC)),
-    Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, Queues.NonEeaDesk, 100, None, None)), SplitSources.Historical, Option(EventTypes.DC)),
+    Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, Queues.NonEeaDesk, 100, Option(nats), Option(ages))), SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages, Option(EventTypes.DC)),
+    Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, Queues.NonEeaDesk, 100, Option(nats), Option(ages))), SplitSources.Historical, Option(EventTypes.DC)),
   )
   def generateFlight(voyageNumber: Int, scheduled: Long, origin: PortCode): ApiFlightWithSplits = ApiFlightWithSplits(
     apiFlight = arrival(voyageNumber, scheduled, origin),
