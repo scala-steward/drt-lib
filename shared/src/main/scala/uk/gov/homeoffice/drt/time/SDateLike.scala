@@ -12,6 +12,10 @@ trait SDateLike {
 
   def `DD-Month-YYYY`: String = f"$getDate%02d $getMonthString $getFullYear%04d"
 
+  def `dayOfWeek-DD-MMM-YYYY`: String = f"${getDayOfWeekString} $getDate%02d ${getMonthString.substring(0, 3)} $getFullYear%04d"
+
+  def `shortDayOfWeek-DD-MMM-YYYY`: String = f"${getDayOfWeekString.substring(0, 3)} $getDate%02d ${getMonthString.substring(0, 3)} $getFullYear%04d"
+
   def <(other: SDateLike): Boolean = millisSinceEpoch < other.millisSinceEpoch
 
   def >(other: SDateLike): Boolean = millisSinceEpoch > other.millisSinceEpoch
@@ -78,8 +82,9 @@ trait SDateLike {
 
   def prettyTimeWithMeridian: String = {
     val hourIn12Format = if (getHours % 12 == 0) 12 else getHours % 12
-    f"$hourIn12Format%02d:$getMinutes%02d ${if(getHours >= 12) "PM" else "AM"}"
+    f"$hourIn12Format%02d:$getMinutes%02d ${if (getHours >= 12) "PM" else "AM"}"
   }
+
   def hms: String = f"$getHours%02d:$getMinutes%02d:$getSeconds%02d"
 
   def getZone: String
@@ -101,6 +106,11 @@ trait SDateLike {
       this
     else
       addDays(-1 * getDayOfWeek)
+
+  def getDayOfWeekString: String = {
+    val daysOfWeek = List("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+    daysOfWeek(getDayOfWeek - 1)
+  }
 
   override def toString: String = f"$getFullYear-$getMonth%02d-$getDate%02dT$getHours%02d$getMinutes%02d"
 
