@@ -43,29 +43,23 @@ class ArrivalsRestorer[A <: WithUnique[UniqueArrival] with Updatable[A]] {
   def finish(): Unit = arrivals = Map()
 }
 
-case class FlightsWithSplitsDiff(flightsToUpdate: Iterable[ApiFlightWithSplits], arrivalsToRemove: Iterable[UniqueArrivalLike]) extends FlightUpdates {
+case class FlightsWithSplitsDiff(flightsToUpdate: Iterable[ApiFlightWithSplits]) extends FlightUpdates {
   def latestUpdateMillis: Long = Try(flightsToUpdate.map(_.lastUpdated.getOrElse(0L)).max).getOrElse(0L)
 
-  def isEmpty: Boolean = flightsToUpdate.isEmpty && arrivalsToRemove.isEmpty
+  def isEmpty: Boolean = flightsToUpdate.isEmpty
 
   def nonEmpty: Boolean = !isEmpty
 
   def updateMinutes(sourceOrderPreference: List[FeedSource]): Set[Long] = flightsToUpdate.flatMap(_.apiFlight.pcpRange(sourceOrderPreference)).toSet
 
-  def applyTo(flightsWithSplits: FlightsWithSplits, nowMillis: Long, sourceOrderPreference: List[FeedSource]): (FlightsWithSplits, Set[Long]) = {
-    val updated = flightsWithSplits.flights ++ flightsToUpdate.map(f => (f.apiFlight.unique, f.copy(lastUpdated = Option(nowMillis))))
-
-    val minusRemovals: Map[UniqueArrival, ApiFlightWithSplits] = ArrivalsRemoval.removeArrivals(arrivalsToRemove, updated)
+  def applyTo(flightsWithSplits: FlightsWithSplits,
+              nowMillis: Long,
+              sourceOrderPreference: List[FeedSource],
+             ): (FlightsWithSplits, Set[Long], Iterable[ApiFlightWithSplits], Iterable[UniqueArrival]) = {
+    val updatedFlights = flightsToUpdate.map(_.copy(lastUpdated = Option(nowMillis)))
+    val updated = flightsWithSplits.flights ++ updatedFlights.map(f => f.unique -> f)
 
     val asMap: Map[UniqueArrival, ApiFlightWithSplits] = flightsWithSplits.flights
-
-    val minutesFromRemovalsInExistingState: Set[Long] = arrivalsToRemove
-      .flatMap {
-        case r: UniqueArrival =>
-          asMap.get(r).map(_.apiFlight.pcpRange(sourceOrderPreference)).getOrElse(List())
-        case r: LegacyUniqueArrival =>
-          asMap.collect { case (ua, a) if ua.equalsLegacy(r) => a }.flatMap(_.apiFlight.pcpRange(sourceOrderPreference))
-      }.toSet
 
     val minutesFromExistingStateUpdatedFlights = flightsToUpdate
       .flatMap { fws =>
@@ -75,32 +69,27 @@ case class FlightsWithSplitsDiff(flightsToUpdate: Iterable[ApiFlightWithSplits],
         }
       }.toSet
 
-    val updatedMinutesFromFlights = minutesFromRemovalsInExistingState ++
+    val updatedMinutesFromFlights =
       updateMinutes(sourceOrderPreference) ++
       minutesFromExistingStateUpdatedFlights
 
-    (FlightsWithSplits(minusRemovals), updatedMinutesFromFlights)
+    (FlightsWithSplits(updated), updatedMinutesFromFlights, updatedFlights, Seq.empty)
   }
 
-  lazy val terminals: Set[Terminal] = flightsToUpdate.map(_.apiFlight.Terminal).toSet ++
-    arrivalsToRemove.map(_.terminal).toSet
+  lazy val terminals: Set[Terminal] = flightsToUpdate.map(_.apiFlight.Terminal).toSet
 
   def ++(other: FlightsWithSplitsDiff): FlightsWithSplitsDiff =
-    FlightsWithSplitsDiff(flightsToUpdate ++ other.flightsToUpdate, arrivalsToRemove ++ other.arrivalsToRemove)
+    FlightsWithSplitsDiff(flightsToUpdate ++ other.flightsToUpdate)
 
   def window(startMillis: Long, endMillis: Long): FlightsWithSplitsDiff =
     FlightsWithSplitsDiff(flightsToUpdate.filter(fws =>
       startMillis <= fws.apiFlight.Scheduled && fws.apiFlight.Scheduled <= endMillis
-    ), arrivalsToRemove.filter(ua =>
-      startMillis <= ua.scheduled && ua.scheduled <= endMillis
     ))
 
-  def forTerminal(terminal: Terminal): FlightsWithSplitsDiff = FlightsWithSplitsDiff(
-    flightsToUpdate.filter(_.apiFlight.Terminal == terminal),
-    arrivalsToRemove.filter(_.terminal == terminal)
-  )
+  def forTerminal(terminal: Terminal): FlightsWithSplitsDiff =
+    FlightsWithSplitsDiff(flightsToUpdate.filter(_.apiFlight.Terminal == terminal))
 }
 
 object FlightsWithSplitsDiff {
-  val empty: FlightsWithSplitsDiff = FlightsWithSplitsDiff(List(), List())
+  val empty: FlightsWithSplitsDiff = FlightsWithSplitsDiff(Seq.empty)
 }

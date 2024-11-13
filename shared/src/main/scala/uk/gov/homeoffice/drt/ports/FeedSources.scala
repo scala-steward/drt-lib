@@ -130,6 +130,18 @@ object FeedSource {
 
   def apply(feedSource: String): Option[FeedSource] = feedSources.find(fs => fs.toString == feedSource || fs.name == feedSource)
 
+  def byId(id: String): FeedSource = id match {
+    case "api" => ApiFeedSource
+    case "acl" => AclFeedSource
+    case "forecast" => ForecastFeedSource
+    case "historic-api" => HistoricApiFeedSource
+    case "live" => LiveFeedSource
+    case "live-base" => LiveBaseFeedSource
+    case "scenario-simulation" => ScenarioSimulationSource
+    case "ml" => MlFeedSource
+    case _ => UnknownFeedSource
+  }
+
   implicit val feedSourceReadWriter: ReadWriter[FeedSource] =
     readwriter[Value].bimap[FeedSource](
       feedSource => feedSource.toString,

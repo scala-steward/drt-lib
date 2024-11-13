@@ -32,13 +32,21 @@ class CapacityHourlyTable(tag: Tag)
 
   def dateUtc: Rep[String] = column[String]("date_utc")
 
-  def hour: Rep[Int] = column[Int]("hour")
+  def hour: Rep[Int] = column[Int]("hour", O.SqlType("smallint"))
 
-  def capacity: Rep[Int] = column[Int]("capacity")
+  def capacity: Rep[Int] = column[Int]("capacity", O.SqlType("smallint"))
 
   def updatedAt: Rep[Timestamp] = column[java.sql.Timestamp]("updated_at")
 
   def pk = primaryKey("pk_capacity_hourly_port_terminal_dateutc_hour", (port, terminal, dateUtc, hour))
+
+  def portTerminalDateHourIndex = index("idx_capacity_hourly_port_terminal_date_hour", (port, terminal, dateUtc, hour), unique = false)
+
+  def portTerminalDateIndex = index("idx_capacity_hourly_port_terminal_date", (port, terminal, dateUtc), unique = false)
+
+  def portDateIndex = index("idx_capacity_hourly_port_date", (port, dateUtc), unique = false)
+
+  def dateIndex = index("idx_capacity_hourly_date", dateUtc, unique = false)
 
   def * = (
     port,

@@ -11,25 +11,19 @@ class FlightsWithSplitsDiffSpec extends Specification {
   val arrivalWithSplits: ApiFlightWithSplits = ApiFlightWithSplits(arrival, Set(), None)
 
   def arrivalForDate(date: SDateLike): Arrival = ArrivalGenerator.arrival(sch = date.millisSinceEpoch)
+
   def arrivalForDateAndTerminal(date: SDateLike, terminal: Terminal): Arrival =
     ArrivalGenerator.arrival(sch = date.millisSinceEpoch, terminal = terminal)
 
   "Given a FlightsWithSplitsDiff with no updates and no removals then isEmpty should be true" >> {
-    val diff = FlightsWithSplitsDiff(List(), List())
+    val diff = FlightsWithSplitsDiff(List())
     val result = diff.isEmpty
 
     result === true
   }
 
   "Given a FlightsWithSplitsDiff with one update and no removals then isEmpty should be false" >> {
-    val diff = FlightsWithSplitsDiff(List(arrivalWithSplits), List())
-    val result = diff.isEmpty
-
-    result === false
-  }
-
-  "Given a FlightsWithSplitsDiff with no updates and one removal then isEmpty should be false" >> {
-    val diff = FlightsWithSplitsDiff(List(), List(arrival.unique))
+    val diff = FlightsWithSplitsDiff(List(arrivalWithSplits))
     val result = diff.isEmpty
 
     result === false
@@ -37,10 +31,7 @@ class FlightsWithSplitsDiffSpec extends Specification {
 
   "Given a FlightsWithSplitsDiff with one update and one removal on the filter day then I should get both" >> {
     val date = SDate("2020-09-21")
-    val diff = FlightsWithSplitsDiff(
-      List(ArrivalGenerator.flightWithSplitsForDayAndTerminal(date)),
-      List(arrivalForDate(date).unique)
-    )
+    val diff = FlightsWithSplitsDiff(List(ArrivalGenerator.flightWithSplitsForDayAndTerminal(date)))
 
     val result = diff.window(date.millisSinceEpoch, date.addDays(1).millisSinceEpoch)
 
@@ -54,14 +45,10 @@ class FlightsWithSplitsDiffSpec extends Specification {
       List(
         ArrivalGenerator.flightWithSplitsForDayAndTerminal(filterDate),
         ArrivalGenerator.flightWithSplitsForDayAndTerminal(otherDate)
-      ),
-      List()
+      )
     )
     val expected = FlightsWithSplitsDiff(
-      List(
-        ArrivalGenerator.flightWithSplitsForDayAndTerminal(filterDate)
-      ),
-      List()
+      List(ArrivalGenerator.flightWithSplitsForDayAndTerminal(filterDate))
     )
 
     val result = diff.window(filterDate.millisSinceEpoch, filterDate.addDays(1).millisSinceEpoch)
@@ -80,20 +67,10 @@ class FlightsWithSplitsDiffSpec extends Specification {
         ArrivalGenerator.flightWithSplitsForDayAndTerminal(filterDate),
         ArrivalGenerator.flightWithSplitsForDayAndTerminal(beforeDate),
         ArrivalGenerator.flightWithSplitsForDayAndTerminal(afterDate)
-      ),
-      List(
-        arrivalForDate(filterDate).unique,
-        arrivalForDate(beforeDate).unique,
-        arrivalForDate(afterDate).unique
       )
     )
     val expected = FlightsWithSplitsDiff(
-      List(
-        ArrivalGenerator.flightWithSplitsForDayAndTerminal(filterDate)
-      ),
-      List(
-        arrivalForDate(filterDate).unique
-      )
+      List(ArrivalGenerator.flightWithSplitsForDayAndTerminal(filterDate))
     )
 
     val result = diff.window(
@@ -112,20 +89,12 @@ class FlightsWithSplitsDiffSpec extends Specification {
       List(
         ArrivalGenerator.flightWithSplitsForDayAndTerminal(date, T1),
         ArrivalGenerator.flightWithSplitsForDayAndTerminal(date, T2)
-      ),
-      List(
-        arrivalForDateAndTerminal(date, T1).unique,
-        arrivalForDateAndTerminal(date, T2).unique
-
       )
     )
 
     val expected = FlightsWithSplitsDiff(
       List(
         ArrivalGenerator.flightWithSplitsForDayAndTerminal(date, T1)
-      ),
-      List(
-        arrivalForDateAndTerminal(date, T1).unique
       )
     )
 

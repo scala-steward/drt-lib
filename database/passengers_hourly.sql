@@ -1,16 +1,16 @@
-CREATE TABLE passengers_hourly
+create table "passengers_hourly"
 (
-    port       varchar(3)  NOT NULL,
-    terminal   varchar(3)  NOT NULL,
-    queue      varchar(10) NOT NULL,
-    date_utc   varchar(10) NOT NULL,
-    hour       smallint    NOT NULL,
-    passengers smallint    NOT NULL,
-    updated_at timestamp   NOT NULL,
-    PRIMARY KEY (port, terminal, queue, date_utc, hour)
+    "port"       VARCHAR   NOT NULL,
+    "terminal"   VARCHAR   NOT NULL,
+    "queue"      VARCHAR   NOT NULL,
+    "date_utc"   VARCHAR   NOT NULL,
+    "hour"       smallint  NOT NULL,
+    "passengers" smallint  NOT NULL,
+    "updated_at" TIMESTAMP NOT NULL
 );
-
-CREATE INDEX port_terminal_queue_date ON public.passengers_hourly (port, terminal, queue, date_utc);
-CREATE INDEX port_terminal_date_hour ON public.passengers_hourly (port, terminal, date_utc, hour);
-CREATE INDEX port_terminal_date ON public.passengers_hourly (port, terminal, date_utc);
-CREATE INDEX port_date ON public.passengers_hourly (port, date_utc);
+alter table "passengers_hourly"
+    add constraint "pk_passengers_hourly_port_terminal_queue_dateutc_hour" primary key ("port", "terminal", "queue", "date_utc", "hour");
+create index "idx_passengers_hourly_date" on "passengers_hourly" ("date_utc");
+create index "idx_passengers_hourly_port_date" on "passengers_hourly" ("port", "date_utc");
+create index "idx_passengers_hourly_port_terminal_date" on "passengers_hourly" ("port", "terminal", "date_utc");
+create index "idx_passengers_hourly_port_terminal_date_hour" on "passengers_hourly" ("port", "terminal", "date_utc", "hour");
