@@ -24,7 +24,7 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
 
   val dao: QueueSlotDao = QueueSlotDao()
 
-  println(dao.table.schema.createStatements.mkString(";\n") + ";")
+  SchemaUtils.printStatements(dao.table.schema.createStatements)
 
   before {
     Await.result(

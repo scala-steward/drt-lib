@@ -26,7 +26,7 @@ class PassengersHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAf
 
   private val dao: PassengersHourlyDao.type = PassengersHourlyDao
 
-  println(dao.table.schema.createStatements.mkString(";\n") + ";")
+  SchemaUtils.printStatements(dao.table.schema.createStatements)
 
   before {
     Await.result(

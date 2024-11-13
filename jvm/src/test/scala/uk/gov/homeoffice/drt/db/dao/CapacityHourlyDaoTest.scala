@@ -26,7 +26,7 @@ class CapacityHourlyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
 
   private val dao: CapacityHourlyDao.type = CapacityHourlyDao
 
-  println(dao.table.schema.createStatements.mkString(";\n") + ";")
+  SchemaUtils.printStatements(dao.table.schema.createStatements)
 
   before {
     Await.result(

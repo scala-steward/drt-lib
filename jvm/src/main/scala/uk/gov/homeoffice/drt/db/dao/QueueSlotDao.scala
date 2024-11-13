@@ -18,6 +18,10 @@ case class QueueSlotDao()
                        (implicit ec: ExecutionContext) {
   val table: TableQuery[QueueSlotTable] = TableQuery[QueueSlotTable]
 
+  def printlnCreateStatements(): Unit = {
+    println(table.schema.createStatements.mkString(";\n") + ";")
+  }
+
   def get(port: PortCode, slotLengthMinutes: Int): (Terminal, Queue, Long) => DBIOAction[Seq[CrunchMinute], NoStream, Effect.Read] =
     (terminal, queue, startTime) =>
       table
