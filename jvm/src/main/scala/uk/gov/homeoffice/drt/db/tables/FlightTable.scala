@@ -1,6 +1,7 @@
 package uk.gov.homeoffice.drt.db.tables
 
 import slick.lifted.Tag
+import spray.json.JsValue
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
 
 import java.sql.Timestamp
@@ -19,9 +20,9 @@ case class FlightRow(port: String,
                      stand: Option[String],
                      maxPax: Option[Int],
                      baggageReclaimId: Option[String],
-                     paxSources: Array[Byte],
+                     paxSourcesJson: String,
                      redListPax: Option[Int],
-                     splits: Array[Byte],
+                     splitsJson: String,
                      updatedAt: Timestamp,
                     )
 
@@ -76,7 +77,7 @@ class FlightTable(tag: Tag)
 
   def pcpTime: Rep[Option[Timestamp]] = column[Option[Timestamp]]("pcp_time")
 
-  def paxSources: Rep[Array[Byte]] = column[Array[Byte]]("pax_sources", O.SqlType("bytea"))
+  def paxSourcesJson: Rep[String] = column[String]("pax_sources_json")
 
   def carrierScheduled: Rep[Option[Timestamp]] = column[Option[Timestamp]]("carrier_scheduled")
 
@@ -84,7 +85,7 @@ class FlightTable(tag: Tag)
 
   def redListPax: Rep[Option[Int]] = column[Option[Int]]("red_list_pax")
 
-  def splits: Rep[Array[Byte]] = column[Array[Byte]]("splits", O.SqlType("bytea"))
+  def splitsJson: Rep[String] = column[String]("splits_json")
 
   def updatedAt: Rep[Timestamp] = column[Timestamp]("updated_at")
 
@@ -122,8 +123,8 @@ class FlightTable(tag: Tag)
     stand,
     maxPax,
     baggageReclaimId,
-    paxSources,
+    paxSourcesJson,
     redListPax,
-    splits,
+    splitsJson,
     updatedAt).mapTo[FlightRow]
 }
