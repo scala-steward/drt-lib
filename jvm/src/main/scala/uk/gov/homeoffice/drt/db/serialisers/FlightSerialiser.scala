@@ -10,9 +10,8 @@ import uk.gov.homeoffice.drt.ports._
 import uk.gov.homeoffice.drt.time.SDate
 import uk.gov.homeoffice.drt.{Nationality, arrivals}
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream}
+import java.nio.charset.StandardCharsets
 import java.sql.Timestamp
-import java.util.zip.{DeflaterOutputStream, InflaterInputStream}
 
 
 trait FlightJsonFormats extends DefaultJsonProtocol {
@@ -137,16 +136,16 @@ object FlightSerialiser extends FlightJsonFormats {
           stand = flight.Stand,
           maxPax = flight.MaxPax,
           baggageReclaimId = flight.BaggageReclaimId,
-          paxSources = compress(flight.PassengerSources.toJson.compactPrint),
+          paxSourcesJson = flight.PassengerSources.toJson.compactPrint,
           redListPax = flight.RedListPax,
-          splits = compress(splits.toJson.compactPrint),
+          splitsJson= splits.toJson.compactPrint,
           updatedAt = new Timestamp(lastUpdated.getOrElse(0)),
         )
     }
 
   val fromRow: FlightRow => arrivals.ApiFlightWithSplits = {
     f =>
-      val passengerSources = decompress(f.paxSources).parseJson.convertTo[Map[FeedSource, Passengers]]
+      val passengerSources = f.paxSourcesJson.parseJson.convertTo[Map[FeedSource, Passengers]]
       val arrival = Arrival(
         Origin = PortCode(f.origin),
         Scheduled = f.timings.scheduled.getTime,
@@ -174,37 +173,7 @@ object FlightSerialiser extends FlightJsonFormats {
         ScheduledDeparture = f.timings.scheduledDeparture.map(_.getTime),
         RedListPax = f.redListPax,
       )
-      val splits = decompress(f.splits).parseJson.convertTo[Set[Splits]]
+      val splits = f.splitsJson.parseJson.convertTo[Set[Splits]]
       ApiFlightWithSplits(arrival, splits, Option(f.updatedAt.getTime))
-  }
-
-  def compress(bytes: String): Array[Byte] = {
-    val deflater = new java.util.zip.Deflater
-    val baos = new ByteArrayOutputStream
-    val dos = new DeflaterOutputStream(baos, deflater)
-    dos.write(bytes.getBytes("ASCII"))
-    baos.close()
-    dos.finish()
-    dos.close()
-    baos.toByteArray
-  }
-
-  def decompress(bytes: Array[Byte]): String = {
-    val deflater = new java.util.zip.Inflater()
-    val baos = new ByteArrayOutputStream(512)
-    val bytesIn = new ByteArrayInputStream(bytes)
-    val in = new InflaterInputStream(bytesIn, deflater)
-    var go = true
-    while (go) {
-      val b = in.read
-      if (b == -1)
-        go = false
-      else
-        baos.write(b)
-    }
-    baos.close()
-    in.close()
-
-    new String(baos.toByteArray, "ASCII")
   }
 }
