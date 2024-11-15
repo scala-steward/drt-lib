@@ -7,7 +7,7 @@ import uk.gov.homeoffice.drt.db.serialisers.FlightSerialiser
 import uk.gov.homeoffice.drt.db.tables.{FlightRow, FlightTable}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.time.UtcDate
+import uk.gov.homeoffice.drt.time.{DateLike, LocalDate, SDate, UtcDate}
 
 import java.sql.Timestamp
 import scala.concurrent.ExecutionContext
@@ -29,23 +29,29 @@ case class FlightDao()
         .result
         .map(_.map(FlightSerialiser.fromRow).headOption)
 
-  def getForTerminalDate(port: PortCode): (String, UtcDate) => DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
+  def getForTerminalLocalDatePcpTime(port: PortCode): (Terminal, DateLike) => DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
     (terminal, date) =>
-      table
-        .filter(f =>
-          f.port === port.iata &&
-            f.terminal === terminal &&
-            f.scheduledDateUtc === date.toISOString
-        )
+      filterLocalDatePcp(date)
+        .filter(f => f.port === port.iata && f.terminal === terminal.toString)
         .result
         .map(_.map(FlightSerialiser.fromRow))
 
-  def getForDateDate(port: PortCode): UtcDate => DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
+  def getForLocalDatePcpTime(port: PortCode): DateLike => DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
     date =>
-      table
-        .filter(f => f.port === port.iata && f.scheduledDateUtc === date.toISOString)
+      filterLocalDatePcp(date)
+        .filter(f => f.port === port.iata)
         .result
         .map(_.map(FlightSerialiser.fromRow))
+  
+  private def filterLocalDatePcp(date: DateLike): Query[FlightTable, FlightRow, Seq] =
+    table
+      .filter { f =>
+        val start = SDate(date)
+        val end = start.addDays(1).addMinutes(-1)
+        val dates = Set(start.toUtcDate, end.toUtcDate).map(_.toISOString)
+
+        f.scheduledDateUtc.inSet(dates) && f.pcpTime >= new Timestamp(start.millisSinceEpoch) && f.pcpTime <= new Timestamp(end.millisSinceEpoch)
+      }
 
   def insertOrUpdate(port: PortCode): ApiFlightWithSplits => DBIOAction[Int, NoStream, Effect.Write with Effect.Transactional] = {
     val toRow: ApiFlightWithSplits => FlightRow = FlightSerialiser.toRow(port)
