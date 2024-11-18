@@ -9,7 +9,7 @@ object ArrivalExportHeadings {
 
   private val arrivalHeadings: String = Seq(
     "IATA",
-    "ICAO",
+    "Terminal",
     "Origin",
     "Gate/Stand",
     "Status",
