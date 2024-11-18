@@ -7,7 +7,7 @@ import uk.gov.homeoffice.drt.db.serialisers.FlightSerialiser
 import uk.gov.homeoffice.drt.db.tables.{FlightRow, FlightTable}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.time.{DateLike, LocalDate, SDate, UtcDate}
+import uk.gov.homeoffice.drt.time.{DateLike, SDate, UtcDate}
 
 import java.sql.Timestamp
 import scala.concurrent.ExecutionContext
@@ -29,21 +29,21 @@ case class FlightDao()
         .result
         .map(_.map(FlightSerialiser.fromRow).headOption)
 
-  def getForTerminalLocalDatePcpTime(port: PortCode): (Terminal, DateLike) => DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
+  def getForTerminalDatePcpTime(port: PortCode): (Terminal, DateLike) => DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
     (terminal, date) =>
-      filterLocalDatePcp(date)
+      filterDatePcpTime(date)
         .filter(f => f.port === port.iata && f.terminal === terminal.toString)
         .result
         .map(_.map(FlightSerialiser.fromRow))
 
-  def getForLocalDatePcpTime(port: PortCode): DateLike => DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
+  def getForDatePcpTime(port: PortCode): DateLike => DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
     date =>
-      filterLocalDatePcp(date)
+      filterDatePcpTime(date)
         .filter(f => f.port === port.iata)
         .result
         .map(_.map(FlightSerialiser.fromRow))
-  
-  private def filterLocalDatePcp(date: DateLike): Query[FlightTable, FlightRow, Seq] =
+
+  private def filterDatePcpTime(date: DateLike): Query[FlightTable, FlightRow, Seq] =
     table
       .filter { f =>
         val start = SDate(date)
