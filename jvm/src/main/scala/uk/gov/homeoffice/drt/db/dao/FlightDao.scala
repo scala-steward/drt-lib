@@ -29,10 +29,10 @@ case class FlightDao()
         .result
         .map(_.map(FlightSerialiser.fromRow).headOption)
 
-  def getForTerminalUtcDate(port: PortCode): (Terminal, UtcDate) => DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
-    (terminal, date) =>
+  def getForTerminalsUtcDate(port: PortCode): (Seq[Terminal], UtcDate) => DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
+    (terminals, date) =>
       table
-        .filter(f => f.port === port.iata && f.terminal === terminal.toString && f.scheduledDateUtc === date.toISOString)
+        .filter(f => f.port === port.iata && f.terminal.inSet(terminals.map(_.toString)) && f.scheduledDateUtc === date.toISOString)
         .result
         .map(_.map(FlightSerialiser.fromRow))
 
