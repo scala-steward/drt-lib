@@ -36,7 +36,7 @@ case class FlightDao()
         .result
         .map(_.map(FlightSerialiser.fromRow))
 
-  def getForUtcDatePcpTime(port: PortCode): UtcDate => DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
+  def getForUtcDate(port: PortCode): UtcDate => DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
     date =>
       table
         .filter(f => f.port === port.iata && f.scheduledDateUtc === date.toISOString)
