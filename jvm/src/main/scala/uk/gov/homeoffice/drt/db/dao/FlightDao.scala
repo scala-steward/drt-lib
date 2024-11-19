@@ -12,14 +12,17 @@ import uk.gov.homeoffice.drt.ports.{FeedSource, PortCode}
 import uk.gov.homeoffice.drt.time.{DateRange, LocalDate, SDate, UtcDate}
 
 import java.sql.Timestamp
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 
 case class FlightDao()
                     (implicit ec: ExecutionContext) {
   val table: TableQuery[FlightTable] = TableQuery[FlightTable]
 
-  def flightsForPcpDateRange(portCode: PortCode, paxFeedSourceOrder: List[FeedSource]): (LocalDate, LocalDate, Seq[Terminal]) => Source[DBIOAction[(UtcDate, Seq[ApiFlightWithSplits]), NoStream, Effect.Read], NotUsed] = {
+  def flightsForPcpDateRange(portCode: PortCode,
+                             paxFeedSourceOrder: List[FeedSource],
+                             execute: DBIOAction[(UtcDate, Seq[ApiFlightWithSplits]), NoStream, Effect.Read] => Future[Seq[(UtcDate, Seq[ApiFlightWithSplits])]]
+                            ): (LocalDate, LocalDate, Seq[Terminal]) => Source[Seq[(UtcDate, Seq[ApiFlightWithSplits])], NotUsed] = {
     val getFlights = getForTerminalsUtcDate(portCode)
 
     (start, end, terminals) =>
@@ -27,10 +30,14 @@ case class FlightDao()
       val endPlusADay = SDate(end).addDays(1).toUtcDate
       val utcEnd = UtcDate(endPlusADay.year, endPlusADay.month, endPlusADay.day)
       Source(DateRange(utcStart, utcEnd))
-        .map { date =>
-          getFlights(terminals, date).map { flights =>
-            date -> flights.filter(_.apiFlight.hasPcpDuring(SDate(start), SDate(end).addDays(1).addMinutes(-1), paxFeedSourceOrder))
-          }
+        .mapAsync(1) { date =>
+          execute(
+            getFlights(terminals, date)
+              .map { flights =>
+                val relevantFlightsForDates = flights.filter(_.apiFlight.hasPcpDuring(SDate(start), SDate(end).addDays(1).addMinutes(-1), paxFeedSourceOrder))
+                date -> relevantFlightsForDates
+              }
+          )
         }
   }
 
