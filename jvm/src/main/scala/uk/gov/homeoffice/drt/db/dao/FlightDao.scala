@@ -1,13 +1,15 @@
 package uk.gov.homeoffice.drt.db.dao
 
-import slick.dbio.Effect
+import akka.NotUsed
+import akka.stream.scaladsl.Source
+import slick.dbio.{DBIOAction, Effect, NoStream}
 import uk.gov.homeoffice.drt.arrivals.{ApiFlightWithSplits, UniqueArrival}
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
 import uk.gov.homeoffice.drt.db.serialisers.FlightSerialiser
 import uk.gov.homeoffice.drt.db.tables.{FlightRow, FlightTable}
-import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.time.UtcDate
+import uk.gov.homeoffice.drt.ports.{FeedSource, PortCode}
+import uk.gov.homeoffice.drt.time.{DateRange, LocalDate, SDate, UtcDate}
 
 import java.sql.Timestamp
 import scala.concurrent.ExecutionContext
@@ -16,6 +18,21 @@ import scala.concurrent.ExecutionContext
 case class FlightDao()
                     (implicit ec: ExecutionContext) {
   val table: TableQuery[FlightTable] = TableQuery[FlightTable]
+
+  def flightsForPcpDateRange(portCode: PortCode, paxFeedSourceOrder: List[FeedSource]): (LocalDate, LocalDate, Seq[Terminal]) => Source[DBIOAction[(UtcDate, Seq[ApiFlightWithSplits]), NoStream, Effect.Read], NotUsed] = {
+    val getFlights = getForTerminalsUtcDate(portCode)
+
+    (start, end, terminals) =>
+      val utcStart = SDate(start).addDays(-1).toUtcDate
+      val endPlusADay = SDate(end).addDays(1).toUtcDate
+      val utcEnd = UtcDate(endPlusADay.year, endPlusADay.month, endPlusADay.day)
+      Source(DateRange(utcStart, utcEnd))
+        .map { date =>
+          getFlights(terminals, date).map { flights =>
+            date -> flights.filter(_.apiFlight.hasPcpDuring(SDate(start), SDate(end).addDays(1).addMinutes(-1), paxFeedSourceOrder))
+          }
+        }
+  }
 
   def get(port: PortCode): (PortCode, Terminal, Long, Int) => DBIOAction[Option[ApiFlightWithSplits], NoStream, Effect.Read] =
     (origin, terminal, scheduled, voyageNumber) =>
