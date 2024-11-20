@@ -21,8 +21,8 @@ case class FlightDao()
 
   def flightsForPcpDateRange(portCode: PortCode,
                              paxFeedSourceOrder: List[FeedSource],
-                             execute: DBIOAction[(UtcDate, Seq[ApiFlightWithSplits]), NoStream, Effect.Read] => Future[Seq[(UtcDate, Seq[ApiFlightWithSplits])]]
-                            ): (LocalDate, LocalDate, Seq[Terminal]) => Source[Seq[(UtcDate, Seq[ApiFlightWithSplits])], NotUsed] = {
+                             execute: DBIOAction[(UtcDate, Seq[ApiFlightWithSplits]), NoStream, Effect.Read] => Future[(UtcDate, Seq[ApiFlightWithSplits])]
+                            ): (LocalDate, LocalDate, Seq[Terminal]) => Source[(UtcDate, Seq[ApiFlightWithSplits]), NotUsed] = {
     val getFlights = getForTerminalsUtcDate(portCode)
 
     (start, end, terminals) =>
