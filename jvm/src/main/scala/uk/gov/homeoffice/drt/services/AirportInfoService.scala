@@ -1,18 +1,12 @@
 package uk.gov.homeoffice.drt.services
 
-import uk.gov.homeoffice.drt.ports.PortCode
+import uk.gov.homeoffice.drt.ports.{AirportInfo, PortCode}
 import uk.gov.homeoffice.drt.redlist.RedListUpdates
 import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch
-import upickle.default._
 
 import scala.io.Codec
 import scala.util.Try
 
-case class AirportInfo(airportName: String, city: String, country: String, code: String)
-
-object AirportInfo {
-  implicit val rw: ReadWriter[AirportInfo] = macroRW
-}
 
 object AirportInfoService {
 
