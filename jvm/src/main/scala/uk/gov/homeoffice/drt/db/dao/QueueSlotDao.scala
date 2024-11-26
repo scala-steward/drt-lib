@@ -1,5 +1,7 @@
 package uk.gov.homeoffice.drt.db.dao
 
+import akka.NotUsed
+import akka.stream.scaladsl.Source
 import slick.dbio.Effect
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
 import uk.gov.homeoffice.drt.db.serialisers.QueueSlotSerialiser
@@ -8,10 +10,10 @@ import uk.gov.homeoffice.drt.model.CrunchMinute
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.time.UtcDate
+import uk.gov.homeoffice.drt.time.{DateRange, LocalDate, SDate, UtcDate}
 
 import java.sql.Timestamp
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 
 case class QueueSlotDao()
@@ -21,6 +23,21 @@ case class QueueSlotDao()
   def printlnCreateStatements(): Unit = {
     println(table.schema.createStatements.mkString(";\n") + ";")
   }
+
+  def flightsForPcpDateRange(portCode: PortCode,
+                             execute: DBIOAction[(UtcDate, Seq[CrunchMinute]), NoStream, Effect.Read] => Future[(UtcDate, Seq[CrunchMinute])]
+                            ): (LocalDate, LocalDate, Seq[Terminal]) => Source[(UtcDate, Seq[CrunchMinute]), NotUsed] = {
+    val getMinutes = getForTerminalsUtcDate(portCode)
+
+    (start, end, terminals) =>
+      val utcStart = SDate(start).toUtcDate
+      val utcEnd = SDate(end).toUtcDate
+      Source(DateRange(utcStart, utcEnd))
+        .mapAsync(1) { date =>
+          execute(getMinutes(terminals, date).map(date -> _))
+        }
+  }
+
 
   def get(port: PortCode, slotLengthMinutes: Int): (Terminal, Queue, Long) => DBIOAction[Seq[CrunchMinute], NoStream, Effect.Read] =
     (terminal, queue, startTime) =>
@@ -35,18 +52,18 @@ case class QueueSlotDao()
         .result
         .map(_.map(QueueSlotSerialiser.fromRow))
 
-  def getForDatePortTerminalDate(port: PortCode): (Terminal, UtcDate) => DBIOAction[Seq[CrunchMinute], NoStream, Effect.Read] =
-    (terminal, date) =>
+  def getForTerminalsUtcDate(port: PortCode): (Seq[Terminal], UtcDate) => DBIOAction[Seq[CrunchMinute], NoStream, Effect.Read] =
+    (terminals, date) =>
       table
-        .filter(f =>
-          f.port === port.iata &&
-            f.terminal === terminal.toString &&
-            f.slotDateUtc === date.toISOString
+        .filter(m =>
+          m.port === port.iata &&
+            m.terminal.inSet(terminals.map(_.toString)) &&
+            m.slotDateUtc === date.toISOString
         )
         .result
         .map(_.map(QueueSlotSerialiser.fromRow))
 
-  def getForDatePortDate(port: PortCode): UtcDate => DBIOAction[Seq[CrunchMinute], NoStream, Effect.Read] =
+  def getForUtcDate(port: PortCode): UtcDate => DBIOAction[Seq[CrunchMinute], NoStream, Effect.Read] =
     date =>
       table
         .filter(f => f.port === port.iata && f.slotDateUtc === date.toISOString)
