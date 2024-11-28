@@ -24,7 +24,7 @@ case class QueueSlotDao()
     println(table.schema.createStatements.mkString(";\n") + ";")
   }
 
-  def flightsForPcpDateRange(portCode: PortCode,
+  def queueSlotsForDateRange(portCode: PortCode,
                              execute: DBIOAction[(UtcDate, Seq[CrunchMinute]), NoStream, Effect.Read] => Future[(UtcDate, Seq[CrunchMinute])]
                             ): (LocalDate, LocalDate, Seq[Terminal]) => Source[(UtcDate, Seq[CrunchMinute]), NotUsed] = {
     val getMinutes = getForTerminalsUtcDate(portCode)
