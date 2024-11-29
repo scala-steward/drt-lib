@@ -25,9 +25,10 @@ case class QueueSlotDao()
   }
 
   def queueSlotsForDateRange(portCode: PortCode,
+                             slotLengthMinutes: Int,
                              execute: DBIOAction[(UtcDate, Seq[CrunchMinute]), NoStream, Effect.Read] => Future[(UtcDate, Seq[CrunchMinute])]
                             ): (LocalDate, LocalDate, Seq[Terminal]) => Source[(UtcDate, Seq[CrunchMinute]), NotUsed] = {
-    val getMinutes = getForTerminalsUtcDate(portCode)
+    val getMinutes = getForTerminalsUtcDate(portCode, slotLengthMinutes)
 
     (start, end, terminals) =>
       val utcStart = SDate(start).toUtcDate
@@ -52,21 +53,26 @@ case class QueueSlotDao()
         .result
         .map(_.map(QueueSlotSerialiser.fromRow))
 
-  def getForTerminalsUtcDate(port: PortCode): (Seq[Terminal], UtcDate) => DBIOAction[Seq[CrunchMinute], NoStream, Effect.Read] =
+  def getForTerminalsUtcDate(port: PortCode, slotLengthMinutes: Int): (Seq[Terminal], UtcDate) => DBIOAction[Seq[CrunchMinute], NoStream, Effect.Read] =
     (terminals, date) =>
       table
         .filter(m =>
           m.port === port.iata &&
             m.terminal.inSet(terminals.map(_.toString)) &&
-            m.slotDateUtc === date.toISOString
+            m.slotDateUtc === date.toISOString &&
+            m.slotLengthMinutes === slotLengthMinutes
         )
         .result
         .map(_.map(QueueSlotSerialiser.fromRow))
 
-  def getForUtcDate(port: PortCode): UtcDate => DBIOAction[Seq[CrunchMinute], NoStream, Effect.Read] =
+  def getForUtcDate(port: PortCode, slotLengthMinutes: Int): UtcDate => DBIOAction[Seq[CrunchMinute], NoStream, Effect.Read] =
     date =>
       table
-        .filter(f => f.port === port.iata && f.slotDateUtc === date.toISOString)
+        .filter(m =>
+          m.port === port.iata &&
+            m.slotDateUtc === date.toISOString &&
+            m.slotLengthMinutes === slotLengthMinutes
+        )
         .result
         .map(_.map(QueueSlotSerialiser.fromRow))
 
