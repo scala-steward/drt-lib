@@ -28,25 +28,24 @@ object QueueSlotSerialiser {
           deployedDesks = cm.deployedDesks,
           deployedWait = cm.deployedWait,
           deployedPaxInQueue = cm.maybeDeployedPaxInQueue,
-          updatedAt = new Timestamp(cm.lastUpdated.getOrElse(cm.minute)),
+          updatedAt = new Timestamp(cm.lastUpdated.getOrElse(SDate.now().millisSinceEpoch)),
         )
 
 
-  val fromRow: QueueSlotRow => CrunchMinute = {
-    case row: QueueSlotRow =>
-      CrunchMinute(
-        terminal = Terminal(row.terminal),
-        queue = Queue(row.queue),
-        minute = row.slotStart.getTime,
-        paxLoad = row.paxLoad,
-        workLoad = row.workLoad,
-        deskRec = row.deskRec,
-        waitTime = row.waitTime,
-        maybePaxInQueue = row.paxInQueue,
-        deployedDesks = row.deployedDesks,
-        deployedWait = row.deployedWait,
-        maybeDeployedPaxInQueue = row.deployedPaxInQueue,
-        lastUpdated = Option(row.updatedAt.getTime),
-      )
+  val fromRow: QueueSlotRow => CrunchMinute = { row =>
+    CrunchMinute(
+      terminal = Terminal(row.terminal),
+      queue = Queue(row.queue),
+      minute = row.slotStart.getTime,
+      paxLoad = row.paxLoad,
+      workLoad = row.workLoad,
+      deskRec = row.deskRec,
+      waitTime = row.waitTime,
+      maybePaxInQueue = row.paxInQueue,
+      deployedDesks = row.deployedDesks,
+      deployedWait = row.deployedWait,
+      maybeDeployedPaxInQueue = row.deployedPaxInQueue,
+      lastUpdated = Option(row.updatedAt.getTime),
+    )
   }
 }
