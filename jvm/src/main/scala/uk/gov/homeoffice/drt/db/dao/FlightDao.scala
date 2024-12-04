@@ -56,7 +56,11 @@ case class FlightDao()
   def getForTerminalsUtcDate(port: PortCode): (Seq[Terminal], UtcDate) => DBIOAction[Seq[ApiFlightWithSplits], NoStream, Effect.Read] =
     (terminals, date) =>
       table
-        .filter(f => f.port === port.iata && f.terminal.inSet(terminals.map(_.toString)) && f.scheduledDateUtc === date.toISOString)
+        .filter(f =>
+          f.port === port.iata &&
+            f.terminal.inSet(terminals.map(_.toString)) &&
+            f.scheduledDateUtc === date.toISOString
+        )
         .result
         .map(_.map(FlightSerialiser.fromRow))
 
