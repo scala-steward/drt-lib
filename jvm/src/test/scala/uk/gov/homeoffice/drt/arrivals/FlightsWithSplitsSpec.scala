@@ -17,9 +17,9 @@ class FlightsWithSplitsSpec extends Specification{
     )
     "Given a flight with Splits containing flights inside and outside the range" >> {
       "Then I should only get flights scheduled inside the range" >> {
-        val fws1 = ArrivalGenerator.flightWithSplitsForDayAndTerminal(SDate("2020-09-22T10:00"))
-        val fws2 = ArrivalGenerator.flightWithSplitsForDayAndTerminal(SDate("2020-09-21T10:00"))
-        val fws3 = ArrivalGenerator.flightWithSplitsForDayAndTerminal(SDate("2020-09-23T11:00"))
+        val fws1 = ArrivalGeneratorShared.flightWithSplitsForDayAndTerminal(SDate("2020-09-22T10:00"))
+        val fws2 = ArrivalGeneratorShared.flightWithSplitsForDayAndTerminal(SDate("2020-09-21T10:00"))
+        val fws3 = ArrivalGeneratorShared.flightWithSplitsForDayAndTerminal(SDate("2020-09-23T11:00"))
         val flightsWithSplits = FlightsWithSplits(Map(
           fws1.unique -> fws1,
           fws2.unique -> fws2,
