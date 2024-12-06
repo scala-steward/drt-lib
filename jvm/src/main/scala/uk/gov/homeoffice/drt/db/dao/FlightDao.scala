@@ -40,13 +40,13 @@ case class FlightDao()
           )
         }
   }
-
-  def uniqueFlightsForDatesAndTerminals(getFlights: (PortCode, List[FeedSource], LocalDate, LocalDate, Seq[Terminal]) => Source[(UtcDate, Seq[ApiFlightWithSplits]), NotUsed]
+  
+  def uniqueFlightsForDatesAndTerminals(execute: DBIOAction[(UtcDate, Seq[ApiFlightWithSplits]), NoStream, Effect.Read] => Future[(UtcDate, Seq[ApiFlightWithSplits])]
                                        ): (PortCode, List[FeedSource], LocalDate, LocalDate, Seq[Terminal]) => Source[ApiFlightWithSplits, NotUsed] =
     (portCode, sourceOrder, start, end, terminals) => {
       val uniqueFlights = CodeShares.uniqueArrivals(sourceOrder) _
 
-      getFlights(portCode, sourceOrder, start, end, terminals)
+      flightsForPcpDateRange(portCode, sourceOrder, execute)(start, end, terminals)
         .map(_._2)
         .map(uniqueFlights)
         .mapConcat(identity)
