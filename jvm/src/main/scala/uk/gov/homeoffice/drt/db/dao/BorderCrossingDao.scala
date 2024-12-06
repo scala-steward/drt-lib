@@ -3,7 +3,7 @@ package uk.gov.homeoffice.drt.db.dao
 import slick.dbio.Effect
 import slick.sql.FixedSqlAction
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
-import uk.gov.homeoffice.drt.db.tables.{BorderCrossingRow, BorderCrossingTable}
+import uk.gov.homeoffice.drt.db.tables.{BorderCrossingRow, BorderCrossingTable, GateType}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.{LocalDate, SDate, UtcDate}
@@ -14,18 +14,25 @@ import scala.concurrent.ExecutionContext
 object BorderCrossingDao {
   val table: TableQuery[BorderCrossingTable] = TableQuery[BorderCrossingTable]
 
-  def replaceHours(port: PortCode): (Terminal, Iterable[BorderCrossingRow]) => DBIOAction[Unit, NoStream, Effect.Write with Effect.Transactional] =
-    (terminal, rows) => {
-      val validRows = rows.filter(r => r.portCode == port.iata && r.terminal == terminal.toString).toSet
+  def replaceHours(port: PortCode): (Terminal, GateType, Iterable[BorderCrossingRow]) => DBIOAction[Unit, NoStream, Effect.Write with Effect.Transactional] =
+    (terminal, gateType, rows) => {
+      val validRows = rows.filter(r =>
+        r.portCode == port.iata &&
+          r.terminal == terminal.toString &&
+          r.gateType == gateType.value
+      ).toSet
 
       if (validRows.nonEmpty) {
         val dateHours = validRows.map {
-          case BorderCrossingRow(_, _, dateUtc, hour, _, _) => (dateUtc, hour)
+          case BorderCrossingRow(_, _, dateUtc, _, hour, _, _) => (dateUtc, hour)
         }
 
         val deleteAction: FixedSqlAction[Int, NoStream, Effect.Write] = table
-          .filter(_.port === port.iata)
-          .filter(_.terminal === terminal.toString)
+          .filter(r =>
+            r.port === port.iata &&
+              r.terminal === terminal.toString &&
+              r.gateType === gateType.value
+          )
           .filter { row =>
             dateHours
               .map {

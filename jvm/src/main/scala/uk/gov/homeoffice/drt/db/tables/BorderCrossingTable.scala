@@ -8,9 +8,29 @@ import uk.gov.homeoffice.drt.time.UtcDate
 
 import java.sql.Timestamp
 
+sealed trait GateType {
+  def value: String
+}
+
+case object EGate extends GateType {
+  val value: String = "egate"
+}
+case object Pcp extends GateType {
+  val value: String = "pcp"
+}
+
+object GateType {
+  def apply(value: String): GateType = value match {
+    case EGate.value => EGate
+    case Pcp.value => Pcp
+    case _ => throw new IllegalArgumentException(s"Unknown gate type: $value")
+  }
+}
+
 case class BorderCrossing(portCode: PortCode,
                           terminal: Terminal,
                           dateUtc: UtcDate,
+                          gateType: GateType,
                           hour: Int,
                           passengers: Int,
                          )
@@ -18,6 +38,7 @@ case class BorderCrossing(portCode: PortCode,
 case class BorderCrossingRow(portCode: String,
                              terminal: String,
                              dateUtc: String,
+                             gateType: String,
                              hour: Int,
                              passengers: Int,
                              updatedAt: Timestamp,
@@ -31,6 +52,8 @@ class BorderCrossingTable(tag: Tag)
   def terminal: Rep[String] = column[String]("terminal")
 
   def dateUtc: Rep[String] = column[String]("date_utc")
+
+  def gateType: Rep[String] = column[String]("gate_type")
 
   def hour: Rep[Int] = column[Int]("hour", O.SqlType("smallint"))
 
@@ -52,6 +75,7 @@ class BorderCrossingTable(tag: Tag)
     port,
     terminal,
     dateUtc,
+    gateType,
     hour,
     passengers,
     updatedAt) <> (BorderCrossingRow.tupled, BorderCrossingRow.unapply)
