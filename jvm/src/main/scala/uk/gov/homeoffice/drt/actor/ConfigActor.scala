@@ -8,7 +8,7 @@ import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.actor.ConfigActor._
 import uk.gov.homeoffice.drt.actor.acking.AckingReceiver.StreamCompleted
 import uk.gov.homeoffice.drt.actor.commands.Commands.{AddUpdatesSubscriber, GetState}
-import uk.gov.homeoffice.drt.actor.commands.{CrunchRequest, TerminalUpdateRequest}
+import uk.gov.homeoffice.drt.actor.commands.TerminalUpdateRequest
 import uk.gov.homeoffice.drt.actor.serialisation.{ConfigDeserialiser, ConfigSerialiser, EmptyConfig}
 import uk.gov.homeoffice.drt.ports.config.updates.{ConfigUpdate, Configs}
 import uk.gov.homeoffice.drt.protobuf.messages.config.Configs.RemoveConfigMessage
