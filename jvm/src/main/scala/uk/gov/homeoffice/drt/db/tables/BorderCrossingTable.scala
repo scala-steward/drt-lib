@@ -20,7 +20,7 @@ case object Pcp extends GateType {
 }
 
 object GateType {
-  def apply(value: String): GateType = value match {
+  def apply(value: String): GateType = value.toLowerCase match {
     case EGate.value => EGate
     case Pcp.value => Pcp
     case _ => throw new IllegalArgumentException(s"Unknown gate type: $value")
