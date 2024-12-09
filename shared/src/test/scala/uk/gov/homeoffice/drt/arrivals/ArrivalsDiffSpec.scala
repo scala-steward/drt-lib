@@ -17,7 +17,7 @@ class ArrivalsDiffSpec extends Specification {
       }
 
       "One existing flight" >> {
-        val arrival = ArrivalGenerator.arrival(iata = "BA0001")
+        val arrival = ArrivalGeneratorShared.arrival(iata = "BA0001")
         val flights = Map(arrival.unique -> arrival)
 
         "Then I should get an empty FlightsWithSplits" >> {
@@ -28,7 +28,7 @@ class ArrivalsDiffSpec extends Specification {
     }
 
     "Given one new arrival and" >> {
-      val arrival = ArrivalGenerator.arrival(iata = "BA0001", status = ArrivalStatus("new status"))
+      val arrival = ArrivalGeneratorShared.arrival(iata = "BA0001", status = ArrivalStatus("new status"))
       val arrivalsDiff = ArrivalsDiff(Seq(arrival), Seq())
 
       "No existing flights" >> {

@@ -4,7 +4,7 @@ import uk.gov.homeoffice.drt.ports.Terminals.{T1, Terminal}
 import uk.gov.homeoffice.drt.ports.{FeedSource, PortCode}
 import uk.gov.homeoffice.drt.time.SDateLike
 
-object ArrivalGenerator {
+object ArrivalGeneratorShared {
   val midnight20220515Bst: Long = 1655247600000L
 
   def arrival(iata: String = "",

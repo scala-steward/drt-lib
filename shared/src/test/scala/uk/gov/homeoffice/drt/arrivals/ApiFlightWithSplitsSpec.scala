@@ -171,7 +171,7 @@ class ApiFlightWithSplitsSpec extends Specification {
   }
 
   "bestSplits" should {
-    val flight = ApiFlightWithSplits(apiFlight = ArrivalGenerator.arrival(iata = "BA0001", passengerSources = Map(LiveFeedSource -> Passengers(Option(100), None))), splits = Set.empty, lastUpdated = None)
+    val flight = ApiFlightWithSplits(apiFlight = ArrivalGeneratorShared.arrival(iata = "BA0001", passengerSources = Map(LiveFeedSource -> Passengers(Option(100), None))), splits = Set.empty, lastUpdated = None)
     val apiSplits = Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, Queues.NonEeaDesk, 100, None, None)), SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages, Option(EventTypes.DC))
     val invalidApiSplits = Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, Queues.NonEeaDesk, 1, None, None)), SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages, Option(EventTypes.DC))
     val validButAllTransitApi = Splits(Set(ApiPaxTypeAndQueueCount(Transit, Queues.Transfer, 100, None, None)), SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages, Option(EventTypes.DC))
@@ -207,7 +207,7 @@ class ApiFlightWithSplitsSpec extends Specification {
                                         passengerSources: Map[FeedSource, Passengers],
                                         scheduled: Long,
                                        ): ApiFlightWithSplits = {
-    val flight: Arrival = ArrivalGenerator.arrival(
+    val flight: Arrival = ArrivalGeneratorShared.arrival(
       feedSources = sources,
       passengerSources = passengerSources + (ApiFeedSource -> Passengers(Option(splitsDirect), Option(splitsTransfer))),
       sch = scheduled)
@@ -216,7 +216,7 @@ class ApiFlightWithSplitsSpec extends Specification {
   }
 
   private def flightWithPaxAndHistoricSplits(splitsDirect: Int, splitsTransfer: Int, sources: Set[FeedSource], passengerSources: Map[FeedSource, Passengers]): ApiFlightWithSplits = {
-    val flight: Arrival = ArrivalGenerator
+    val flight: Arrival = ArrivalGeneratorShared
       .arrival(feedSources = sources,passengerSources = passengerSources)
 
     ApiFlightWithSplits(flight, Set(splitsForPax(directPax = splitsDirect, transferPax = splitsTransfer, Historical)))

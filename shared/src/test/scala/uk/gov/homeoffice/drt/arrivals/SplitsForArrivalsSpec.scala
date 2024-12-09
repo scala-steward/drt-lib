@@ -69,7 +69,7 @@ class SplitsForArrivalsSpec extends Specification {
           val existingSplits2 = Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, EGate, 1, None, None)), ApiSplitsWithHistoricalEGateAndFTPercentages, None, PaxNumbers)
           val newSplits = Splits(Set(ApiPaxTypeAndQueueCount(EeaNonMachineReadable, EeaDesk, 1, None, None)), ApiSplitsWithHistoricalEGateAndFTPercentages, None, PaxNumbers)
           val splitsForArrivals = SplitsForArrivals(Map(uniqueArrival -> Set(newSplits)))
-          val arrival = ArrivalGenerator.arrival(iata = "BA0001", terminal = T1, origin = PortCode("JFK"),
+          val arrival = ArrivalGeneratorShared.arrival(iata = "BA0001", terminal = T1, origin = PortCode("JFK"),
             passengerSources = Map(LiveFeedSource -> Passengers(Option(1), Some(0)), ApiFeedSource -> Passengers(Option(1), None)), feedSources = Set(LiveFeedSource, ApiFeedSource))
           val flights = FlightsWithSplits(Seq(ApiFlightWithSplits(arrival, Set(existingSplits1, existingSplits2))))
 
@@ -84,8 +84,8 @@ class SplitsForArrivalsSpec extends Specification {
 
       "Given 2 splits and two arrivals, one with a new source and one with the same source" >> {
         "Then I should get a FlightsWithSplits containing the arrivals updated with the correct new splits" >> {
-          val arrival1 = ArrivalGenerator.arrival(iata = "BA0001", terminal = T1, origin = PortCode("JFK"), passengerSources = Map(LiveFeedSource -> Passengers(Option(1), Some(0))))
-          val arrival2 = ArrivalGenerator.arrival(iata = "FR1234", terminal = T1, origin = PortCode("JFK"), passengerSources = Map(LiveFeedSource -> Passengers(Option(1), Some(0))))
+          val arrival1 = ArrivalGeneratorShared.arrival(iata = "BA0001", terminal = T1, origin = PortCode("JFK"), passengerSources = Map(LiveFeedSource -> Passengers(Option(1), Some(0))))
+          val arrival2 = ArrivalGeneratorShared.arrival(iata = "FR1234", terminal = T1, origin = PortCode("JFK"), passengerSources = Map(LiveFeedSource -> Passengers(Option(1), Some(0))))
           val existingSplits1 = Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, NonEeaDesk, 1, None, None)), Historical, None, PaxNumbers)
           val existingSplits2 = Splits(Set(ApiPaxTypeAndQueueCount(EeaMachineReadable, EGate, 1, None, None)), Historical, None, PaxNumbers)
           val newSplits1 = Splits(Set(ApiPaxTypeAndQueueCount(EeaNonMachineReadable, EeaDesk, 1, None, None)), Historical, None, PaxNumbers)
