@@ -34,7 +34,7 @@ object Sen extends AirportConfigLike {
     eGateBankSizes = Map(),
     role = SEN,
     terminalPaxTypeQueueAllocation = Map(T1 -> defaultQueueRatiosWithoutEgates),
-    feedSources = Seq(ApiFeedSource, LiveFeedSource),
+    feedSources = Seq(ApiFeedSource, LiveFeedSource, AclFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),
     desksByTerminal = Map(T1 -> 6)
   )
