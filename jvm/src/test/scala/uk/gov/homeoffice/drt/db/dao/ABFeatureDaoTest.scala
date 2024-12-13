@@ -15,7 +15,6 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
 class ABFeatureDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
-
   val db: profile.backend.Database = TestDatabase.db
   val abFeatureDao: ABFeatureDao = ABFeatureDao(TestDatabase.db)
 
