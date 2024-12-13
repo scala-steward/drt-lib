@@ -61,7 +61,7 @@ class BorderCrossingTable(tag: Tag)
 
   def updatedAt: Rep[Timestamp] = column[java.sql.Timestamp]("updated_at")
 
-  def pk = primaryKey("pk_border_crossing_port_terminal_dateutc_hour", (port, terminal, dateUtc, hour))
+  def pk = primaryKey("pk_border_crossing_port_terminal_dateutc_gatetype_hour", (port, terminal, dateUtc, gateType, hour))
 
   def portTerminalDateHourIndex = index("idx_border_crossing_port_terminal_date_hour", (port, terminal, dateUtc, hour), unique = false)
 
