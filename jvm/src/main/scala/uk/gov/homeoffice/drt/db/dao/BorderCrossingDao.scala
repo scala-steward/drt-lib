@@ -33,7 +33,7 @@ object BorderCrossingDao {
       .filter(_.terminal === terminal)
       .filter(_.dateUtc === date)
       .result
-  
+
   def totalForPortAndDate(port: String, maybeTerminal: Option[String])
                          (implicit ec: ExecutionContext): LocalDate => DBIOAction[Int, NoStream, Effect.Read] =
     localDate =>
