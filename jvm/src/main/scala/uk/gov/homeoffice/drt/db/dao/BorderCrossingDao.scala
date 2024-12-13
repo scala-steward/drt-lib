@@ -1,7 +1,6 @@
 package uk.gov.homeoffice.drt.db.dao
 
 import slick.dbio.Effect
-import slick.sql.FixedSqlAction
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
 import uk.gov.homeoffice.drt.db.tables.{BorderCrossingRow, BorderCrossingTable, GateType}
 import uk.gov.homeoffice.drt.ports.PortCode
@@ -14,39 +13,18 @@ import scala.concurrent.ExecutionContext
 object BorderCrossingDao {
   val table: TableQuery[BorderCrossingTable] = TableQuery[BorderCrossingTable]
 
-  def replaceHours(port: PortCode): (Terminal, GateType, Iterable[BorderCrossingRow]) => DBIOAction[Unit, NoStream, Effect.Write with Effect.Transactional] =
+  def replaceHours(port: PortCode)
+                  (implicit ec: ExecutionContext): (Terminal, GateType, Iterable[BorderCrossingRow]) => DBIOAction[Int, NoStream, Effect.Write] =
     (terminal, gateType, rows) => {
-      val validRows = rows.filter(r =>
-        r.portCode == port.iata &&
-          r.terminal == terminal.toString &&
-          r.gateType == gateType.value
-      ).toSet
-
-      if (validRows.nonEmpty) {
-        val dateHours = validRows.map {
-          case BorderCrossingRow(_, _, dateUtc, _, hour, _, _) => (dateUtc, hour)
+      val inserts = rows
+        .filter { r =>
+          r.portCode == port.iata &&
+            r.terminal == terminal.toString &&
+            r.gateType == gateType.value
         }
+        .map(table.insertOrUpdate)
 
-        val deleteAction: FixedSqlAction[Int, NoStream, Effect.Write] = table
-          .filter(r =>
-            r.port === port.iata &&
-              r.terminal === terminal.toString &&
-              r.gateType === gateType.value
-          )
-          .filter { row =>
-            dateHours
-              .map {
-                case (date, hour) => row.dateUtc === date && row.hour === hour
-              }
-              .reduce(_ || _)
-          }
-          .delete
-
-        val insertAction = table ++= validRows
-
-        DBIO.seq(deleteAction, insertAction).transactionally
-      }
-      else DBIO.successful()
+      DBIO.sequence(inserts).map(_.sum)
     }
 
   def get(portCode: String, terminal: String, date: String): DBIOAction[Seq[BorderCrossingRow], NoStream, Effect.Read] =
@@ -55,7 +33,7 @@ object BorderCrossingDao {
       .filter(_.terminal === terminal)
       .filter(_.dateUtc === date)
       .result
-
+  
   def totalForPortAndDate(port: String, maybeTerminal: Option[String])
                          (implicit ec: ExecutionContext): LocalDate => DBIOAction[Int, NoStream, Effect.Read] =
     localDate =>
