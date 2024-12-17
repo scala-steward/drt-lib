@@ -67,6 +67,7 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "io.spray" %% "spray-json" % sprayJsonVersion,
       "com.h2database" % "h2" % h2Version % Test
     ),
+    Test / parallelExecution := false,
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
     Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
     Compile / PB.protocExecutable := {

@@ -18,20 +18,20 @@ trait IABFeatureDao {
 }
 
 case class ABFeatureDao(db: Database) extends IABFeatureDao {
-  val abFeatureTable: TableQuery[ABFeatureTable] = TableQuery[ABFeatureTable]
+  val table: TableQuery[ABFeatureTable] = TableQuery[ABFeatureTable]
 
   override def insertOrUpdate(aBFeatureRow: ABFeatureRow): Future[Int] = {
-    db.run(abFeatureTable.insertOrUpdate(aBFeatureRow))
+    db.run(table.insertOrUpdate(aBFeatureRow))
   }
 
   override def getABFeatures: Future[Seq[ABFeatureRow]] = {
-    db.run(abFeatureTable.result).mapTo[Seq[ABFeatureRow]]
+    db.run(table.result).mapTo[Seq[ABFeatureRow]]
   }
 
   override def getABFeatureByFunctionName(functionName: String): Future[Seq[ABFeatureRow]] = {
-    db.run(abFeatureTable.filter(_.functionName === functionName).result).mapTo[Seq[ABFeatureRow]]
+    db.run(table.filter(_.functionName === functionName).result).mapTo[Seq[ABFeatureRow]]
   }
 
   override def getABFeaturesByEmailForFunction(email: String, functionName: String): Future[Seq[ABFeatureRow]] =
-    db.run(abFeatureTable.filter(ab => ab.email === email && ab.functionName === functionName).result).mapTo[Seq[ABFeatureRow]]
+    db.run(table.filter(ab => ab.email === email && ab.functionName === functionName).result).mapTo[Seq[ABFeatureRow]]
 }

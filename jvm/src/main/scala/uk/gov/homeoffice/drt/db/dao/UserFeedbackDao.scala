@@ -19,19 +19,19 @@ trait IUserFeedbackDao {
 }
 
 case class UserFeedbackDao(db: Database) extends IUserFeedbackDao {
-  val userFeedbackTable: TableQuery[UserFeedbackTable] = TableQuery[UserFeedbackTable]
+  val table: TableQuery[UserFeedbackTable] = TableQuery[UserFeedbackTable]
 
   override def insertOrUpdate(userFeedbackRow: UserFeedbackRow): Future[Int] = {
-    db.run(userFeedbackTable insertOrUpdate userFeedbackRow)
+    db.run(table insertOrUpdate userFeedbackRow)
   }
 
   override def selectAllAsStream(): Source[UserFeedbackRow, _] = {
-    Source.fromPublisher(db.stream(userFeedbackTable.result))
+    Source.fromPublisher(db.stream(table.result))
   }
 
   override def selectAll()(implicit executionContext: ExecutionContext): Future[Seq[UserFeedbackRow]] = {
-    db.run(userFeedbackTable.result).mapTo[Seq[UserFeedbackRow]]
+    db.run(table.result).mapTo[Seq[UserFeedbackRow]]
   }
 
-  override def selectByEmail(email: String): Future[Seq[UserFeedbackRow]] = db.run(userFeedbackTable.filter(_.email === email).result)
+  override def selectByEmail(email: String): Future[Seq[UserFeedbackRow]] = db.run(table.filter(_.email === email).result)
 }
