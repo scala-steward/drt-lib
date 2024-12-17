@@ -131,6 +131,7 @@ object FeedArrivalMessageConversion {
       carrierCode = msg.carrierCode.getOrElse(""),
       flightCodeSuffix = msg.flightCodeSuffix,
       origin = msg.origin.getOrElse(""),
+      previousPort = msg.previousPort,
       scheduled = msg.scheduled.getOrElse(0L),
     )
 
@@ -168,6 +169,7 @@ object FeedArrivalMessageConversion {
       carrierCode = msg.carrierCode.getOrElse(""),
       flightCodeSuffix = msg.flightCodeSuffix,
       origin = msg.origin.getOrElse(""),
+      previousPort = msg.previousPort,
       scheduled = msg.scheduled.getOrElse(0L),
       estimated = msg.estimated,
       touchdown = msg.touchdown,

@@ -33,6 +33,7 @@ class FlightMessageConversionSpec extends Specification {
     AirportID = PortCode("LHR"),
     Terminal = T1,
     Origin = PortCode("CDG"),
+    PreviousPort = Option(PortCode("JFK")),
     Scheduled = 5L,
     PcpTime = Option(6L),
     FeedSources = Set(LiveFeedSource, AclFeedSource, ForecastFeedSource, LiveBaseFeedSource, ApiFeedSource),

@@ -30,6 +30,7 @@ object FlightRowHelper {
     AirportID = PortCode(""),
     Terminal = T1,
     Origin = origin,
+    PreviousPort = Option(PortCode("JFK")),
     Scheduled = scheduled,
     PcpTime = Option(5L),
     FeedSources = Set(LiveFeedSource, ForecastFeedSource),

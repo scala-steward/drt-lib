@@ -1,13 +1,13 @@
 package uk.gov.homeoffice.drt.db.tables
 
 import slick.lifted.Tag
-import spray.json.JsValue
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
 
 import java.sql.Timestamp
 
 case class FlightRow(port: String,
                      origin: String,
+                     previousPort: Option[String],
                      terminal: String,
                      voyageNumber: Int,
                      carrierCode: String,
@@ -42,6 +42,8 @@ class FlightTable(tag: Tag)
   def port: Rep[String] = column[String]("port")
 
   def origin: Rep[String] = column[String]("origin")
+
+  def previousPort: Rep[Option[String]] = column[Option[String]]("previous_port")
 
   def terminal: Rep[String] = column[String]("terminal")
 
@@ -111,6 +113,7 @@ class FlightTable(tag: Tag)
   def * = (
     port,
     origin,
+    previousPort,
     terminal,
     voyageNumber,
     carrierCode,
