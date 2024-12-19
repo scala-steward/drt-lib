@@ -20,6 +20,7 @@ object Man extends AirportConfigLike {
     val b5jssk = 52.7
     val nvn = 89.1
     val vn = 99.9
+    val egates = 44d
   }
 
   private object ProcTimesT2 {
@@ -28,14 +29,16 @@ object Man extends AirportConfigLike {
     val b5jssk = 59.8
     val nvn = 101.3
     val vn = 98.2
+    val egates = 51d
   }
 
   private object ProcTimesT3 {
     val gbr = 31.8
     val eea = 39.8
-    val b5jssk = 57
+    val b5jssk = 57.0
     val nvn = 86.4
     val vn = 91.6
+    val egates = 44d
   }
 
   val config: AirportConfig = AirportConfig(
@@ -65,9 +68,9 @@ object Man extends AirportConfigLike {
         eeaChildToDesk -> ProcTimesT1.eea / 60,
         gbrNationalToDesk -> ProcTimesT1.gbr / 60,
         gbrNationalChildToDesk -> ProcTimesT1.gbr / 60,
-        b5jsskToEGate -> 38d / 60,
-        eeaMachineReadableToEGate -> 44d / 60,
-        gbrNationalToEgate -> 44d / 60,
+        b5jsskToEGate -> ProcTimesT1.egates / 60,
+        eeaMachineReadableToEGate -> ProcTimesT1.egates / 60,
+        gbrNationalToEgate -> ProcTimesT1.egates / 60,
         visaNationalToDesk -> ProcTimesT1.vn / 60,
         nonVisaNationalToDesk -> ProcTimesT1.nvn / 60,
       ),
@@ -79,9 +82,9 @@ object Man extends AirportConfigLike {
         eeaChildToDesk -> ProcTimesT2.eea / 60,
         gbrNationalToDesk -> ProcTimesT2.gbr / 60,
         gbrNationalChildToDesk -> ProcTimesT2.gbr / 60,
-        b5jsskToEGate -> 51d / 60,
-        eeaMachineReadableToEGate -> 51d / 60,
-        gbrNationalToEgate -> 51d / 60,
+        b5jsskToEGate -> ProcTimesT2.egates / 60,
+        eeaMachineReadableToEGate -> ProcTimesT2.egates / 60,
+        gbrNationalToEgate -> ProcTimesT2.egates / 60,
         visaNationalToDesk -> ProcTimesT2.vn / 60,
         nonVisaNationalToDesk -> ProcTimesT2.nvn / 60,
       ),
@@ -93,9 +96,9 @@ object Man extends AirportConfigLike {
         eeaChildToDesk -> ProcTimesT3.eea / 60,
         gbrNationalToDesk -> ProcTimesT3.gbr / 60,
         gbrNationalChildToDesk -> ProcTimesT3.gbr / 60,
-        b5jsskToEGate -> 44d / 60,
-        eeaMachineReadableToEGate -> 44d / 60,
-        gbrNationalToEgate -> 44d / 60,
+        b5jsskToEGate -> ProcTimesT3.egates / 60,
+        eeaMachineReadableToEGate -> ProcTimesT3.egates / 60,
+        gbrNationalToEgate -> ProcTimesT3.egates / 60,
         visaNationalToDesk -> ProcTimesT3.vn / 60,
         nonVisaNationalToDesk -> ProcTimesT3.nvn / 60,
       )),

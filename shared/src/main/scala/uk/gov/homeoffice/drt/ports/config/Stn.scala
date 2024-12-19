@@ -21,6 +21,7 @@ object Stn extends AirportConfigLike {
     val b5jssk = 51.5
     val nvn = 84.1
     val vn = 89.9
+    val egates = 45d
   }
 
   val config: AirportConfig = AirportConfig(
@@ -48,9 +49,9 @@ object Stn extends AirportConfigLike {
       eeaChildToDesk -> ProcTimes.eea / 60,
       gbrNationalToDesk -> ProcTimes.gbr / 60,
       gbrNationalChildToDesk -> ProcTimes.gbr / 60,
-      b5jsskToEGate -> 45d / 60,
-      eeaMachineReadableToEGate -> 45d / 60,
-      gbrNationalToEgate -> 45d / 60,
+      b5jsskToEGate -> ProcTimes.egates / 60,
+      eeaMachineReadableToEGate -> ProcTimes.egates / 60,
+      gbrNationalToEgate -> ProcTimes.egates / 60,
       visaNationalToDesk -> ProcTimes.vn / 60,
       nonVisaNationalToDesk -> ProcTimes.nvn / 60,
     )),
