@@ -55,6 +55,7 @@ object AirportConfigDefaults {
     val b5jssk = 46.0
     val nvn = 91.3
     val vn = 101.3
+    val egates = 36d
   }
 
   val defaultProcessingTimes: Map[PaxTypeAndQueue, Double] = Map(
@@ -65,9 +66,9 @@ object AirportConfigDefaults {
     eeaNonMachineReadableToDesk -> ProcTimes.eea / 60,
     gbrNationalToDesk -> ProcTimes.gbr / 60,
     gbrNationalChildToDesk -> ProcTimes.gbr / 60,
-    b5jsskToEGate -> 36d / 60,
-    eeaMachineReadableToEGate -> 36d / 60,
-    gbrNationalToEgate -> 36d / 60,
+    b5jsskToEGate -> ProcTimes.egates,
+    eeaMachineReadableToEGate -> ProcTimes.egates,
+    gbrNationalToEgate -> ProcTimes.egates,
     visaNationalToDesk -> ProcTimes.vn / 60,
     nonVisaNationalToDesk -> ProcTimes.nvn / 60
   )
