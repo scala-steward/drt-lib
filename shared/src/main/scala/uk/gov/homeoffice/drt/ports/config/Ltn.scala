@@ -14,6 +14,15 @@ object Ltn extends AirportConfigLike {
 
   import AirportConfigDefaults._
 
+  private object ProcTimes {
+    val gbr = 30.1
+    val eea = 37.4
+    val b5jssk = 52.9
+    val nvn = 64.4
+    val vn = 83.8
+    val egates = 47d
+  }
+
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("LTN"),
     portName = "Luton",
@@ -24,18 +33,18 @@ object Ltn extends AirportConfigLike {
     defaultWalkTimeMillis = Map(T1 -> 300000L),
     terminalPaxSplits = Map(T1 -> defaultPaxSplits),
     terminalProcessingTimes = Map(T1 -> Map(
-      b5jsskToDesk -> 59d / 60,
-      b5jsskChildToDesk -> 59d / 60,
-      eeaMachineReadableToDesk -> 40d / 60,
-      eeaNonMachineReadableToDesk -> 40d / 60,
-      eeaChildToDesk -> 40d / 60,
-      gbrNationalToDesk -> 31d / 60,
-      gbrNationalChildToDesk -> 31d / 60,
-      b5jsskToEGate -> 47d / 60,
-      eeaMachineReadableToEGate -> 47d / 60,
-      gbrNationalToEgate -> 47d / 60,
-      visaNationalToDesk -> 92d / 60,
-      nonVisaNationalToDesk -> 56d / 60,
+      b5jsskToDesk -> ProcTimes.b5jssk / 60,
+      b5jsskChildToDesk -> ProcTimes.b5jssk / 60,
+      eeaMachineReadableToDesk -> ProcTimes.eea / 60,
+      eeaNonMachineReadableToDesk -> ProcTimes.eea / 60,
+      eeaChildToDesk -> ProcTimes.eea / 60,
+      gbrNationalToDesk -> ProcTimes.gbr / 60,
+      gbrNationalChildToDesk -> ProcTimes.gbr / 60,
+      b5jsskToEGate -> ProcTimes.egates / 60,
+      eeaMachineReadableToEGate -> ProcTimes.egates / 60,
+      gbrNationalToEgate -> ProcTimes.egates / 60,
+      visaNationalToDesk -> ProcTimes.vn / 60,
+      nonVisaNationalToDesk -> ProcTimes.nvn / 60,
     )),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(
