@@ -35,7 +35,7 @@ object Cwl extends AirportConfigLike {
     eGateBankSizes = Map(T1 -> Iterable(5)),
     role = CWL,
     terminalPaxTypeQueueAllocation = Map(T1 -> defaultQueueRatios),
-    feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, AclFeedSource),
+    feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, LiveFeedSource, AclFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),
     desksByTerminal = Map(T1 -> 8)
   )
