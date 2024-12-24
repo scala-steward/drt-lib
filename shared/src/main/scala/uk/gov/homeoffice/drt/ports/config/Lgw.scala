@@ -20,6 +20,7 @@ object Lgw extends AirportConfigLike {
     val b5jssk = 51.8
     val nvn = 89.5
     val vn = 101.2
+    val egates = 47d
   }
 
   private object ProcTimesSouth {
@@ -28,6 +29,7 @@ object Lgw extends AirportConfigLike {
     val b5jssk = 51.3
     val nvn = 86.1
     val vn = 104.8
+    val egates = 47d
   }
 
   val config: AirportConfig = AirportConfig(
@@ -60,9 +62,9 @@ object Lgw extends AirportConfigLike {
         eeaChildToDesk -> ProcTimesNorth.eea / 60,
         gbrNationalToDesk -> ProcTimesNorth.gbr / 60,
         gbrNationalChildToDesk -> ProcTimesNorth.gbr / 60,
-        b5jsskToEGate -> 47d / 60,
-        eeaMachineReadableToEGate -> 47d / 60,
-        gbrNationalToEgate -> 47d / 60,
+        b5jsskToEGate -> ProcTimesNorth.egates / 60,
+        eeaMachineReadableToEGate -> ProcTimesNorth.egates / 60,
+        gbrNationalToEgate -> ProcTimesNorth.egates / 60,
         visaNationalToDesk -> ProcTimesNorth.vn / 60,
         nonVisaNationalToDesk -> ProcTimesNorth.nvn / 60
       ),
@@ -74,9 +76,9 @@ object Lgw extends AirportConfigLike {
         eeaChildToDesk -> ProcTimesSouth.eea / 60,
         gbrNationalToDesk -> ProcTimesSouth.gbr / 60,
         gbrNationalChildToDesk -> ProcTimesSouth.gbr / 60,
-        b5jsskToEGate -> 47d / 60,
-        eeaMachineReadableToEGate -> 47d / 60,
-        gbrNationalToEgate -> 47d / 60,
+        b5jsskToEGate -> ProcTimesSouth.egates / 60,
+        eeaMachineReadableToEGate -> ProcTimesSouth.egates / 60,
+        gbrNationalToEgate -> ProcTimesSouth.egates / 60,
         visaNationalToDesk -> ProcTimesSouth.vn / 60,
         nonVisaNationalToDesk -> ProcTimesSouth.nvn / 60,
       )),

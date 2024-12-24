@@ -30,6 +30,7 @@ object Lhr extends AirportConfigLike {
     val b5jssk = 62.6
     val nvn = 95.0
     val vn = 103.5
+    val egates = 44d
   }
 
   private object ProcTimesT3 {
@@ -38,6 +39,7 @@ object Lhr extends AirportConfigLike {
     val b5jssk = 55.4
     val nvn = 94.9
     val vn = 107.3
+    val egates = 44d
   }
 
   private object ProcTimesT4 {
@@ -46,6 +48,7 @@ object Lhr extends AirportConfigLike {
     val b5jssk = 62.8
     val nvn = 89.4
     val vn = 107.9
+    val egates = 44d
   }
 
   private object ProcTimesT5 {
@@ -54,6 +57,7 @@ object Lhr extends AirportConfigLike {
     val b5jssk = 57.5
     val nvn = 90.4
     val vn = 113.9
+    val egates = 47d
   }
 
   val config: AirportConfig = AirportConfig(
@@ -87,9 +91,9 @@ object Lhr extends AirportConfigLike {
         eeaChildToDesk -> ProcTimesT2.eea / 60,
         gbrNationalToDesk -> ProcTimesT2.gbr / 60,
         gbrNationalChildToDesk -> ProcTimesT2.gbr / 60,
-        b5jsskToEGate -> 44d / 60,
-        eeaMachineReadableToEGate -> 44d / 60,
-        gbrNationalToEgate -> 44d / 60,
+        b5jsskToEGate -> ProcTimesT2.egates / 60,
+        eeaMachineReadableToEGate -> ProcTimesT2.egates / 60,
+        gbrNationalToEgate -> ProcTimesT2.egates / 60,
         visaNationalToDesk -> ProcTimesT2.vn / 60,
         nonVisaNationalToDesk -> ProcTimesT2.nvn / 60,
         visaNationalToFastTrack -> ProcTimesT2.vn / 60,
@@ -104,9 +108,9 @@ object Lhr extends AirportConfigLike {
         eeaChildToDesk -> ProcTimesT3.eea / 60,
         gbrNationalToDesk -> ProcTimesT3.gbr / 60,
         gbrNationalChildToDesk -> ProcTimesT3.gbr / 60,
-        b5jsskToEGate -> 44d / 60,
-        eeaMachineReadableToEGate -> 44d / 60,
-        gbrNationalToEgate -> 44d / 60,
+        b5jsskToEGate -> ProcTimesT3.egates / 60,
+        eeaMachineReadableToEGate -> ProcTimesT3.egates / 60,
+        gbrNationalToEgate -> ProcTimesT3.egates / 60,
         visaNationalToDesk -> ProcTimesT3.vn / 60,
         nonVisaNationalToDesk -> ProcTimesT3.nvn / 60,
         visaNationalToFastTrack -> ProcTimesT3.vn / 60,
@@ -121,9 +125,9 @@ object Lhr extends AirportConfigLike {
         eeaChildToDesk -> ProcTimesT4.eea / 60,
         gbrNationalToDesk -> ProcTimesT4.gbr / 60,
         gbrNationalChildToDesk -> ProcTimesT4.gbr / 60,
-        b5jsskToEGate -> 44d / 60,
-        eeaMachineReadableToEGate -> 44d / 60,
-        gbrNationalToEgate -> 44d / 60,
+        b5jsskToEGate -> ProcTimesT4.egates / 60,
+        eeaMachineReadableToEGate -> ProcTimesT4.egates / 60,
+        gbrNationalToEgate -> ProcTimesT4.egates / 60,
         visaNationalToDesk -> ProcTimesT4.vn / 60,
         nonVisaNationalToDesk -> ProcTimesT4.nvn / 60,
         visaNationalToFastTrack -> ProcTimesT4.vn / 60,
@@ -138,9 +142,9 @@ object Lhr extends AirportConfigLike {
         eeaChildToDesk -> ProcTimesT5.eea / 60,
         gbrNationalToDesk -> ProcTimesT5.gbr / 60,
         gbrNationalChildToDesk -> ProcTimesT5.gbr / 60,
-        b5jsskToEGate -> 47d / 60,
-        eeaMachineReadableToEGate -> 47d / 60,
-        gbrNationalToEgate -> 47d / 60,
+        b5jsskToEGate -> ProcTimesT5.egates / 60,
+        eeaMachineReadableToEGate -> ProcTimesT5.egates / 60,
+        gbrNationalToEgate -> ProcTimesT5.egates / 60,
         visaNationalToDesk -> ProcTimesT5.vn / 60,
         nonVisaNationalToDesk -> ProcTimesT5.nvn / 60,
         visaNationalToFastTrack -> ProcTimesT5.vn / 60,

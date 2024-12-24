@@ -20,6 +20,7 @@ object Bhx extends AirportConfigLike {
     val b5jssk = 51.0
     val nvn = 85.0
     val vn = 90.9
+    val egates = 48d
   }
 
   val config: AirportConfig = AirportConfig(
@@ -55,9 +56,9 @@ object Bhx extends AirportConfigLike {
       eeaChildToDesk -> ProcTimes.eea / 60,
       gbrNationalToDesk -> ProcTimes.gbr / 60,
       gbrNationalChildToDesk -> ProcTimes.gbr / 60,
-      b5jsskToEGate -> 48d / 60,
-      eeaMachineReadableToEGate -> 48d / 60,
-      gbrNationalToEgate -> 48d / 60,
+      b5jsskToEGate -> ProcTimes.egates / 60,
+      eeaMachineReadableToEGate -> ProcTimes.egates / 60,
+      gbrNationalToEgate -> ProcTimes.egates / 60,
       visaNationalToDesk -> ProcTimes.vn / 60,
       nonVisaNationalToDesk -> ProcTimes.nvn / 60
     ), T2 -> Map(
@@ -68,9 +69,9 @@ object Bhx extends AirportConfigLike {
       eeaChildToDesk -> ProcTimes.eea / 60,
       gbrNationalToDesk -> ProcTimes.gbr / 60,
       gbrNationalChildToDesk -> ProcTimes.gbr / 60,
-      b5jsskToEGate -> 48d / 60,
-      eeaMachineReadableToEGate -> 48d / 60,
-      gbrNationalToEgate -> 48d / 60,
+      b5jsskToEGate -> ProcTimes.egates / 60,
+      eeaMachineReadableToEGate -> ProcTimes.egates / 60,
+      gbrNationalToEgate -> ProcTimes.egates / 60,
       visaNationalToDesk -> ProcTimes.vn / 60,
       nonVisaNationalToDesk -> ProcTimes.nvn / 60
     )),
