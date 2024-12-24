@@ -3,7 +3,7 @@ package uk.gov.homeoffice.drt.arrivals
 import uk.gov.homeoffice.drt.DataUpdates.FlightUpdates
 import uk.gov.homeoffice.drt.arrivals.SplitsForArrivals.updateFlightWithSplits
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages
-import uk.gov.homeoffice.drt.ports.{ApiFeedSource, FeedSource}
+import uk.gov.homeoffice.drt.ports.{ApiFeedSource, FeedSource, PortCode}
 import upickle.default.{macroRW, _}
 
 
@@ -66,7 +66,10 @@ case class SplitsForArrivals(splits: Map[UniqueArrival, Set[Splits]]) extends Fl
       case (key, splits) =>
         flightsWithSplits.flights.get(key) match {
           case Some(fws) if splits.exists(_.source == ApiSplitsWithHistoricalEGateAndFTPercentages) => fws.apiFlight.pcpRange(sourceOrderPreference)
-          case _ => Iterable()
+          case _ =>
+            findWithPreviousPort(flightsWithSplits, key)
+              .map(_.apiFlight.pcpRange(sourceOrderPreference))
+              .getOrElse(Iterable.empty)
         }
     }.toSet
 
@@ -77,15 +80,26 @@ case class SplitsForArrivals(splits: Map[UniqueArrival, Set[Splits]]) extends Fl
             case Some(existingFws) =>
               val updatedFlightWithSplits = updateFlightWithSplits(existingFws, incomingSplits, nowMillis)
               Option(updatedFlightWithSplits)
-            case None => None
+            case None =>
+              findWithPreviousPort(flightsWithSplits, key)
+                .map(updateFlightWithSplits(_, incomingSplits, nowMillis))
           }
       }
-      .collect { case Some(fws) => fws}
+      .collect { case Some(fws) => fws }
 
     val updated = flightsWithSplits.flights ++ updatedFlights.map(f => f.unique -> f)
 
     (FlightsWithSplits(updated), minutesFromUpdates, updatedFlights, Seq.empty)
   }
+
+  private def findWithPreviousPort(flightsWithSplits: FlightsWithSplits, key: UniqueArrival): Option[ApiFlightWithSplits] =
+    flightsWithSplits.flights
+      .collect {
+        case (_, fws) if fws.apiFlight.PreviousPort.nonEmpty => fws
+      }
+      .find { fws =>
+        key == UniqueArrival(fws.apiFlight.VoyageNumber.numeric, fws.apiFlight.Terminal, fws.apiFlight.Scheduled, fws.apiFlight.PreviousPort.getOrElse(PortCode("")))
+      }
 
   def ++(tuple: (UniqueArrival, Set[Splits])): Map[UniqueArrival, Set[Splits]] = splits + tuple
 }
