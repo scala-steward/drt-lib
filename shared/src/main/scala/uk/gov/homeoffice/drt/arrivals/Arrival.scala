@@ -80,7 +80,11 @@ case class Arrival(Operator: Option[Operator],
   extends WithUnique[UniqueArrival] with Updatable[Arrival] {
   lazy val differenceFromScheduled: Option[FiniteDuration] = Actual.map(a => (a - Scheduled).milliseconds)
 
-  val fifteenMinutes = 15 * 60 * 1000
+  lazy val lastPort: PortCode = PreviousPort.getOrElse(Origin)
+
+  lazy val keyForManifest: UniqueArrival = UniqueArrival(this).copy(origin = lastPort)
+
+  private val fifteenMinutes = 15 * 60 * 1000
 
   def suffixString: String = FlightCodeSuffix match {
     case None => ""
