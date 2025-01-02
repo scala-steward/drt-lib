@@ -117,6 +117,7 @@ object FeedArrivalMessageConversion {
       carrierCode = Option(fa.carrierCode),
       flightCodeSuffix = fa.flightCodeSuffix,
       origin = Option(fa.origin),
+      previousPort = fa.previousPort,
       scheduled = Option(fa.scheduled)
     )
 
@@ -146,6 +147,7 @@ object FeedArrivalMessageConversion {
       carrierCode = Option(fa.carrierCode),
       flightCodeSuffix = fa.flightCodeSuffix,
       origin = Option(fa.origin),
+      previousPort = fa.previousPort,
       scheduled = Option(fa.scheduled),
       estimated = fa.estimated,
       touchdown = fa.touchdown,
