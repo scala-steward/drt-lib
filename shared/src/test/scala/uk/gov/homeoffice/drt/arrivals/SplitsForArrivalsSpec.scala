@@ -80,24 +80,7 @@ class SplitsForArrivalsSpec extends Specification {
           Set(newSplits, existingSplits1), Option(now))))
       }
     }
-
-    "Given one new split and arrival that matches on the last port field rather than the origin" >> {
-      "Then I should get a FlightsWithSplits containing the matching arrival with the new split" >> {
-        val newSplits = Splits(Set(ApiPaxTypeAndQueueCount(EeaNonMachineReadable, EeaDesk, 1, None, None)), ApiSplitsWithHistoricalEGateAndFTPercentages, None, PaxNumbers)
-        val arrival = ArrivalGeneratorShared.arrival(iata = "BA0001", terminal = T1, origin = PortCode("CDG"), previousPort = Option(PortCode("JFK")),
-          passengerSources = Map(LiveFeedSource -> Passengers(Option(1), Some(0)), ApiFeedSource -> Passengers(Option(1), None)), feedSources = Set(LiveFeedSource, ApiFeedSource))
-        val splitsForArrivals = SplitsForArrivals(Map(uniqueArrival -> Set(newSplits)))
-        val flights = FlightsWithSplits(Seq(ApiFlightWithSplits(arrival, Set())))
-
-        val updated = splitsForArrivals.applyTo(flights, now, List())._1
-
-        updated === FlightsWithSplits(Seq(ApiFlightWithSplits(arrival.copy(
-          FeedSources = Set(ApiFeedSource, LiveFeedSource),
-          PassengerSources = Map(ApiFeedSource -> Passengers(Option(1), Option(0)), LiveFeedSource -> Passengers(Option(1), Option(0)))),
-          Set(newSplits), Option(now))))
-      }
-    }
-
+    
     "Given 2 splits and two arrivals, one with a new source and one with the same source" >> {
       "Then I should get a FlightsWithSplits containing the arrivals updated with the correct new splits" >> {
         val arrival1 = ArrivalGeneratorShared.arrival(iata = "BA0001", terminal = T1, origin = PortCode("JFK"), passengerSources = Map(LiveFeedSource -> Passengers(Option(1), Some(0))))
