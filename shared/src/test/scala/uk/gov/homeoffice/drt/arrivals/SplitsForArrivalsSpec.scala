@@ -80,7 +80,7 @@ class SplitsForArrivalsSpec extends Specification {
           Set(newSplits, existingSplits1), Option(now))))
       }
     }
-    
+
     "Given 2 splits and two arrivals, one with a new source and one with the same source" >> {
       "Then I should get a FlightsWithSplits containing the arrivals updated with the correct new splits" >> {
         val arrival1 = ArrivalGeneratorShared.arrival(iata = "BA0001", terminal = T1, origin = PortCode("JFK"), passengerSources = Map(LiveFeedSource -> Passengers(Option(1), Some(0))))
