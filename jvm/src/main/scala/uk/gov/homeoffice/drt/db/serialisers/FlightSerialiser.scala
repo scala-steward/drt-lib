@@ -10,7 +10,6 @@ import uk.gov.homeoffice.drt.ports._
 import uk.gov.homeoffice.drt.time.SDate
 import uk.gov.homeoffice.drt.{Nationality, arrivals}
 
-import java.nio.charset.StandardCharsets
 import java.sql.Timestamp
 
 
@@ -124,6 +123,7 @@ object FlightSerialiser extends FlightJsonFormats {
         FlightRow(
           port = portCode.iata,
           origin = flight.Origin.iata,
+          previousPort = flight.PreviousPort.map(_.iata),
           terminal = flight.Terminal.toString,
           voyageNumber = flight.VoyageNumber.numeric,
           carrierCode = flight.CarrierCode.code,
@@ -148,6 +148,7 @@ object FlightSerialiser extends FlightJsonFormats {
       val passengerSources = f.paxSourcesJson.parseJson.convertTo[Map[FeedSource, Passengers]]
       val arrival = Arrival(
         Origin = PortCode(f.origin),
+        PreviousPort = f.previousPort.map(PortCode(_)),
         Scheduled = f.timings.scheduled.getTime,
         Status = ArrivalStatus(f.status),
         Estimated = f.timings.estimated.map(_.getTime),

@@ -62,25 +62,24 @@ case class SplitsForArrivals(splits: Map[UniqueArrival, Set[Splits]]) extends Fl
               nowMillis: Long,
               sourceOrderPreference: List[FeedSource],
              ): (FlightsWithSplits, Set[Long], Iterable[ApiFlightWithSplits], Iterable[UniqueArrival]) = {
-    val minutesFromUpdates = splits.flatMap {
-      case (key, splits) =>
-        flightsWithSplits.flights.get(key) match {
-          case Some(fws) if splits.exists(_.source == ApiSplitsWithHistoricalEGateAndFTPercentages) => fws.apiFlight.pcpRange(sourceOrderPreference)
-          case _ => Iterable()
-        }
-    }.toSet
+    val minutesFromUpdates = splits
+      .flatMap {
+        case (key, splits) =>
+          flightsWithSplits.flights.get(key) match {
+            case Some(fws) if splits.exists(_.source == ApiSplitsWithHistoricalEGateAndFTPercentages) => fws.apiFlight.pcpRange(sourceOrderPreference)
+            case _ => Iterable.empty
+          }
+      }
+      .toSet
 
     val updatedFlights = splits
       .map {
-        case (key, incomingSplits) =>
-          flightsWithSplits.flights.get(key) match {
-            case Some(existingFws) =>
-              val updatedFlightWithSplits = updateFlightWithSplits(existingFws, incomingSplits, nowMillis)
-              Option(updatedFlightWithSplits)
-            case None => None
+        case (apiArrivalKey, incomingSplits) =>
+          flightsWithSplits.flights.get(apiArrivalKey).map {
+            existingFws => updateFlightWithSplits(existingFws, incomingSplits, nowMillis)
           }
       }
-      .collect { case Some(fws) => fws}
+      .collect { case Some(fws) => fws }
 
     val updated = flightsWithSplits.flights ++ updatedFlights.map(f => f.unique -> f)
 

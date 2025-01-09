@@ -4,7 +4,6 @@ import uk.gov.homeoffice.drt.auth.Roles.LTN
 import uk.gov.homeoffice.drt.ports.PaxTypes._
 import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
 import uk.gov.homeoffice.drt.ports.Queues._
-import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
 

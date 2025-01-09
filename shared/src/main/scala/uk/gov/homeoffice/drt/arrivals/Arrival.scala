@@ -68,6 +68,7 @@ case class Arrival(Operator: Option[Operator],
                    AirportID: PortCode,
                    Terminal: Terminal,
                    Origin: PortCode,
+                   PreviousPort: Option[PortCode],
                    Scheduled: Long,
                    PcpTime: Option[Long],
                    FeedSources: Set[FeedSource],
@@ -79,7 +80,11 @@ case class Arrival(Operator: Option[Operator],
   extends WithUnique[UniqueArrival] with Updatable[Arrival] {
   lazy val differenceFromScheduled: Option[FiniteDuration] = Actual.map(a => (a - Scheduled).milliseconds)
 
-  val fifteenMinutes = 15 * 60 * 1000
+  lazy val lastPort: PortCode = PreviousPort.getOrElse(Origin)
+
+  lazy val keyForManifest: UniqueArrival = UniqueArrival(this).copy(origin = lastPort)
+
+  private val fifteenMinutes = 15 * 60 * 1000
 
   def suffixString: String = FlightCodeSuffix match {
     case None => ""
@@ -283,6 +288,7 @@ object Arrival {
             rawICAO: String,
             rawIATA: String,
             Origin: PortCode,
+            PreviousPort: Option[PortCode],
             Scheduled: Long,
             PcpTime: Option[Long],
             FeedSources: Set[FeedSource],
@@ -320,6 +326,7 @@ object Arrival {
       AirportID = AirportID,
       Terminal = Terminal,
       Origin = Origin,
+      PreviousPort = PreviousPort,
       Scheduled = Scheduled,
       PcpTime = PcpTime,
       FeedSources = FeedSources,
