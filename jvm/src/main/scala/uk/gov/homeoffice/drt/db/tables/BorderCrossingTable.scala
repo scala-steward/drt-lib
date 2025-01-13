@@ -57,7 +57,7 @@ class BorderCrossingTable(tag: Tag)
 
   def hour: Rep[Int] = column[Int]("hour", O.SqlType("smallint"))
 
-  def passengers: Rep[Int] = column[Int]("passengers", O.SqlType("smallint"))
+  def passengers: Rep[Int] = column[Int]("passengers")
 
   def updatedAt: Rep[Timestamp] = column[java.sql.Timestamp]("updated_at")
 
