@@ -3,7 +3,7 @@ package uk.gov.homeoffice.drt.splits
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.homeoffice.drt.arrivals.SplitStyle.{PaxNumbers, Percentage, Ratio}
-import uk.gov.homeoffice.drt.arrivals.{ApiFlightWithSplits, Arrival, ArrivalGenerator, Passengers, SplitStyle, Splits}
+import uk.gov.homeoffice.drt.arrivals.{ApiFlightWithSplits, Arrival, ArrivalGeneratorShared, Passengers, SplitStyle, Splits}
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitSources.{ApiSplitsWithHistoricalEGateAndFTPercentages, Historical, TerminalAverage}
 import uk.gov.homeoffice.drt.ports.{ApiFeedSource, ApiPaxTypeAndQueueCount, LiveFeedSource, PaxTypeAndQueue, PaxTypes, Queues}
 import uk.gov.homeoffice.drt.splits.ApiSplitsToSplitRatio.applyPaxSplitsToFlightPax
@@ -222,7 +222,7 @@ class ApiSplitsToSplitRatioSpec extends AnyWordSpec with Matchers {
   }
   "paxPerQueueUsingBestSplitsAsRatio" should {
     "return total pax broken down per queue given a flight with percentage splits" in {
-      val flight = ArrivalGenerator
+      val flight = ArrivalGeneratorShared
         .arrival(passengerSources = Map(LiveFeedSource -> Passengers(Option(152), None)))
       val splits = Splits(
         Set(
@@ -247,7 +247,7 @@ class ApiSplitsToSplitRatioSpec extends AnyWordSpec with Matchers {
     }
 
     "return the total broken down per queue given a flight with PaxNumbers splits" in {
-      val flight = ArrivalGenerator
+      val flight = ArrivalGeneratorShared
         .arrival(passengerSources = Map(LiveFeedSource -> Passengers(Option(100), None)))
       val splits = Splits(Set(
         ApiPaxTypeAndQueueCount(PaxTypes.NonVisaNational, Queues.NonEeaDesk, 15, None, None),
@@ -265,7 +265,7 @@ class ApiSplitsToSplitRatioSpec extends AnyWordSpec with Matchers {
     }
 
     "return the total broken down per queue given a flight with no pax number for live feed and splits ApiSplitsWithHistoricalEGateAndFTPercentages" in {
-      val flight: Arrival = ArrivalGenerator
+      val flight: Arrival = ArrivalGeneratorShared
         .arrival(passengerSources = Map(), feedSources = Set(ApiFeedSource))
         .copy(PassengerSources = Map(ApiFeedSource -> Passengers(Some(100), None)))
       val splits = Splits(Set(

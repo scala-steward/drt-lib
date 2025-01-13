@@ -8,6 +8,8 @@ sealed trait PaxType {
   def name: String = getClass.getSimpleName
 
   def cleanName: String = getClass.getSimpleName.dropRight(1)
+
+  def id: Int
 }
 
 sealed trait GbrPaxType extends PaxType
@@ -31,32 +33,68 @@ object PaxType {
     case _ => UndefinedPaxType
   }
 
+  def apply(paxTypeNumber: Int): PaxType = paxTypeNumber match {
+    case 1 => GBRNational
+    case 2 => GBRNationalBelowEgateAge
+    case 3 => EeaMachineReadable
+    case 4 => EeaNonMachineReadable
+    case 5 => EeaBelowEGateAge
+    case 6 => VisaNational
+    case 7 => NonVisaNational
+    case 8 => B5JPlusNational
+    case 9 => B5JPlusNationalBelowEGateAge
+    case 10 => Transit
+    case _ => UndefinedPaxType
+  }
+
   implicit val paxTypeReaderWriter: ReadWriter[PaxType] =
     readwriter[Value].bimap[PaxType](paxType => paxType.cleanName, (s: Value) => PaxType(s"${s.str}$$"))
 }
 
 object PaxTypes {
-  case object GBRNational extends GbrPaxType
+  case object GBRNational extends GbrPaxType {
+    override def id: Int = 1
+  }
 
-  case object GBRNationalBelowEgateAge extends GbrPaxType
+  case object GBRNationalBelowEgateAge extends GbrPaxType {
+    override def id: Int = 2
+  }
 
-  case object EeaMachineReadable extends EeaPaxType
+  case object EeaMachineReadable extends EeaPaxType {
+    override def id: Int = 3
+  }
 
-  case object EeaNonMachineReadable extends EeaPaxType
+  case object EeaNonMachineReadable extends EeaPaxType {
+    override def id: Int = 4
+  }
 
-  case object EeaBelowEGateAge extends EeaPaxType
+  case object EeaBelowEGateAge extends EeaPaxType {
+    override def id: Int = 5
+  }
 
-  case object VisaNational extends NonEeaPaxType
+  case object VisaNational extends NonEeaPaxType {
+    override def id: Int = 6
+  }
 
-  case object NonVisaNational extends NonEeaPaxType
+  case object NonVisaNational extends NonEeaPaxType {
+    override def id: Int = 7
+  }
 
-  case object B5JPlusNational extends NonEeaPaxType
+  case object B5JPlusNational extends NonEeaPaxType {
+    override def id: Int = 8
+  }
 
-  case object B5JPlusNationalBelowEGateAge extends NonEeaPaxType
+  case object B5JPlusNationalBelowEGateAge extends NonEeaPaxType {
+    override def id: Int = 9
+  }
 
-  case object Transit extends PaxType
+  case object Transit extends PaxType {
+    override def id: Int = 10
+  }
 
-  case object UndefinedPaxType extends PaxType
+  case object UndefinedPaxType extends PaxType {
+    override def id: Int = -1
+  }
 
   val allPaxTypes: Iterable[PaxType] = Iterable(
     GBRNational,

@@ -151,4 +151,20 @@ object SDate {
   }
 
   def weekOfYear(date: SDateLike): Int = new DateTime(date.millisSinceEpoch, DateTimeZone.UTC).getWeekOfWeekyear
+
+  def monthsOfTheYear: Seq[String] = Seq(
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  )
+
 }

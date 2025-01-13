@@ -9,7 +9,7 @@ object ArrivalExportHeadings {
 
   private val arrivalHeadings: String = Seq(
     "IATA",
-    "ICAO",
+    "Terminal",
     "Origin",
     "Gate/Stand",
     "Status",
@@ -31,7 +31,7 @@ object ArrivalExportHeadings {
 
   private val apiAdditionalHeadings: String = Seq("Nationalities", "Ages").mkString(",")
 
-  private val regionalExportPrefixHeadings: String = Seq("Region", "Port", "Terminal").mkString(",")
+  private val regionalExportPrefixHeadings: String = Seq("Region", "Port").mkString(",")
 
   private def headingsForSplitSource(source: String): String = queueNamesInOrder
     .map(q => s"$source ${Queues.displayName(q)}")

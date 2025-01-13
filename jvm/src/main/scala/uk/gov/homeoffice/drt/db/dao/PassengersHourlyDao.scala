@@ -115,4 +115,9 @@ object PassengersHourlyDao {
       .result
       .map(rows => filterLocalDate(rows, localDate))
   }
+
+  def removeAllBefore: UtcDate => DBIOAction[Int, NoStream, Effect.Write] = date =>
+    table
+      .filter(_.dateUtc < date.toISOString)
+      .delete
 }

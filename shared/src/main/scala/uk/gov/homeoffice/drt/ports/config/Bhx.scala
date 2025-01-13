@@ -14,6 +14,15 @@ object Bhx extends AirportConfigLike {
 
   import AirportConfigDefaults._
 
+  private object ProcTimes {
+    val gbr = 23.2
+    val eea = 35.1
+    val b5jssk = 51.0
+    val nvn = 85.0
+    val vn = 90.9
+    val egates = 48d
+  }
+
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("BHX"),
     portName = "Birmingham",
@@ -40,31 +49,31 @@ object Bhx extends AirportConfigLike {
         SplitRatio(nonVisaNationalToDesk, 0.04)
       )),
     terminalProcessingTimes = Map(T1 -> Map(
-      b5jsskToDesk -> 62d / 60,
-      b5jsskChildToDesk -> 62d / 60,
-      eeaMachineReadableToDesk -> 41d / 60,
-      eeaNonMachineReadableToDesk -> 41d / 60,
-      eeaChildToDesk -> 41d / 60,
-      gbrNationalToDesk -> 29d / 60,
-      gbrNationalChildToDesk -> 29d / 60,
-      b5jsskToEGate -> 48d / 60,
-      eeaMachineReadableToEGate -> 48d / 60,
-      gbrNationalToEgate -> 48d / 60,
-      visaNationalToDesk -> 100d / 60,
-      nonVisaNationalToDesk -> 98d / 60
+      b5jsskToDesk -> ProcTimes.b5jssk / 60,
+      b5jsskChildToDesk -> ProcTimes.b5jssk / 60,
+      eeaMachineReadableToDesk -> ProcTimes.eea / 60,
+      eeaNonMachineReadableToDesk -> ProcTimes.eea / 60,
+      eeaChildToDesk -> ProcTimes.eea / 60,
+      gbrNationalToDesk -> ProcTimes.gbr / 60,
+      gbrNationalChildToDesk -> ProcTimes.gbr / 60,
+      b5jsskToEGate -> ProcTimes.egates / 60,
+      eeaMachineReadableToEGate -> ProcTimes.egates / 60,
+      gbrNationalToEgate -> ProcTimes.egates / 60,
+      visaNationalToDesk -> ProcTimes.vn / 60,
+      nonVisaNationalToDesk -> ProcTimes.nvn / 60
     ), T2 -> Map(
-      b5jsskToDesk -> 62d / 60,
-      b5jsskChildToDesk -> 62d / 60,
-      eeaMachineReadableToDesk -> 41d / 60,
-      eeaNonMachineReadableToDesk -> 41d / 60,
-      eeaChildToDesk -> 41d / 60,
-      gbrNationalToDesk -> 29d / 60,
-      gbrNationalChildToDesk -> 29d / 60,
-      b5jsskToEGate -> 48d / 60,
-      eeaMachineReadableToEGate -> 48d / 60,
-      gbrNationalToEgate -> 48d / 60,
-      visaNationalToDesk -> 100d / 60,
-      nonVisaNationalToDesk -> 98d / 60
+      b5jsskToDesk -> ProcTimes.b5jssk / 60,
+      b5jsskChildToDesk -> ProcTimes.b5jssk / 60,
+      eeaMachineReadableToDesk -> ProcTimes.eea / 60,
+      eeaNonMachineReadableToDesk -> ProcTimes.eea / 60,
+      eeaChildToDesk -> ProcTimes.eea / 60,
+      gbrNationalToDesk -> ProcTimes.gbr / 60,
+      gbrNationalChildToDesk -> ProcTimes.gbr / 60,
+      b5jsskToEGate -> ProcTimes.egates / 60,
+      eeaMachineReadableToEGate -> ProcTimes.egates / 60,
+      gbrNationalToEgate -> ProcTimes.egates / 60,
+      visaNationalToDesk -> ProcTimes.vn / 60,
+      nonVisaNationalToDesk -> ProcTimes.nvn / 60
     )),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(

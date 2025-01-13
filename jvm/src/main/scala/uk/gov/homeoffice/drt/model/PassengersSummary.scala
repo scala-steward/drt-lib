@@ -1,4 +1,4 @@
-package uk.gov.homeoffice.drt.models
+package uk.gov.homeoffice.drt.model
 
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.time.LocalDate

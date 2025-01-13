@@ -15,6 +15,15 @@ object Stn extends AirportConfigLike {
 
   import AirportConfigDefaults._
 
+  private object ProcTimes {
+    val gbr = 30.1
+    val eea = 37.3
+    val b5jssk = 51.5
+    val nvn = 84.1
+    val vn = 89.9
+    val egates = 45d
+  }
+
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("STN"),
     portName = "Stansted",
@@ -33,18 +42,18 @@ object Stn extends AirportConfigLike {
       SplitRatio(nonVisaNationalToDesk, 0.01)
     )),
     terminalProcessingTimes = Map(T1 -> Map(
-      b5jsskToDesk -> 57d / 60,
-      b5jsskChildToDesk -> 57d / 60,
-      eeaMachineReadableToDesk -> 38d / 60,
-      eeaNonMachineReadableToDesk -> 38d / 60,
-      eeaChildToDesk -> 38d / 60,
-      gbrNationalToDesk -> 30d / 60,
-      gbrNationalChildToDesk -> 30d / 60,
-      b5jsskToEGate -> 45d / 60,
-      eeaMachineReadableToEGate -> 45d / 60,
-      gbrNationalToEgate -> 45d / 60,
-      visaNationalToDesk -> 95d / 60,
-      nonVisaNationalToDesk -> 84d / 60,
+      b5jsskToDesk -> ProcTimes.b5jssk / 60,
+      b5jsskChildToDesk -> ProcTimes.b5jssk / 60,
+      eeaMachineReadableToDesk -> ProcTimes.eea / 60,
+      eeaNonMachineReadableToDesk -> ProcTimes.eea / 60,
+      eeaChildToDesk -> ProcTimes.eea / 60,
+      gbrNationalToDesk -> ProcTimes.gbr / 60,
+      gbrNationalChildToDesk -> ProcTimes.gbr / 60,
+      b5jsskToEGate -> ProcTimes.egates / 60,
+      eeaMachineReadableToEGate -> ProcTimes.egates / 60,
+      gbrNationalToEgate -> ProcTimes.egates / 60,
+      visaNationalToDesk -> ProcTimes.vn / 60,
+      nonVisaNationalToDesk -> ProcTimes.nvn / 60,
     )),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(

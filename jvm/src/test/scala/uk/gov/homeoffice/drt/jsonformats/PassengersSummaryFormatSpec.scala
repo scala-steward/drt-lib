@@ -3,7 +3,7 @@ package uk.gov.homeoffice.drt.jsonformats
 import org.scalatest.wordspec.AnyWordSpec
 import spray.json.enrichAny
 import uk.gov.homeoffice.drt.jsonformats.PassengersSummaryFormat.JsonFormat
-import uk.gov.homeoffice.drt.models.PassengersSummary
+import uk.gov.homeoffice.drt.model.PassengersSummary
 import uk.gov.homeoffice.drt.ports.Queues
 import uk.gov.homeoffice.drt.time.LocalDate
 
