@@ -1,7 +1,6 @@
 package uk.gov.homeoffice.drt.actor
 
 import org.apache.commons.csv.{CSVFormat, CSVParser}
-import org.slf4j.LoggerFactory
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 
 import scala.io.Source
