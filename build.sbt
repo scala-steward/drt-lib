@@ -21,16 +21,16 @@ lazy val root = project.in(file(".")).
 
 lazy val akkaVersion = "2.8.5"
 lazy val akkaHttpVersion = "10.5.2"
-lazy val jodaVersion = "2.12.5"
+lazy val jodaVersion = "2.12.7"
 lazy val upickleVersion = "3.1.3"
 lazy val sparkMlLibVersion = "3.5.4"
-lazy val scalaTestVersion = "3.2.17"
+lazy val scalaTestVersion = "3.2.19"
 lazy val specs2Version = "4.20.9"
 lazy val csvCommonsVersion = "1.13.0"
-lazy val catsVersion = "2.10.0"
+lazy val catsVersion = "2.12.0"
 lazy val scribeSlf4jVersion = "3.16.0"
 lazy val slickVersion = "3.4.1"
-lazy val h2Version = "2.2.220"
+lazy val h2Version = "2.2.224"
 lazy val sprayJsonVersion = "1.3.6"
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
