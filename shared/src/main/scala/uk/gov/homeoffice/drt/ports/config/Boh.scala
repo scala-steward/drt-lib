@@ -15,6 +15,7 @@ object Boh extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("BOH"),
+    portName = "Bournemouth",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.QueueDesk)
     ),

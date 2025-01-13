@@ -34,6 +34,7 @@ message FlightMessage {
     optional int64 ScheduledDeparture = 27;
     repeated TotalPaxSourceMessage TotalPax = 30;
     optional PredictionsMessage Predictions = 31;
+    optional string PreviousPort = 32;
     optional int32 ActPax__OLD = 6;
     optional int32 TranPax__OLD = 7;
     optional int32 FlightID__OLD = 10;

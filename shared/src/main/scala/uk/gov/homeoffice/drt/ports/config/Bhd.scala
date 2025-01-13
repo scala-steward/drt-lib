@@ -15,6 +15,7 @@ object Bhd extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("BHD"),
+    portName = "Belfast City",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.NonEeaDesk, Queues.EeaDesk)
     ),

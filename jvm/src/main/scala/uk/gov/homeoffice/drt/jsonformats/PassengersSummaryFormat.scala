@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.jsonformats
 
 import spray.json.{DefaultJsonProtocol, JsArray, JsNumber, JsObject, JsString, JsValue, RootJsonFormat, enrichAny}
-import uk.gov.homeoffice.drt.models.{PassengersSummaries, PassengersSummary}
+import uk.gov.homeoffice.drt.model.{PassengersSummaries, PassengersSummary}
 import uk.gov.homeoffice.drt.ports.Queues
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.time.LocalDate
@@ -16,8 +16,8 @@ object PassengersSummaryFormat extends DefaultJsonProtocol {
     override def read(json: JsValue): PassengersSummary = {
       val obj = json.asJsObject
 
-      obj.getFields("regionName", "portCode", "totalPcpPax", "queueCounts") match {
-        case Seq(JsString(regionName), JsString(portCode), JsNumber(totalPcpPax), JsArray(queueCounts)) =>
+      obj.getFields("regionName", "portCode", "totalCapacity", "totalPcpPax", "queueCounts") match {
+        case Seq(JsString(regionName), JsString(portCode), JsNumber(totalCapacity), JsNumber(totalPcpPax), JsArray(queueCounts)) =>
           val queueCountsMap = queueCounts.map {
             case queueCount: JsObject =>
               val queueName = queueCount.fields("queueName").convertTo[String]
@@ -28,7 +28,7 @@ object PassengersSummaryFormat extends DefaultJsonProtocol {
           val maybeTerminalName = obj.fields.get("terminalName").map(_.convertTo[String])
           val maybeDate = obj.fields.get("date").map(_.convertTo[LocalDate])
           val maybeHour = obj.fields.get("hour").map(_.convertTo[Int])
-          PassengersSummary(regionName, portCode, maybeTerminalName, totalPcpPax.toInt, queueCountsMap, maybeDate, maybeHour)
+          PassengersSummary(regionName, portCode, maybeTerminalName, totalCapacity.toInt, totalPcpPax.toInt, queueCountsMap, maybeDate, maybeHour)
         case _ => throw new Exception("PassengersSummary expected")
       }
     }
@@ -41,6 +41,7 @@ object PassengersSummaryFormat extends DefaultJsonProtocol {
       val fields = SortedMap(
         "regionName" -> JsString(obj.regionName),
         "portCode" -> JsString(obj.portCode),
+        "totalCapacity" -> JsNumber(obj.totalCapacity),
         "totalPcpPax" -> JsNumber(obj.totalPcpPax),
         "queueCounts" -> JsArray(obj.queueCounts.map {
           case (queue, count) => JsObject(Map(

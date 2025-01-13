@@ -1,5 +1,6 @@
 package uk.gov.homeoffice.drt.arrivals
 
+import uk.gov.homeoffice.drt.arrivals.Arrival.paxOffPerMinute
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.ports._
 import uk.gov.homeoffice.drt.prediction.arrival.{OffScheduleModelAndFeatures, ToChoxModelAndFeatures}
@@ -67,6 +68,7 @@ case class Arrival(Operator: Option[Operator],
                    AirportID: PortCode,
                    Terminal: Terminal,
                    Origin: PortCode,
+                   PreviousPort: Option[PortCode],
                    Scheduled: Long,
                    PcpTime: Option[Long],
                    FeedSources: Set[FeedSource],
@@ -78,8 +80,11 @@ case class Arrival(Operator: Option[Operator],
   extends WithUnique[UniqueArrival] with Updatable[Arrival] {
   lazy val differenceFromScheduled: Option[FiniteDuration] = Actual.map(a => (a - Scheduled).milliseconds)
 
-  val paxOffPerMinute = 20
-  val fifteenMinutes = 15 * 60 * 1000
+  lazy val lastPort: PortCode = PreviousPort.getOrElse(Origin)
+
+  lazy val keyForManifest: UniqueArrival = UniqueArrival(this).copy(origin = lastPort)
+
+  private val fifteenMinutes = 15 * 60 * 1000
 
   def suffixString: String = FlightCodeSuffix match {
     case None => ""
@@ -195,16 +200,6 @@ case class Arrival(Operator: Option[Operator],
     pcpStart to pcpEnd by oneMinuteMillis
   }
 
-  def paxDeparturesByMinute(departRate: Int, sourceOrderPreference: List[FeedSource]): Iterable[(Long, Int)] = {
-    val bestPax = bestPaxEstimate(sourceOrderPreference).passengers.actual.getOrElse(0)
-    val maybeRemainingPax = bestPax % departRate match {
-      case 0 => None
-      case someLeftovers => Option(someLeftovers)
-    }
-    val paxByMinute = List.fill(bestPax / departRate)(departRate) ::: maybeRemainingPax.toList
-    pcpRange(sourceOrderPreference).zip(paxByMinute)
-  }
-
   lazy val unique: UniqueArrival = UniqueArrival(VoyageNumber.numeric, Terminal, Scheduled, Origin)
 
   def isCancelled: Boolean = Status.description match {
@@ -231,6 +226,7 @@ case class Arrival(Operator: Option[Operator],
 }
 
 object Arrival {
+  val paxOffPerMinute: Int = 20
   val defaultMinutesToChox: Int = 5
 
   val flightCodeRegex: Regex = "^([A-Z0-9]{2,3}?)([0-9]{1,4})([A-Z]*)$".r
@@ -292,6 +288,7 @@ object Arrival {
             rawICAO: String,
             rawIATA: String,
             Origin: PortCode,
+            PreviousPort: Option[PortCode],
             Scheduled: Long,
             PcpTime: Option[Long],
             FeedSources: Set[FeedSource],
@@ -329,6 +326,7 @@ object Arrival {
       AirportID = AirportID,
       Terminal = Terminal,
       Origin = Origin,
+      PreviousPort = PreviousPort,
       Scheduled = Scheduled,
       PcpTime = PcpTime,
       FeedSources = FeedSources,

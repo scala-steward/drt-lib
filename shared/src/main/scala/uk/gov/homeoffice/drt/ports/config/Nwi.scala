@@ -16,6 +16,7 @@ object Nwi extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("NWI"),
+    portName = "Norwich",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.EeaDesk, Queues.NonEeaDesk)
     ),

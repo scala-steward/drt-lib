@@ -6,18 +6,18 @@ import uk.gov.homeoffice.drt.ports._
 class ArrivalSpec extends Specification {
   "An Arrival" should {
     "Know it has no source of passengers when there are no sources" in {
-      ArrivalGenerator.arrival(passengerSources = Map()).hasNoPaxSource shouldEqual true
+      ArrivalGeneratorShared.arrival(passengerSources = Map()).hasNoPaxSource shouldEqual true
     }
     "Know it has no source of passengers when there are no sources with a pax figure" in {
-      ArrivalGenerator.arrival(passengerSources = Map(LiveFeedSource -> Passengers(None, None))).hasNoPaxSource shouldEqual true
+      ArrivalGeneratorShared.arrival(passengerSources = Map(LiveFeedSource -> Passengers(None, None))).hasNoPaxSource shouldEqual true
     }
     "Know it has a source of passengers when there is a source with a pax figure" in {
-      ArrivalGenerator.arrival(passengerSources = Map(LiveFeedSource -> Passengers(Option(100), None))).hasNoPaxSource shouldEqual false
+      ArrivalGeneratorShared.arrival(passengerSources = Map(LiveFeedSource -> Passengers(Option(100), None))).hasNoPaxSource shouldEqual false
     }
   }
 
   "Arrival bestPcpPaxEstimate" should {
-    val arrivalBase = ArrivalGenerator.arrival()
+    val arrivalBase = ArrivalGeneratorShared.arrival()
     val liveFeedPaxSource = LiveFeedSource -> Passengers(Option(10), None)
     val portForecastFeedPaxSource = ForecastFeedSource -> Passengers(Option(10), None)
     val apiFeedPaxSource = ApiFeedSource -> Passengers(Option(10), None)
@@ -118,11 +118,11 @@ class ArrivalSpec extends Specification {
     }
 
     "Give api total pax minus the api transit pax when there is a live feed with undefined pax and api with pax" >> {
-        val arrival = arrivalBase.copy(PassengerSources = Map(
-          LiveFeedSource -> Passengers(None, Option(0)),
-          ApiFeedSource -> Passengers(Option(10), Option(3))
-        ))
-        arrival.bestPcpPaxEstimate(sourceOrderPreference) must beSome(10 - 3)
+      val arrival = arrivalBase.copy(PassengerSources = Map(
+        LiveFeedSource -> Passengers(None, Option(0)),
+        ApiFeedSource -> Passengers(Option(10), Option(3))
+      ))
+      arrival.bestPcpPaxEstimate(sourceOrderPreference) must beSome(10 - 3)
     }
 
     "Give zero pcp when the flight is domestic" >> {
@@ -156,31 +156,31 @@ class ArrivalSpec extends Specification {
 
   "minutesOfPaxArrivals" >> {
     "should return 0 when there are 0 total passengers" >> {
-      ArrivalGenerator.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(0), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 0
+      ArrivalGeneratorShared.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(0), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 0
     }
     "should return 1 when there are 1 total passengers" >> {
-      ArrivalGenerator.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(1), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 1
+      ArrivalGeneratorShared.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(1), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 1
     }
     "should return 1 when there are 20 total passengers" >> {
-      ArrivalGenerator.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(20), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 1
+      ArrivalGeneratorShared.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(20), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 1
     }
     "should return 2 when there are 21 total passengers" >> {
-      ArrivalGenerator.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(21), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 2
+      ArrivalGeneratorShared.arrival(passengerSources = Map(ApiFeedSource -> Passengers(Option(21), None))).minutesOfPaxArrivals(List(ApiFeedSource)) === 2
     }
   }
 
   "pcpRange" >> {
     "should return 0L to 0L given an arrival with scheduled time 0L and 0 total passengers" >> {
-      ArrivalGenerator.arrival(sch = 0L,  passengerSources = Map(ApiFeedSource -> Passengers(Option(0), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
+      ArrivalGeneratorShared.arrival(sch = 0L,  passengerSources = Map(ApiFeedSource -> Passengers(Option(0), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
     }
     "should return 0L to 0L given an arrival with scheduled time 0L and 1 total passengers" >> {
-      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(1), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
+      ArrivalGeneratorShared.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(1), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
     }
     "should return 0L to 0L given an arrival with scheduled time 0L and 20 total passengers" >> {
-      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(20), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
+      ArrivalGeneratorShared.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(20), None))).pcpRange(List(ApiFeedSource)) === (0L to 0L by 60000)
     }
     "should return 0L to 60000L given an arrival with scheduled time 0L and 21 total passengers" >> {
-      ArrivalGenerator.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(21), None))).pcpRange(List(ApiFeedSource)) === (0L to 60000L by 60000)
+      ArrivalGeneratorShared.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(21), None))).pcpRange(List(ApiFeedSource)) === (0L to 60000L by 60000)
     }
   }
 }

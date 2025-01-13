@@ -16,6 +16,7 @@ object Gla extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("GLA"),
+    portName = "Glasgow",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.NonEeaDesk, Queues.EeaDesk, Queues.EGate)
     ),

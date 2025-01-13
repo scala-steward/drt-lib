@@ -5,7 +5,9 @@ import uk.gov.homeoffice.drt.ports.ClassNameForToString
 import upickle.default
 import upickle.default.{ReadWriter, macroRW}
 
-sealed trait EventType extends ClassNameForToString
+sealed trait EventType extends ClassNameForToString {
+  val name: String
+}
 
 object EventType {
   implicit val rw: default.ReadWriter[EventType] = ReadWriter.merge(macroRW[DC.type], macroRW[CI.type], macroRW[InvalidEventType.type])
@@ -19,10 +21,16 @@ object EventType {
 
 object EventTypes {
 
-  case object DC extends EventType
+  case object DC extends EventType {
+    override val name: String = "DC"
+  }
 
-  case object CI extends EventType
+  case object CI extends EventType {
+    override val name: String = "CI"
+  }
 
-  object InvalidEventType extends EventType
+  object InvalidEventType extends EventType {
+    override val name: String = "Invalid"
+  }
 
 }

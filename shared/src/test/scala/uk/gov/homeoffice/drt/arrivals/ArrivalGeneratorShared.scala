@@ -4,13 +4,16 @@ import uk.gov.homeoffice.drt.ports.Terminals.{T1, Terminal}
 import uk.gov.homeoffice.drt.ports.{FeedSource, PortCode}
 import uk.gov.homeoffice.drt.time.SDateLike
 
-object ArrivalGenerator {
+object ArrivalGeneratorShared {
+  val midnight20220515Bst: Long = 1655247600000L
+
   def arrival(iata: String = "",
               icao: String = "",
-              sch: Long = 0L,
+              sch: Long = midnight20220515Bst,
               maxPax: Option[Int] = None,
               terminal: Terminal = Terminal("T1"),
               origin: PortCode = PortCode(""),
+              previousPort: Option[PortCode] = None,
               operator: Option[Operator] = None,
               status: ArrivalStatus = ArrivalStatus(""),
               predictions: Predictions = Predictions(0L, Map()),
@@ -45,6 +48,7 @@ object ArrivalGenerator {
       rawICAO = icao,
       rawIATA = iata,
       Origin = origin,
+      PreviousPort = previousPort,
       PcpTime = if (pcpTime.isDefined) Option(pcpTime.get) else if (sch != 0L) Some(sch) else None,
       Scheduled = sch,
       FeedSources = feedSources,

@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.actor
 
 import akka.pattern.StatusReply.Ack
-import akka.persistence.{RecoveryCompleted, SnapshotOffer}
+import akka.persistence.{RecoveryCompleted, SnapshotMetadata, SnapshotOffer}
 import org.apache.spark.ml.regression.LinearRegressionModel
 import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
@@ -88,6 +88,7 @@ object PredictionModelActor {
 class PredictionModelActor(val now: () => SDateLike,
                            modelCategory: ModelCategory,
                            identifier: WithId,
+                           override val maybePointInTime: Option[Long],
                           ) extends RecoveryActorLike {
 
   import uk.gov.homeoffice.drt.protobuf.serialisation.ModelAndFeaturesConversion._
@@ -104,34 +105,26 @@ class PredictionModelActor(val now: () => SDateLike,
   implicit val sdateFromLong: Long => SDateLike = (ts: Long) => SDate(ts)
   implicit val sdateFromLocalDate: LocalDate => SDateLike = (ts: LocalDate) => SDate(ts)
 
-  override def receiveRecover: Receive = {
-    case SnapshotOffer(md, ss) =>
-      logSnapshotOffer(md)
-      playSnapshotMessage(ss)
-
-    case RecoveryCompleted =>
-      postRecoveryComplete()
-
-    case event: GeneratedMessage =>
-      Try {
-        bytesSinceSnapshotCounter += event.serializedSize
-        messagesPersistedSinceSnapshotCounter += 1
-        playRecoveryMessage(event)
-      } match {
-        case Failure(exception) =>
-          log.error(s"Failed to replay recovery message $event", exception)
-        case _ =>
-      }
-  }
+  override def logSnapshotOffer(md: SnapshotMetadata): Unit = log.info(snapshotOfferLogMessage(md))
 
   override def processRecoveryMessage: PartialFunction[Any, Unit] = {
-    case RemoveModelMessage(targetName, _) =>
-      targetName.foreach(tn => state = state - tn)
+    case RemoveModelMessage(targetName, Some(createdAt)) =>
+      maybePointInTime match {
+        case Some(pit) if pit < createdAt =>
+          log.debug(s"Ignoring message created more recently than the recovery point in time")
+        case _ =>
+          targetName.foreach(tn => state = state - tn)
+      }
 
     case msg: ModelAndFeaturesMessage =>
-      modelAndFeaturesFromMessage(msg).foreach(modelAndFeatures =>
-        state = state.updated(modelAndFeatures.targetName, modelAndFeatures)
-      )
+      (maybePointInTime, msg.timestamp) match {
+        case (Some(pit), Some(createdAt)) if pit < createdAt =>
+          log.debug(s"Ignoring message created more recently than the recovery point in time")
+        case _ =>
+          modelAndFeaturesFromMessage(msg).foreach(modelAndFeatures =>
+            state = state.updated(modelAndFeatures.targetName, modelAndFeatures)
+          )
+      }
   }
 
   override def processSnapshotMessage: PartialFunction[Any, Unit] = {

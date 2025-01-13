@@ -13,6 +13,7 @@ sealed trait FeedArrival extends WithUnique[UniqueArrival] with Updatable[FeedAr
   val carrierCode: String
   val flightCodeSuffix: Option[String]
   val origin: String
+  val previousPort: Option[String]
   val scheduled: Long
   lazy val unique: UniqueArrival = UniqueArrival(voyageNumber, terminal, scheduled, PortCode(origin))
 
@@ -30,6 +31,7 @@ case class ForecastArrival(operator: Option[String],
                            carrierCode: String,
                            flightCodeSuffix: Option[String],
                            origin: String,
+                           previousPort: Option[String],
                            scheduled: Long,
                           ) extends FeedArrival {
   override def update(incoming: FeedArrival): FeedArrival = incoming match {
@@ -58,6 +60,7 @@ case class ForecastArrival(operator: Option[String],
     AirportID = PortCode(""),
     Terminal = terminal,
     Origin = PortCode(origin),
+    PreviousPort = previousPort.map(PortCode(_)),
     Scheduled = scheduled,
     PcpTime = None,
     FeedSources = Set(feedSource),
@@ -77,6 +80,7 @@ case class LiveArrival(operator: Option[String],
                        carrierCode: String,
                        flightCodeSuffix: Option[String],
                        origin: String,
+                       previousPort: Option[String],
                        scheduled: Long,
                        estimated: Option[Long],
                        touchdown: Option[Long],
@@ -103,6 +107,7 @@ case class LiveArrival(operator: Option[String],
       stand = la.stand.orElse(stand),
       runway = la.runway.orElse(runway),
       baggageReclaim = la.baggageReclaim.orElse(baggageReclaim),
+      previousPort = la.previousPort,
     )
   }
 
@@ -125,6 +130,7 @@ case class LiveArrival(operator: Option[String],
     AirportID = PortCode(""),
     Terminal = terminal,
     Origin = PortCode(origin),
+    PreviousPort = previousPort.map(PortCode(_)),
     Scheduled = scheduled,
     PcpTime = None,
     FeedSources = Set(feedSource),
