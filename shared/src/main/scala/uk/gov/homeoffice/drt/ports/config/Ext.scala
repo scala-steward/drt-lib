@@ -15,6 +15,7 @@ object Ext extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("EXT"),
+    portName = "Exeter",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.QueueDesk)
     ),

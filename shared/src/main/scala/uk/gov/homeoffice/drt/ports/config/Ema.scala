@@ -19,6 +19,7 @@ object Ema extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("EMA"),
+    portName = "East Midlands",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.QueueDesk, Queues.EGate)
     ),

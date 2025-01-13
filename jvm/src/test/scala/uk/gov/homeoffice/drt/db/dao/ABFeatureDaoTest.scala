@@ -1,31 +1,32 @@
-package uk.gov.homeoffice.drt.db
+package uk.gov.homeoffice.drt.db.dao
 
-import org.specs2.mutable.Specification
-import org.specs2.specification.BeforeEach
+import org.scalatest.BeforeAndAfter
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import slick.dbio.DBIO
-
-import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
 import slick.jdbc.PostgresProfile.api._
+import uk.gov.homeoffice.drt.db.TestDatabase
+import uk.gov.homeoffice.drt.db.TestDatabase.profile
+import uk.gov.homeoffice.drt.db.tables.ABFeatureRow
 
 import java.sql.Timestamp
 import java.time.Instant
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
-class ABFeatureDaoSpec extends Specification with BeforeEach {
+class ABFeatureDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
+  val db: profile.backend.Database = TestDatabase.db
+  val abFeatureDao: ABFeatureDao = ABFeatureDao(TestDatabase.db)
 
-  sequential
-
-  lazy val db = TestDatabase.db
-
-  override def before = {
+  before {
     Await.result(
       db.run(DBIO.seq(
-        TestDatabase.abFeatureTable.schema.dropIfExists,
-        TestDatabase.abFeatureTable.schema.createIfNotExists)
+        abFeatureDao.table.schema.dropIfExists,
+        abFeatureDao.table.schema.createIfNotExists)
       ), 2.second)
   }
 
-  def getABFeatureRow() = {
+  def getABFeatureRow: ABFeatureRow = {
     ABFeatureRow(email = "test@test.com",
       functionName = "feedback",
       presentedAt = new Timestamp(Instant.now().toEpochMilli),
@@ -34,19 +35,16 @@ class ABFeatureDaoSpec extends Specification with BeforeEach {
 
   "ABFeatureDao" should {
     "should return a list of AB Features" in {
-      val abFeatureDao = ABFeatureDao(TestDatabase.db)
-      val abFeatureRow = getABFeatureRow()
+      val abFeatureRow = getABFeatureRow
 
       Await.result(abFeatureDao.insertOrUpdate(abFeatureRow), 1.second)
       val abFeatureSelectResult = Await.result(abFeatureDao.getABFeatures, 1.second)
 
-      abFeatureSelectResult.size === 1
-      abFeatureSelectResult.head === abFeatureRow
+      abFeatureSelectResult should ===(Seq(abFeatureRow))
     }
 
     "should return AB Features for a given functionName" in {
-      val abFeatureDao = ABFeatureDao(TestDatabase.db)
-      val abFeatureRow = getABFeatureRow()
+      val abFeatureRow = getABFeatureRow
 
       val arrivalFeature = abFeatureRow.copy(functionName = "arrival")
       Await.result(abFeatureDao.insertOrUpdate(abFeatureRow), 1.second)
@@ -54,13 +52,11 @@ class ABFeatureDaoSpec extends Specification with BeforeEach {
 
       val abFeatureSelectResult = Await.result(abFeatureDao.getABFeatureByFunctionName("arrival"), 1.second)
 
-      abFeatureSelectResult.size === 1
-      abFeatureSelectResult.head === arrivalFeature
+      abFeatureSelectResult should ===(Seq(arrivalFeature))
     }
 
     "should return AB Features for a given functionName and email" in {
-      val abFeatureDao = ABFeatureDao(TestDatabase.db)
-      val abFeatureRow = getABFeatureRow()
+      val abFeatureRow = getABFeatureRow
 
       val arrivalFeature = abFeatureRow.copy(functionName = "arrival",email="test1@test.com")
       Await.result(abFeatureDao.insertOrUpdate(abFeatureRow), 1.second)
@@ -68,8 +64,7 @@ class ABFeatureDaoSpec extends Specification with BeforeEach {
 
       val abFeatureSelectResult = Await.result(abFeatureDao.getABFeaturesByEmailForFunction("test1@test.com","arrival"), 1.second)
 
-      abFeatureSelectResult.size === 1
-      abFeatureSelectResult.head === arrivalFeature
+      abFeatureSelectResult should ===(Seq(arrivalFeature))
     }
   }
 }

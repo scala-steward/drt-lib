@@ -12,6 +12,7 @@ object FeedArrivalGenerator {
            carrierCode: String = "BA",
            flightCodeSuffix: Option[String] = None,
            origin: String = "JFK",
+           previousPort: Option[String] = None,
            scheduled: Long = 0L,
            estimated: Option[Long] = None,
            touchdown: Option[Long] = None,
@@ -33,6 +34,7 @@ object FeedArrivalGenerator {
       carrierCode = carrierCode,
       flightCodeSuffix = flightCodeSuffix,
       origin = origin,
+      previousPort = previousPort,
       scheduled = scheduled,
       estimated = estimated,
       touchdown = touchdown,
@@ -54,6 +56,7 @@ object FeedArrivalGenerator {
                carrierCode: String = "BA",
                flightCodeSuffix: Option[String] = None,
                origin: String = "JFK",
+               previousPort: Option[String] = None,
                scheduled: Long = 0L,
               ): ForecastArrival =
     ForecastArrival(
@@ -66,6 +69,7 @@ object FeedArrivalGenerator {
       carrierCode = carrierCode,
       flightCodeSuffix = flightCodeSuffix,
       origin = origin,
+      previousPort = previousPort,
       scheduled = scheduled,
     )
 }

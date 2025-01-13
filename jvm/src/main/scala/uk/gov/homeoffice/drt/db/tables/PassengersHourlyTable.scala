@@ -1,4 +1,4 @@
-package uk.gov.homeoffice.drt.db
+package uk.gov.homeoffice.drt.db.tables
 
 import slick.lifted.Tag
 import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
@@ -37,15 +37,30 @@ class PassengersHourlyTable(tag: Tag)
 
   def dateUtc: Rep[String] = column[String]("date_utc")
 
-  def hour: Rep[Int] = column[Int]("hour")
+  def hour: Rep[Int] = column[Int]("hour", O.SqlType("smallint"))
 
-  def passengers: Rep[Int] = column[Int]("passengers")
+  def passengers: Rep[Int] = column[Int]("passengers", O.SqlType("smallint"))
 
   def updatedAt: Rep[Timestamp] = column[java.sql.Timestamp]("updated_at")
 
-  def pk = primaryKey("pk_port_terminal_queue_dateutc_hour", (port, terminal, queue, dateUtc, hour))
+  def pk = primaryKey("pk_passengers_hourly_port_terminal_queue_dateutc_hour", (port, terminal, queue, dateUtc, hour))
 
-  def * = (port, terminal, queue, dateUtc, hour, passengers, updatedAt) <> (PassengersHourlyRow.tupled, PassengersHourlyRow.unapply)
+  def portTerminalDateHourIndex = index("idx_passengers_hourly_port_terminal_date_hour", (port, terminal, dateUtc, hour), unique = false)
+
+  def portTerminalDateIndex = index("idx_passengers_hourly_port_terminal_date", (port, terminal, dateUtc), unique = false)
+
+  def portDateIndex = index("idx_passengers_hourly_port_date", (port, dateUtc), unique = false)
+
+  def dateIndex = index("idx_passengers_hourly_date", dateUtc, unique = false)
+
+  def * = (
+    port,
+    terminal,
+    queue,
+    dateUtc,
+    hour,
+    passengers,
+    updatedAt) <> (PassengersHourlyRow.tupled, PassengersHourlyRow.unapply)
 }
 
 

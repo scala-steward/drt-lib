@@ -31,5 +31,8 @@ object PortRegion {
     override val ports: Set[PortCode] = Set(PortCode("LHR"))
   }
 
-  def fromPort(portCode: PortCode): PortRegion = regions.find(_.ports.contains(portCode)).getOrElse(throw new Exception(s"Unknown port $portCode"))
+  def fromPort(portCode: PortCode): PortRegion = {
+    val upperCaseCode = portCode.copy(iata = portCode.iata.toUpperCase)
+    regions.find(_.ports.contains(upperCaseCode)).getOrElse(throw new Exception(s"Unknown port $portCode"))
+  }
 }

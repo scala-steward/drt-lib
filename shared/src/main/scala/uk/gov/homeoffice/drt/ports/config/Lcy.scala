@@ -17,6 +17,7 @@ object Lcy extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("LCY"),
+    portName = "London City",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.NonEeaDesk, Queues.EeaDesk, Queues.EGate)
     ),

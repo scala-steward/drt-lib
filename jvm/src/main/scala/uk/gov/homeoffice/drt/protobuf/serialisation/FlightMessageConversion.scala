@@ -19,7 +19,7 @@ object FlightMessageConversion {
   val log: Logger = LoggerFactory.getLogger(getClass.toString)
 
   def flightWithSplitsDiffFromMessage(diffMessage: FlightsWithSplitsDiffMessage): FlightsWithSplitsDiff =
-    FlightsWithSplitsDiff(diffMessage.updates.map(flightWithSplitsFromMessage).toList, uniqueArrivalsFromMessages(diffMessage.removals))
+    FlightsWithSplitsDiff(diffMessage.updates.map(flightWithSplitsFromMessage).toList)
 
   def uniqueArrivalToMessage(unique: UniqueArrival): UniqueArrivalMessage =
     UniqueArrivalMessage(Option(unique.number), Option(unique.terminal.toString), Option(unique.scheduled), Option(unique.origin.toString))
@@ -30,12 +30,6 @@ object FlightMessageConversion {
   def flightWithSplitsDiffToMessage(diff: FlightsWithSplitsDiff, nowMillis: Long): FlightsWithSplitsDiffMessage = {
     FlightsWithSplitsDiffMessage(
       createdAt = Option(nowMillis),
-      removals = diff.arrivalsToRemove.map {
-        case UniqueArrival(number, terminal, scheduled, origin) =>
-          UniqueArrivalMessage(Option(number), Option(terminal.toString), Option(scheduled), Option(origin.toString))
-        case LegacyUniqueArrival(number, terminal, scheduled) =>
-          UniqueArrivalMessage(Option(number), Option(terminal.toString), Option(scheduled), None)
-      }.toSeq,
       updates = diff.flightsToUpdate.map(flightWithSplitsToMessage).toSeq
     )
   }
@@ -224,6 +218,7 @@ object FlightMessageConversion {
       iCAO = Option(apiFlight.flightCodeString),
       iATA = Option(apiFlight.flightCodeString),
       origin = Option(apiFlight.Origin.toString),
+      previousPort = apiFlight.PreviousPort.map(_.iata),
       pcpTime = apiFlight.PcpTime,
       feedSources = apiFlight.FeedSources.map(_.toString).toSeq,
       scheduled = Option(apiFlight.Scheduled),
@@ -290,6 +285,7 @@ object FlightMessageConversion {
     rawICAO = flightMessage.iCAO.getOrElse(""),
     rawIATA = flightMessage.iATA.getOrElse(""),
     Origin = PortCode(flightMessage.origin.getOrElse("")),
+    PreviousPort = flightMessage.previousPort.map(PortCode(_)),
     PcpTime = flightMessage.pcpTime,
     Scheduled = flightMessage.scheduled.getOrElse(0L),
     FeedSources = getFeedSources(flightMessage.feedSources),

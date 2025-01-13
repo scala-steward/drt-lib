@@ -170,13 +170,44 @@ class ApiFlightWithSplitsSpec extends Specification {
     }
   }
 
+  "bestSplits" should {
+    val flight = ApiFlightWithSplits(apiFlight = ArrivalGeneratorShared.arrival(iata = "BA0001", passengerSources = Map(LiveFeedSource -> Passengers(Option(100), None))), splits = Set.empty, lastUpdated = None)
+    val apiSplits = Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, Queues.NonEeaDesk, 100, None, None)), SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages, Option(EventTypes.DC))
+    val invalidApiSplits = Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, Queues.NonEeaDesk, 1, None, None)), SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages, Option(EventTypes.DC))
+    val validButAllTransitApi = Splits(Set(ApiPaxTypeAndQueueCount(Transit, Queues.Transfer, 100, None, None)), SplitSources.ApiSplitsWithHistoricalEGateAndFTPercentages, Option(EventTypes.DC))
+    val historicalSplits = Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, Queues.NonEeaDesk, 100, None, None)), SplitSources.Historical, Option(EventTypes.DC))
+    val allTransitHistoricalSplits = Splits(Set(ApiPaxTypeAndQueueCount(Transit, Queues.Transfer, 100, None, None)), SplitSources.Historical, Option(EventTypes.DC))
+    val terminalSplits = Splits(Set(ApiPaxTypeAndQueueCount(VisaNational, Queues.NonEeaDesk, 100, None, None)), SplitSources.TerminalAverage, Option(EventTypes.DC))
+
+    "return api if found and valid, and non-zero pax are not all transit" in {
+      val flightWithSplits = flight.copy(splits = Set(apiSplits, historicalSplits, terminalSplits))
+      flightWithSplits.bestSplits.get === apiSplits
+    }
+    "return non-api if api not valid" in {
+      val flightWithSplits = flight.copy(splits = Set(invalidApiSplits, historicalSplits, terminalSplits))
+      flightWithSplits.bestSplits.get !== invalidApiSplits
+    }
+    "return non-api if api only has transit pax" in {
+      val flightWithSplits = flight.copy(splits = Set(validButAllTransitApi, historicalSplits, terminalSplits))
+      flightWithSplits.bestSplits.get !== validButAllTransitApi
+    }
+    "return historic if found and valid, and non-zero pax are not all transit" in {
+      val flightWithSplits = flight.copy(splits = Set(historicalSplits, terminalSplits))
+      flightWithSplits.bestSplits.get === historicalSplits
+    }
+    "return non-historic if historic only has transit pax" in {
+      val flightWithSplits = flight.copy(splits = Set(allTransitHistoricalSplits, terminalSplits))
+      flightWithSplits.bestSplits.get !== allTransitHistoricalSplits
+    }
+  }
+
   private def flightWithPaxAndApiSplits(splitsDirect: Int,
                                         splitsTransfer: Int,
                                         sources: Set[FeedSource],
                                         passengerSources: Map[FeedSource, Passengers],
                                         scheduled: Long,
                                        ): ApiFlightWithSplits = {
-    val flight: Arrival = ArrivalGenerator.arrival(
+    val flight: Arrival = ArrivalGeneratorShared.arrival(
       feedSources = sources,
       passengerSources = passengerSources + (ApiFeedSource -> Passengers(Option(splitsDirect), Option(splitsTransfer))),
       sch = scheduled)
@@ -185,7 +216,7 @@ class ApiFlightWithSplitsSpec extends Specification {
   }
 
   private def flightWithPaxAndHistoricSplits(splitsDirect: Int, splitsTransfer: Int, sources: Set[FeedSource], passengerSources: Map[FeedSource, Passengers]): ApiFlightWithSplits = {
-    val flight: Arrival = ArrivalGenerator
+    val flight: Arrival = ArrivalGeneratorShared
       .arrival(feedSources = sources,passengerSources = passengerSources)
 
     ApiFlightWithSplits(flight, Set(splitsForPax(directPax = splitsDirect, transferPax = splitsTransfer, Historical)))

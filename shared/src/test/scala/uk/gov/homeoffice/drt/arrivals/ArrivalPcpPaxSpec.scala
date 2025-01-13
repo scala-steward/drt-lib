@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.arrivals
 
 import org.specs2.mutable.Specification
-import uk.gov.homeoffice.drt.arrivals.ArrivalGenerator.arrival
+import uk.gov.homeoffice.drt.arrivals.ArrivalGeneratorShared.arrival
 import uk.gov.homeoffice.drt.ports.{AclFeedSource, ApiFeedSource, FeedSource, ForecastFeedSource, HistoricApiFeedSource, LiveFeedSource, MlFeedSource, ScenarioSimulationSource}
 
 class ArrivalPcpPaxSpec extends Specification {

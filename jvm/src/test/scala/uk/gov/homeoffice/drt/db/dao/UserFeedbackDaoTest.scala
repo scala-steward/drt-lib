@@ -1,9 +1,12 @@
-package uk.gov.homeoffice.drt.db
+package uk.gov.homeoffice.drt.db.dao
 
 import akka.actor.ActorSystem
 import akka.stream.scaladsl.Sink
-import org.specs2.mutable.Specification
-import org.specs2.specification.BeforeEach
+import org.scalatest.BeforeAndAfter
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import uk.gov.homeoffice.drt.db.TestDatabase
+import uk.gov.homeoffice.drt.db.tables.UserFeedbackRow
 
 import java.sql.Timestamp
 import java.time.Instant
@@ -11,22 +14,22 @@ import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 
-class UserFeedbackDaoSpec extends Specification with BeforeEach {
-  sequential
-
-  lazy val db = TestDatabase.db
+class UserFeedbackDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
+  private val db = TestDatabase.db
 
   import TestDatabase.profile.api._
 
-  override def before = {
+  val userFeedbackDao: UserFeedbackDao = UserFeedbackDao(TestDatabase.db)
+
+  before {
     Await.result(
       db.run(DBIO.seq(
-        TestDatabase.userFeedbackTable.schema.dropIfExists,
-        TestDatabase.userFeedbackTable.schema.createIfNotExists)
+        userFeedbackDao.table.schema.dropIfExists,
+        userFeedbackDao.table.schema.createIfNotExists)
       ), 2.second)
   }
 
-  def getUserFeedBackRow(createdAt: Timestamp) = {
+  def getUserFeedBackRow(createdAt: Timestamp): UserFeedbackRow = {
     UserFeedbackRow(email = "test@test.com",
       createdAt = createdAt,
       bfRole = "test",
@@ -40,43 +43,34 @@ class UserFeedbackDaoSpec extends Specification with BeforeEach {
 
   "UserFeedbackDao" should {
     "should return a list of user feedback submitted" in {
-      val userFeedbackDao = UserFeedbackDao(TestDatabase.db)
       val userFeedbackRow = getUserFeedBackRow(new Timestamp(Instant.now().minusSeconds(60).toEpochMilli))
 
       Await.result(userFeedbackDao.insertOrUpdate(userFeedbackRow), 1.second)
       val userFeedbackResult = Await.result(userFeedbackDao.selectAll(), 1.second)
 
-      userFeedbackResult.size === 1
-      userFeedbackResult.head === userFeedbackRow
+      userFeedbackResult should ===(Seq(userFeedbackRow))
     }
 
     "should return a list of user feedback using stream" in {
       implicit val system: ActorSystem = ActorSystem("testSystem")
 
-      val userFeedbackDao = UserFeedbackDao(TestDatabase.db)
-      val userFeedbackResult = Await.result(userFeedbackDao.selectAll(), 1.second)
-      userFeedbackResult.size === 1
-      val exitingRow = userFeedbackResult.head
-      val userFeedbackRow = getUserFeedBackRow(new Timestamp(Instant.now().minusSeconds(60).toEpochMilli)).copy(email = "test1@test.com")
+      val userFeedbackRow1 = getUserFeedBackRow(new Timestamp(Instant.now().minusSeconds(60).toEpochMilli))
+      val userFeedbackRow2 = getUserFeedBackRow(new Timestamp(Instant.now().minusSeconds(60).toEpochMilli)).copy(email = "test1@test.com")
 
-      Await.result(userFeedbackDao.insertOrUpdate(userFeedbackRow), 1.second)
+      Await.result(userFeedbackDao.insertOrUpdate(userFeedbackRow1), 1.second)
+      Await.result(userFeedbackDao.insertOrUpdate(userFeedbackRow2), 1.second)
       userFeedbackDao.selectAllAsStream().runWith(Sink.seq)
-        .map { userFeedbackResult =>
-          userFeedbackResult.size === 2
-          userFeedbackResult === Seq(exitingRow, userFeedbackRow)
-        }
+        .map(_ should ===(Seq(userFeedbackRow1, userFeedbackRow2)))
     }
 
     "should return a list of user feedback for given email" in {
-      val userFeedbackDao = UserFeedbackDao(TestDatabase.db)
       val userFeedbackRow = getUserFeedBackRow(new Timestamp(Instant.now().minusSeconds(60).toEpochMilli))
       val secondRow = userFeedbackRow.copy(email = "test2@test.com")
       Await.result(userFeedbackDao.insertOrUpdate(userFeedbackRow), 1.second)
       Await.result(userFeedbackDao.insertOrUpdate(secondRow), 1.second)
       userFeedbackDao.selectByEmail("test2@test.com")
         .map { userFeedbackResult =>
-          userFeedbackResult.size === 1
-          userFeedbackResult.head === secondRow
+          userFeedbackResult should ===(Seq(secondRow))
         }
     }
   }

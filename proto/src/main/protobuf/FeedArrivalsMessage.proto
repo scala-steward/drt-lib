@@ -33,6 +33,7 @@ message LiveFeedArrivalMessage {
     optional string Stand = 17;
     optional string Runway = 18;
     optional string BaggageReclaim = 19;
+    optional string PreviousPort = 20;
 }
 
 message ForecastFeedArrivalMessage {
@@ -46,6 +47,7 @@ message ForecastFeedArrivalMessage {
     optional string FlightCodeSuffix = 8;
     optional string Origin = 9;
     optional int64 Scheduled = 10;
+    optional string PreviousPort = 11;
 }
 
 message ForecastFeedArrivalsDiffMessage {
