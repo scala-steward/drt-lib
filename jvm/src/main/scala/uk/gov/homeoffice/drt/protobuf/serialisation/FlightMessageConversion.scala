@@ -12,13 +12,14 @@ import uk.gov.homeoffice.drt.ports._
 import uk.gov.homeoffice.drt.protobuf.messages.CrunchState._
 import uk.gov.homeoffice.drt.protobuf.messages.FlightsMessage._
 import uk.gov.homeoffice.drt.protobuf.messages.Prediction.{PredictionIntMessage, PredictionLongMessage, PredictionsMessage}
-import uk.gov.homeoffice.drt.time.SDate
+
+
 
 object FlightMessageConversion {
   val log: Logger = LoggerFactory.getLogger(getClass.toString)
 
   def flightWithSplitsDiffFromMessage(diffMessage: FlightsWithSplitsDiffMessage): FlightsWithSplitsDiff =
-    FlightsWithSplitsDiff(diffMessage.updates.map(flightWithSplitsFromMessage).toList, uniqueArrivalsFromMessages(diffMessage.removals))
+    FlightsWithSplitsDiff(diffMessage.updates.map(flightWithSplitsFromMessage).toList)
 
   def uniqueArrivalToMessage(unique: UniqueArrival): UniqueArrivalMessage =
     UniqueArrivalMessage(Option(unique.number), Option(unique.terminal.toString), Option(unique.scheduled), Option(unique.origin.toString))
@@ -29,12 +30,6 @@ object FlightMessageConversion {
   def flightWithSplitsDiffToMessage(diff: FlightsWithSplitsDiff, nowMillis: Long): FlightsWithSplitsDiffMessage = {
     FlightsWithSplitsDiffMessage(
       createdAt = Option(nowMillis),
-      removals = diff.arrivalsToRemove.map {
-        case UniqueArrival(number, terminal, scheduled, origin) =>
-          UniqueArrivalMessage(Option(number), Option(terminal.toString), Option(scheduled), Option(origin.toString))
-        case LegacyUniqueArrival(number, terminal, scheduled) =>
-          UniqueArrivalMessage(Option(number), Option(terminal.toString), Option(scheduled), None)
-      }.toSeq,
       updates = diff.flightsToUpdate.map(flightWithSplitsToMessage).toSeq
     )
   }
@@ -51,9 +46,12 @@ object FlightMessageConversion {
 
   def arrivalsDiffFromMessage(flightsDiffMessage: FlightsDiffMessage): ArrivalsDiff =
     ArrivalsDiff(
-      toUpdate = flightsDiffMessage.updates.map(flightMessageToApiFlight),
+      toUpdate = validFlightsFromMessages(flightsDiffMessage.updates),
       toRemove = flightsDiffMessage.removals.map(uniqueArrivalFromMessage)
     )
+
+  private def validFlightsFromMessages(messages: Seq[FlightMessage]): Seq[Arrival] =
+    messages.map(flightMessageToApiFlight).filter(_.VoyageNumber.numeric > 0)
 
   def splitsForArrivalsToMessage(splitsForArrivals: SplitsForArrivals, nowMillis: Long): SplitsForArrivalsMessage =
     SplitsForArrivalsMessage(
@@ -103,7 +101,7 @@ object FlightMessageConversion {
 
   def restoreArrivalsFromSnapshot(restorer: ArrivalsRestorer[Arrival],
                                   snMessage: FlightStateSnapshotMessage): Unit = {
-    restorer.applyUpdates(snMessage.flightMessages.map(flightMessageToApiFlight))
+    restorer.applyUpdates(validFlightsFromMessages(snMessage.flightMessages))
   }
 
   def feedStatusesFromSnapshotMessage(snMessage: FlightStateSnapshotMessage): Option[FeedStatuses] = {
@@ -165,8 +163,8 @@ object FlightMessageConversion {
     .map(nc => {
       nc.paxNationality -> nc.count
     }).collect {
-    case (Some(nat), Some(count)) => Nationality(nat) -> count
-  }.toMap match {
+      case (Some(nat), Some(count)) => Nationality(nat) -> count
+    }.toMap match {
     case nats if nats.isEmpty => None
     case nats => Option(nats)
   }
@@ -176,8 +174,8 @@ object FlightMessageConversion {
     .map(pa => {
       pa.paxAge -> pa.count
     }).collect {
-    case (Some(age), Some(count)) => PaxAge(age) -> count
-  }.toMap match {
+      case (Some(age), Some(count)) => PaxAge(age) -> count
+    }.toMap match {
     case ages if ages.isEmpty => None
     case ages => Option(ages)
   }
@@ -220,6 +218,7 @@ object FlightMessageConversion {
       iCAO = Option(apiFlight.flightCodeString),
       iATA = Option(apiFlight.flightCodeString),
       origin = Option(apiFlight.Origin.toString),
+      previousPort = apiFlight.PreviousPort.map(_.iata),
       pcpTime = apiFlight.PcpTime,
       feedSources = apiFlight.FeedSources.map(_.toString).toSeq,
       scheduled = Option(apiFlight.Scheduled),
@@ -286,6 +285,7 @@ object FlightMessageConversion {
     rawICAO = flightMessage.iCAO.getOrElse(""),
     rawIATA = flightMessage.iATA.getOrElse(""),
     Origin = PortCode(flightMessage.origin.getOrElse("")),
+    PreviousPort = flightMessage.previousPort.map(PortCode(_)),
     PcpTime = flightMessage.pcpTime,
     Scheduled = flightMessage.scheduled.getOrElse(0L),
     FeedSources = getFeedSources(flightMessage.feedSources),

@@ -29,6 +29,7 @@ object PortCode {
 }
 
 case class AirportConfig(portCode: PortCode,
+                         portName: String,
                          queuesByTerminal: SortedMap[Terminal, Seq[Queue]],
                          divertedQueues: Map[Queue, Queue] = Map(),
                          flexedQueues: Set[Queue] = Set(),
@@ -125,12 +126,4 @@ object AirportConfig {
   )
 
   implicit val rw: ReadWriter[AirportConfig] = macroRW
-
-  def desksByTerminalDefault(minMaxDesksByTerminalQueue: Map[Terminal, Map[Queue, (List[Int], List[Int])]])
-                            (terminal: Terminal): List[Int] = minMaxDesksByTerminalQueue.getOrElse(terminal, Map())
-    .filterKeys(_ != EGate)
-    .map { case (_, (_, max)) => max }
-    .reduce[List[Int]] {
-      case (max1, max2) => max1.zip(max2).map { case (m1, m2) => m1 + m2 }
-    }
 }

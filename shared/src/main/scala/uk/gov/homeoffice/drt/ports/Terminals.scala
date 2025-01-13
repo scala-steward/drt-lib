@@ -52,6 +52,7 @@ object Terminals {
       case "mt" => T1
       case "cta" => CTA
       case "mainapron" => MainApron
+      case "sen" => T1
       case _ => InvalidTerminal
     }
   }

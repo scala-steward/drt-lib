@@ -15,7 +15,7 @@ import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 
 import scala.concurrent.duration.DurationInt
 
-class MockPredictionModelActor(probeRef: ActorRef) extends PredictionModelActor(() => SDate.now(), FlightCategory, TerminalFlightNumberOrigin("T1", 100, "JFK")) {
+class MockPredictionModelActor(probeRef: ActorRef) extends PredictionModelActor(() => SDate.now(), FlightCategory, TerminalFlightNumberOrigin("T1", 100, "JFK"), None) {
   override def persistAndMaybeSnapshotWithAck(messageToPersist: GeneratedMessage, maybeAck:List[(ActorRef, Any)]): Unit = {
     probeRef ! messageToPersist
   }

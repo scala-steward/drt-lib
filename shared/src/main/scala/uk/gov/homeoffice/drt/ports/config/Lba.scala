@@ -15,6 +15,7 @@ object Lba extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("LBA"),
+    portName = "Leeds Bradford",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.NonEeaDesk, Queues.EeaDesk)
     ),

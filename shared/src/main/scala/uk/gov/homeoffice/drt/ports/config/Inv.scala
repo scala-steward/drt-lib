@@ -16,6 +16,7 @@ object Inv extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("INV"),
+    portName = "Inverness",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.EeaDesk, Queues.NonEeaDesk)
     ),

@@ -5,11 +5,12 @@ import org.slf4j.Logger
 import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 
 trait RecoveryLogging {
-  val log: Logger
+  protected val log: Logger
 
   val prefix = "Recovery"
+  def persistenceId: String
 
-  def snapshotOfferLogMessage(md: SnapshotMetadata): String = s"$prefix received SnapshotOffer from ${SDate(md.timestamp).toISOString}, sequence number ${md.sequenceNr}"
+  def snapshotOfferLogMessage(md: SnapshotMetadata): String = s"$persistenceId $prefix received SnapshotOffer from ${SDate(md.timestamp).toISOString}, sequence number ${md.sequenceNr}"
 
   def logSnapshotOffer(md: SnapshotMetadata): Unit = log.debug(snapshotOfferLogMessage(md))
 

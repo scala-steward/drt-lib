@@ -3,10 +3,7 @@ package uk.gov.homeoffice.drt.arrivals
 import uk.gov.homeoffice.drt.DataUpdates.FlightUpdates
 import uk.gov.homeoffice.drt.ports.FeedSource
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.time.{SDateLike, UtcDate}
 import upickle.default.{macroRW, _}
-
-import scala.collection.immutable.SortedMap
 
 
 object ArrivalsDiff {
@@ -15,11 +12,11 @@ object ArrivalsDiff {
   val empty: ArrivalsDiff = ArrivalsDiff(Seq(), Seq())
 
   def apply(toUpdate: Iterable[Arrival], toRemove: Iterable[UniqueArrival]): ArrivalsDiff = ArrivalsDiff(
-    SortedMap[UniqueArrival, Arrival]() ++ toUpdate.map(a => (a.unique, a)), toRemove
+    toUpdate.map(a => (a.unique, a)).toMap, toRemove
   )
 }
 
-case class ArrivalsDiff(toUpdate: SortedMap[UniqueArrival, Arrival], toRemove: Iterable[UniqueArrival]) extends FlightUpdates {
+case class ArrivalsDiff(toUpdate: Map[UniqueArrival, Arrival], toRemove: Iterable[UniqueArrival]) extends FlightUpdates {
   def diff(arrivals: Map[UniqueArrival, Arrival]): ArrivalsDiff = {
     val updatedFlights = toUpdate
       .map {
@@ -42,23 +39,6 @@ case class ArrivalsDiff(toUpdate: SortedMap[UniqueArrival, Arrival], toRemove: I
     ArrivalsDiff(updatedFlights, validRemovals)
   }
 
-  def splitByScheduledUtcDate(implicit millisToSdate: Long => SDateLike): List[(UtcDate, ArrivalsDiff)] = {
-    val updatesByDate = toUpdate.values.groupBy(d => millisToSdate(d.Scheduled).toUtcDate)
-    val removalsByDate = toRemove.groupBy(d => millisToSdate(d.scheduled).toUtcDate)
-
-    val dates = updatesByDate.keys ++ removalsByDate.keys
-
-    dates
-      .map { date =>
-        val updates = updatesByDate.getOrElse(date, Seq())
-        val removals = removalsByDate.getOrElse(date, Seq())
-
-        (date, ArrivalsDiff(updates, removals))
-      }
-      .toList
-      .sortBy(_._1)
-  }
-
   def forTerminal(terminal: Terminal): ArrivalsDiff = ArrivalsDiff(
     toUpdate.filter { case (_, arrival) => arrival.Terminal == terminal },
     toRemove.filter(_.terminal == terminal)
@@ -77,26 +57,31 @@ case class ArrivalsDiff(toUpdate: SortedMap[UniqueArrival, Arrival], toRemove: I
 
   def updateMinutes(sourceOrderPreference: List[FeedSource]): Set[Long] = toUpdate.values.flatMap(_.pcpRange(sourceOrderPreference)).toSet
 
-  def applyTo(flightsWithSplits: FlightsWithSplits, nowMillis: Long, sourceOrderPreference: List[FeedSource]): (FlightsWithSplits, Set[Long]) = {
-    val updated = toUpdate.foldLeft(flightsWithSplits.flights) {
-      case (acc, (key, arrival)) =>
-        acc.get(key) match {
-          case Some(fws) =>
-            acc + (key -> fws.copy(apiFlight = arrival, lastUpdated = Option(nowMillis)))
+  def applyTo(existingFlights: FlightsWithSplits,
+              nowMillis: Long,
+              sourceOrderPreference: List[FeedSource],
+             ): (FlightsWithSplits, Set[Long], Iterable[ApiFlightWithSplits], Iterable[UniqueArrival]) = {
+    val updatedFlights = toUpdate.map {
+      case (key, incomingArrival) =>
+        existingFlights.flights.get(key) match {
+          case Some(existing) =>
+            existing.copy(apiFlight = existing.apiFlight.update(incomingArrival), lastUpdated = Option(nowMillis))
           case None =>
-            acc + (key -> ApiFlightWithSplits(arrival, Set(), Option(nowMillis)))
+            ApiFlightWithSplits(incomingArrival, Set(), Option(nowMillis))
         }
     }
+
+    val updated = existingFlights.flights ++ updatedFlights.map(f => f.unique -> f)
 
     val minusRemovals: Map[UniqueArrival, ApiFlightWithSplits] = ArrivalsRemoval.removeArrivals(toRemove, updated)
 
     val minutesFromRemovalsInExistingState: Set[Long] = toRemove
-      .flatMap { r => flightsWithSplits.flights.get(r).map(_.apiFlight.pcpRange(sourceOrderPreference)).getOrElse(List()) }
+      .flatMap { r => existingFlights.flights.get(r).map(_.apiFlight.pcpRange(sourceOrderPreference)).getOrElse(List()) }
       .toSet
 
     val minutesFromExistingStateUpdatedFlights = toUpdate
       .flatMap { case (unique, _) =>
-        flightsWithSplits.flights.get(unique) match {
+        existingFlights.flights.get(unique) match {
           case None => Set()
           case Some(f) => f.apiFlight.pcpRange(sourceOrderPreference)
         }
@@ -106,6 +91,6 @@ case class ArrivalsDiff(toUpdate: SortedMap[UniqueArrival, Arrival], toRemove: I
       updateMinutes(sourceOrderPreference) ++
       minutesFromExistingStateUpdatedFlights
 
-    (FlightsWithSplits(minusRemovals), updatedMinutesFromFlights)
+    (FlightsWithSplits(minusRemovals), updatedMinutesFromFlights, updatedFlights, toRemove)
   }
 }

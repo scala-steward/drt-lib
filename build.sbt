@@ -20,16 +20,17 @@ lazy val root = project.in(file(".")).
   )
 
 lazy val akkaVersion = "2.8.5"
-lazy val jodaVersion = "2.12.5"
+lazy val akkaHttpVersion = "10.5.2"
+lazy val jodaVersion = "2.12.7"
 lazy val upickleVersion = "3.1.5"
-lazy val sparkMlLibVersion = "3.5.0"
-lazy val scalaTestVersion = "3.2.17"
-lazy val specs2Version = "4.20.3"
-lazy val csvCommonsVersion = "1.10.0"
-lazy val catsVersion = "2.10.0"
-lazy val scribeSlf4jVersion = "3.12.2"
+lazy val sparkMlLibVersion = "3.5.4"
+lazy val scalaTestVersion = "3.2.19"
+lazy val specs2Version = "4.20.9"
+lazy val csvCommonsVersion = "1.13.0"
+lazy val catsVersion = "2.12.0"
+lazy val scribeSlf4jVersion = "3.16.0"
 lazy val slickVersion = "3.4.1"
-lazy val h2Version = "2.2.220"
+lazy val h2Version = "2.2.224"
 lazy val sprayJsonVersion = "1.3.6"
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
@@ -55,18 +56,32 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "com.typesafe.akka" %% "akka-actor" % akkaVersion,
       "com.typesafe.akka" %% "akka-persistence" % akkaVersion,
       "com.typesafe.akka" %% "akka-persistence-query" % akkaVersion,
+      "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
+      "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
       "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
       "joda-time" % "joda-time" % jodaVersion,
       "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion,
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
+      "com.typesafe.akka" %% "akka-persistence-testkit" % akkaVersion % "test",
       "com.typesafe.slick" %% "slick" % slickVersion,
       "io.spray" %% "spray-json" % sprayJsonVersion,
       "com.h2database" % "h2" % h2Version % Test
     ),
+    Test / parallelExecution := false,
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
     Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
+    Compile / PB.protocExecutable := {
+      val osName = System.getProperty("os.name").toLowerCase
+      val defaultExecutable = PB.protocExecutable.value // Retrieve the default value outside the if-else
+      if (osName.contains("mac")) {
+        file("/opt/homebrew/bin/protoc") // Custom path for macOS
+      } else {
+        defaultExecutable// Use the default path for other OSes
+      }
+    },
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
-  ).
+
+).
   jsSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
   )

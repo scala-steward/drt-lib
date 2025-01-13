@@ -16,6 +16,7 @@ object Sen extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("SEN"),
+    portName = "London Southend",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.EeaDesk, Queues.NonEeaDesk)
     ),
@@ -33,7 +34,7 @@ object Sen extends AirportConfigLike {
     eGateBankSizes = Map(),
     role = SEN,
     terminalPaxTypeQueueAllocation = Map(T1 -> defaultQueueRatiosWithoutEgates),
-    feedSources = Seq(ApiFeedSource, LiveFeedSource),
+    feedSources = Seq(ApiFeedSource, LiveFeedSource, AclFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),
     desksByTerminal = Map(T1 -> 6)
   )

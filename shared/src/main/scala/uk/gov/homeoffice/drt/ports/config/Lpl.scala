@@ -15,6 +15,7 @@ object Lpl extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("LPL"),
+    portName = "Liverpool",
     queuesByTerminal = SortedMap(
       T1 -> Seq(Queues.NonEeaDesk, Queues.EeaDesk)
     ),

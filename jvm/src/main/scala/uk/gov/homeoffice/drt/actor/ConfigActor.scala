@@ -8,7 +8,7 @@ import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.actor.ConfigActor._
 import uk.gov.homeoffice.drt.actor.acking.AckingReceiver.StreamCompleted
 import uk.gov.homeoffice.drt.actor.commands.Commands.{AddUpdatesSubscriber, GetState}
-import uk.gov.homeoffice.drt.actor.commands.CrunchRequest
+import uk.gov.homeoffice.drt.actor.commands.TerminalUpdateRequest
 import uk.gov.homeoffice.drt.actor.serialisation.{ConfigDeserialiser, ConfigSerialiser, EmptyConfig}
 import uk.gov.homeoffice.drt.ports.config.updates.{ConfigUpdate, Configs}
 import uk.gov.homeoffice.drt.protobuf.messages.config.Configs.RemoveConfigMessage
@@ -36,7 +36,7 @@ object ConfigActor {
 
 class ConfigActor[A, B <: Configs[A]](val persistenceId: String,
                                       val now: () => SDateLike,
-                                      crunchRequest: LocalDate => CrunchRequest,
+                                      updateRequests: LocalDate => Iterable[TerminalUpdateRequest],
                                       maxForecastDays: Int,
                                      )
                                      (implicit
@@ -110,7 +110,7 @@ class ConfigActor[A, B <: Configs[A]](val persistenceId: String,
       val firstNonHistoricDate = if (firstDay < today) today else firstDay
       val end = SDate(today).addDays(maxForecastDays).toLocalDate
       val range = firstNonHistoricDate.to(end)(SDate(_))
-      range.foreach(requestActor ! crunchRequest(_))
+      range.foreach(ld => updateRequests(ld).foreach(requestActor ! _))
     }
 
   private def stateUpdate(update: ConfigUpdate[A]): B = state.update(update).asInstanceOf[B]

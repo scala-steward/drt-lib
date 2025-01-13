@@ -45,6 +45,9 @@ object Roles {
     SuperAdmin,
     AccessOnlyProd,
     AccessOnlyPreprod,
+    NationalView,
+    ApiQueueAccess,
+    ApiFlightAccess,
   ) ++ portRoles ++ Set(TEST, TEST2)
 
   def parse(roleName: String): Option[Role] = availableRoles.find(role => role.name.toLowerCase == roleName.toLowerCase)
@@ -97,7 +100,19 @@ object Roles {
     override val name: String = "manage-users"
   }
 
+  case object NationalView extends Role {
+    override val name: String = "national:view"
+  }
+
   sealed trait PortAccess extends Role
+
+  case object ApiQueueAccess extends Role {
+    override val name: String = "api-queue-access"
+  }
+
+  case object ApiFlightAccess extends Role {
+    override val name: String = "api-flight-access"
+  }
 
   case object TEST extends PortAccess {
     override val name: String = "TEST"
@@ -223,7 +238,7 @@ object Roles {
   case object CreateAlerts extends Role {
     override val name: String = "create-alerts"
   }
-  
+
   case object DownloadManager extends Role {
     override val name: String = "download-manager"
   }

@@ -32,6 +32,22 @@ message RemoveCrunchRequestMessage {
     optional string terminalName = 4;
 }
 
+message MergeArrivalsRequestsMessage {
+    repeated MergeArrivalsRequestMessage requests = 1;
+}
+
+message MergeArrivalsRequestMessage {
+    optional int32 year = 1;
+    optional int32 month = 2;
+    optional int32 day = 3;
+}
+
+message RemoveMergeArrivalsRequestMessage {
+    optional int32 year = 1;
+    optional int32 month = 2;
+    optional int32 day = 3;
+}
+
 message CrunchStateSnapshotMessage {
     optional int64 crunchStart = 1;
     optional int32 numberOfMinutes = 2;

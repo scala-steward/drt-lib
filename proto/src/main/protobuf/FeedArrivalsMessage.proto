@@ -1,0 +1,63 @@
+syntax = "proto2";
+
+package uk.gov.homeoffice.drt.protobuf.messages;
+
+import "Prediction.proto";
+import "FlightsMessage.proto";
+
+message ForecastArrivalStateSnapshotMessage {
+    repeated ForecastFeedArrivalMessage arrivalMessages = 1;
+}
+
+message LiveArrivalStateSnapshotMessage {
+    repeated LiveFeedArrivalMessage liveArrivalMessages = 1;
+}
+
+message LiveFeedArrivalMessage {
+    optional string Operator = 1;
+    optional int32 MaxPax = 2;
+    optional int32 TotalPax = 3;
+    optional int32 TransPax = 4;
+    optional string Terminal = 5;
+    optional int32 VoyageNumber = 6;
+    optional string CarrierCode = 7;
+    optional string FlightCodeSuffix = 8;
+    optional string Origin = 9;
+    optional int64 Scheduled = 10;
+    optional int64 Estimated = 11;
+    optional int64 Touchdown = 12;
+    optional int64 EstimatedChox = 13;
+    optional int64 ActualChox = 14;
+    optional string Status = 15;
+    optional string Gate = 16;
+    optional string Stand = 17;
+    optional string Runway = 18;
+    optional string BaggageReclaim = 19;
+    optional string PreviousPort = 20;
+}
+
+message ForecastFeedArrivalMessage {
+    optional string Operator = 1;
+    optional int32 MaxPax = 2;
+    optional int32 TotalPax = 3;
+    optional int32 TransPax = 4;
+    optional string Terminal = 5;
+    optional int32 VoyageNumber = 6;
+    optional string CarrierCode = 7;
+    optional string FlightCodeSuffix = 8;
+    optional string Origin = 9;
+    optional int64 Scheduled = 10;
+    optional string PreviousPort = 11;
+}
+
+message ForecastFeedArrivalsDiffMessage {
+    optional int64 createdAt = 1;
+    repeated UniqueArrivalMessage removals = 2;
+    repeated ForecastFeedArrivalMessage forecastUpdates = 3;
+}
+
+message LiveFeedArrivalsDiffMessage {
+    optional int64 createdAt = 1;
+    repeated UniqueArrivalMessage removals = 2;
+    repeated LiveFeedArrivalMessage liveUpdates = 3;
+}
