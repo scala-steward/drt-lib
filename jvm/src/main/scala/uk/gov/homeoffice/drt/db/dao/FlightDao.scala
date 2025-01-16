@@ -3,8 +3,8 @@ package uk.gov.homeoffice.drt.db.dao
 import akka.NotUsed
 import akka.stream.scaladsl.Source
 import slick.dbio.{DBIOAction, Effect, NoStream}
+import slick.jdbc.PostgresProfile.api._
 import uk.gov.homeoffice.drt.arrivals.{ApiFlightWithSplits, CodeShares, UniqueArrival}
-import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
 import uk.gov.homeoffice.drt.db.serialisers.FlightSerialiser
 import uk.gov.homeoffice.drt.db.tables.{FlightRow, FlightTable}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
@@ -40,7 +40,7 @@ case class FlightDao()
           )
         }
   }
-  
+
   def uniqueFlightsForDatesAndTerminals(execute: DBIOAction[(UtcDate, Seq[ApiFlightWithSplits]), NoStream, Effect.Read] => Future[(UtcDate, Seq[ApiFlightWithSplits])]
                                        ): (PortCode, List[FeedSource], LocalDate, LocalDate, Seq[Terminal]) => Source[ApiFlightWithSplits, NotUsed] =
     (portCode, sourceOrder, start, end, terminals) => {

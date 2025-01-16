@@ -3,7 +3,7 @@ package uk.gov.homeoffice.drt.db.dao
 import akka.NotUsed
 import akka.stream.scaladsl.Source
 import slick.dbio.Effect
-import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
+import slick.jdbc.PostgresProfile.api._
 import uk.gov.homeoffice.drt.db.serialisers.QueueSlotSerialiser
 import uk.gov.homeoffice.drt.db.tables.{QueueSlotRow, QueueSlotTable}
 import uk.gov.homeoffice.drt.model.CrunchMinute

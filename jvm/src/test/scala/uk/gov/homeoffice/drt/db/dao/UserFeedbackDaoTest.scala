@@ -15,15 +15,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 
 class UserFeedbackDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
-  private val db = TestDatabase.db
-
   import TestDatabase.profile.api._
 
-  val userFeedbackDao: UserFeedbackDao = UserFeedbackDao(TestDatabase.db)
+  val userFeedbackDao: UserFeedbackDao = UserFeedbackDao(TestDatabase)
 
   before {
     Await.result(
-      db.run(DBIO.seq(
+      TestDatabase.run(DBIO.seq(
         userFeedbackDao.table.schema.dropIfExists,
         userFeedbackDao.table.schema.createIfNotExists)
       ), 2.second)

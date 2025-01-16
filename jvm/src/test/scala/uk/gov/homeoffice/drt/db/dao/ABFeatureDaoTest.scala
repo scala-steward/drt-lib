@@ -6,7 +6,6 @@ import org.scalatest.wordspec.AnyWordSpec
 import slick.dbio.DBIO
 import slick.jdbc.PostgresProfile.api._
 import uk.gov.homeoffice.drt.db.TestDatabase
-import uk.gov.homeoffice.drt.db.TestDatabase.profile
 import uk.gov.homeoffice.drt.db.tables.ABFeatureRow
 
 import java.sql.Timestamp
@@ -15,12 +14,11 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
 class ABFeatureDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
-  val db: profile.backend.Database = TestDatabase.db
-  val abFeatureDao: ABFeatureDao = ABFeatureDao(TestDatabase.db)
+  val abFeatureDao: ABFeatureDao = ABFeatureDao(TestDatabase)
 
   before {
     Await.result(
-      db.run(DBIO.seq(
+      TestDatabase.run(DBIO.seq(
         abFeatureDao.table.schema.dropIfExists,
         abFeatureDao.table.schema.createIfNotExists)
       ), 2.second)

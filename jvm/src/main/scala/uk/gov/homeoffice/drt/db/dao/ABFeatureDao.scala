@@ -2,6 +2,7 @@ package uk.gov.homeoffice.drt.db.dao
 
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.TableQuery
+import uk.gov.homeoffice.drt.db.CentralDatabase
 import uk.gov.homeoffice.drt.db.tables.{ABFeatureRow, ABFeatureTable}
 
 import scala.concurrent.Future
@@ -17,7 +18,7 @@ trait IABFeatureDao {
   def getABFeatureByFunctionName(functionName: String): Future[Seq[ABFeatureRow]]
 }
 
-case class ABFeatureDao(db: Database) extends IABFeatureDao {
+case class ABFeatureDao(db: CentralDatabase) extends IABFeatureDao {
   val table: TableQuery[ABFeatureTable] = TableQuery[ABFeatureTable]
 
   override def insertOrUpdate(aBFeatureRow: ABFeatureRow): Future[Int] = {
