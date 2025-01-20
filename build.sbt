@@ -47,7 +47,6 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "com.outr" %% "scribe-slf4j" % scribeSlf4jVersion
     ),
     resolvers ++= Seq(
-      "Akka library repository".at("https://repo.akka.io/maven"),
       "Artifactory Snapshot Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-snapshot/",
       "Artifactory Release Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-release/"
     )
@@ -67,6 +66,9 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "com.typesafe.slick" %% "slick" % slickVersion,
       "io.spray" %% "spray-json" % sprayJsonVersion,
       "com.h2database" % "h2" % h2Version % Test
+    ),
+    resolvers ++= Seq(
+      "Akka library repository".at("https://repo.akka.io/maven"),
     ),
     Test / parallelExecution := false,
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
