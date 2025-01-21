@@ -17,6 +17,9 @@ steps:
     commands:
       - /app/entrypoint.sh
       - cat /app/.sbt/repositories
+      - whoami
+      - ls -la /
+      - ls -la /app
       - sbt +compile
     environment:
       ARTIFACTORY_PASSWORD:
