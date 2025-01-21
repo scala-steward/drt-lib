@@ -47,6 +47,7 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "com.outr" %% "scribe-slf4j" % scribeSlf4jVersion
     ),
     resolvers ++= Seq(
+      "Akka library repository".at("https://repo.akka.io/maven"),
       "Artifactory Snapshot Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-snapshot/",
       "Artifactory Release Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-release/"
     )
@@ -75,16 +76,13 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
     Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
     Compile / PB.protocExecutable := {
       val osName = System.getProperty("os.name").toLowerCase
-      val defaultExecutable = PB.protocExecutable.value // Retrieve the default value outside the if-else
-      if (osName.contains("mac")) {
-        file("/opt/homebrew/bin/protoc") // Custom path for macOS
-      } else {
-        defaultExecutable// Use the default path for other OSes
-      }
+      if (osName.contains("mac"))
+        file("/opt/homebrew/bin/protoc")
+      else
+        file("/usr/bin/protoc")
     },
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
-
-).
+  ).
   jsSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
   )
