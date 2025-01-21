@@ -13,13 +13,9 @@ workspace:
 steps:
   - name: Build library
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-alpha-8
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-alpha-9
     commands:
       - /app/entrypoint.sh
-      - cat /app/.sbt/repositories
-      - whoami
-      - ls -la /
-      - ls -la /app
       - sbt +compile
     environment:
       ARTIFACTORY_PASSWORD:
@@ -31,7 +27,7 @@ steps:
 
   - name: Publish library
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-alpha-8
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-alpha-9
     commands:
       - /app/entrypoint.sh
       - sbt +publish
@@ -47,7 +43,7 @@ steps:
 
   - name: Unit tests
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-alpha-8
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-alpha-9
     commands:
       - /app/entrypoint.sh
       - sbt --error +test
@@ -80,7 +76,7 @@ steps:
 
   - name: Code coverage report
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-alpha-8
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-alpha-9
     commands:
       - /app/entrypoint.sh
       - sbt -mem 4096 --error coverage test | true
@@ -100,7 +96,7 @@ steps:
 
   - name: Scapegoat
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-alpha-8
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-alpha-9
     commands:
       - /app/entrypoint.sh
       - sbt scapegoat | true
@@ -119,7 +115,7 @@ steps:
 
   - name: Dependency check
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-alpha-8
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-alpha-9
     commands:
       - /app/entrypoint.sh
       - sbt -mem 4096 dependencyCheck
