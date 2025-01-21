@@ -7,15 +7,12 @@ platform:
   os: linux
   arch: amd64
 
-workspace:
-#  path: /app/drone/src
-
 steps:
   - name: Build library
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-alpha-9
     commands:
-#      - /app/entrypoint.sh
+      - /root/entrypoint.sh
       - sbt +compile
     environment:
       ARTIFACTORY_PASSWORD:
@@ -29,7 +26,7 @@ steps:
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-alpha-9
     commands:
-#      - /app/entrypoint.sh
+      - /root/entrypoint.sh
       - sbt +publish
     environment:
       ARTIFACTORY_PASSWORD:
@@ -45,7 +42,7 @@ steps:
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-alpha-9
     commands:
-#      - /app/entrypoint.sh
+      - /root/entrypoint.sh
       - sbt --error +test
     environment:
       JAVA_OPTS: -Xmx2g
@@ -78,7 +75,7 @@ steps:
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-alpha-9
     commands:
-#      - /app/entrypoint.sh
+      - /root/entrypoint.sh
       - sbt -mem 4096 --error coverage test | true
       - sbt coverageReport
     environment:
@@ -98,7 +95,7 @@ steps:
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-alpha-9
     commands:
-#      - /app/entrypoint.sh
+      - /root/entrypoint.sh
       - sbt scapegoat | true
     environment:
       ARTIFACTORY_PASSWORD:
@@ -117,7 +114,7 @@ steps:
     pull: if-not-exists
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-alpha-9
     commands:
-#      - /app/entrypoint.sh
+      - /root/entrypoint.sh
       - sbt -mem 4096 dependencyCheck
     environment:
       NVD_BASE_URL: http://nvdmirror:8008
