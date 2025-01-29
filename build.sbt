@@ -31,8 +31,7 @@ lazy val specs2Version = "4.20.9"
 lazy val csvCommonsVersion = "1.13.0"
 lazy val catsVersion = "2.12.0"
 lazy val scribeSlf4jVersion = "3.16.0"
-lazy val h2Version = "2.2.224"
-lazy val sprayJsonVersion = "1.3.6"
+lazy val h2Version = "2.3.232"
 lazy val sslConfigCoreVersion = "0.6.1"
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
@@ -68,7 +67,6 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
       "com.typesafe.akka" %% "akka-persistence-testkit" % akkaVersion % "test",
       "com.typesafe.slick" %% "slick" % slickVersion,
-      "io.spray" %% "spray-json" % sprayJsonVersion,
       "com.h2database" % "h2" % h2Version % Test
     ),
     resolvers ++= Seq(
