@@ -1,8 +1,8 @@
 package uk.gov.homeoffice.drt.db.dao
 
 import slick.dbio.Effect
+import slick.jdbc.PostgresProfile.api._
 import slick.sql.FixedSqlAction
-import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
 import uk.gov.homeoffice.drt.db.tables.{PassengersHourlyRow, PassengersHourlyTable}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.Queue

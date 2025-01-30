@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.db.dao
 
 import slick.dbio.Effect
-import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
+import slick.jdbc.PostgresProfile.api._
 import uk.gov.homeoffice.drt.db.serialisers.StatusDailySerialiser
 import uk.gov.homeoffice.drt.db.tables.{StatusDaily, StatusDailyRow, StatusDailyTable}
 import uk.gov.homeoffice.drt.ports.PortCode

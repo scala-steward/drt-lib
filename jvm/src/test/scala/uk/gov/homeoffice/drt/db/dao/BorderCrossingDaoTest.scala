@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.homeoffice.drt.db.TestDatabase
 import uk.gov.homeoffice.drt.db.serialisers.BorderCrossingSerialiser
-import uk.gov.homeoffice.drt.db.tables.{BorderCrossing, BorderCrossingRow, EGate, GateType, Pcp}
+import uk.gov.homeoffice.drt.db.tables._
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.{T1, T2, T3, Terminal}
 import uk.gov.homeoffice.drt.time.{LocalDate, SDate, UtcDate}
@@ -16,17 +16,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 
 class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
-  private val db = TestDatabase.db
+  private val dao: BorderCrossingDao.type = BorderCrossingDao
 
   import TestDatabase.profile.api._
 
-  private val dao: BorderCrossingDao.type = BorderCrossingDao
-
-  SchemaUtils.printStatements(dao.table.schema.createStatements)
-
   before {
     Await.result(
-      db.run(DBIO.seq(
+      TestDatabase.run(DBIO.seq(
         dao.table.schema.dropIfExists,
         dao.table.schema.createIfNotExists)
       ), 2.second)
@@ -46,9 +42,9 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
       )
       val paxHourlyToInsert = paxHourly.map(ph => BorderCrossingSerialiser.toRow(ph, 0L))
 
-      Await.result(db.run(insert(portCode)(terminal, EGate, paxHourlyToInsert)), 2.second)
+      Await.result(TestDatabase.run(insert(portCode)(terminal, EGate, paxHourlyToInsert)), 2.second)
 
-      val rows = db.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
+      val rows = TestDatabase.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
       rows.toSet.map(BorderCrossingSerialiser.fromRow) should be(paxHourly.toSet)
     }
 
@@ -60,13 +56,13 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         BorderCrossing(portCode, terminal, UtcDate(2020, 1, 1), Pcp, 1, 1),
         BorderCrossing(portCode, terminal, UtcDate(2020, 1, 1), Pcp, 3, 3),
       ).map(ph => BorderCrossingSerialiser.toRow(ph, 0L))
-      Await.result(db.run(insert(portCode)(terminal, Pcp, paxHourly)), 2.second)
+      Await.result(TestDatabase.run(insert(portCode)(terminal, Pcp, paxHourly)), 2.second)
 
       val paxHourlyUpdate = List(
         BorderCrossing(portCode, terminal, UtcDate(2020, 1, 1), Pcp, 1, 1),
         BorderCrossing(portCode, terminal, UtcDate(2020, 1, 1), Pcp, 2, 2),
       ).map(ph => BorderCrossingSerialiser.toRow(ph, 0L))
-      Await.result(db.run(insert(portCode)(terminal, Pcp, paxHourlyUpdate)), 2.second)
+      Await.result(TestDatabase.run(insert(portCode)(terminal, Pcp, paxHourlyUpdate)), 2.second)
 
       val expected = List(
         BorderCrossing(portCode, terminal, UtcDate(2020, 1, 1), Pcp, 1, 1),
@@ -74,7 +70,7 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         BorderCrossing(portCode, terminal, UtcDate(2020, 1, 1), Pcp, 3, 3),
       )
 
-      val rows = db.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
+      val rows = TestDatabase.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
       rows.toSet.map(ph => BorderCrossingSerialiser.fromRow(ph)) should be(expected.toSet)
     }
 
@@ -89,8 +85,8 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         BorderCrossing(otherPortCode, otherTerminal, UtcDate(2020, 1, 1), Pcp, 3, 3),
       ).map(ph => BorderCrossingSerialiser.toRow(ph, 0L))
 
-      Await.result(db.run(insert(portCode)(terminal, Pcp, paxHourly)), 2.second)
-      val rows = db.run(dao.get(otherPortCode.iata, otherTerminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
+      Await.result(TestDatabase.run(insert(portCode)(terminal, Pcp, paxHourly)), 2.second)
+      val rows = TestDatabase.run(dao.get(otherPortCode.iata, otherTerminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
       rows.toSet.map(ph => BorderCrossingSerialiser.fromRow(ph)) should be(Set())
     }
 
@@ -104,8 +100,8 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         BorderCrossing(otherPortCode, terminal, UtcDate(2020, 1, 1), Pcp, 3, 3),
       ).map(ph => BorderCrossingSerialiser.toRow(ph, 0L))
 
-      Await.result(db.run(insert(portCode)(terminal, Pcp, paxHourly)), 2.second)
-      val rows = db.run(dao.get(otherPortCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
+      Await.result(TestDatabase.run(insert(portCode)(terminal, Pcp, paxHourly)), 2.second)
+      val rows = TestDatabase.run(dao.get(otherPortCode.iata, terminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
       rows.toSet.map(ph => BorderCrossingSerialiser.fromRow(ph)) should be(Set())
     }
 
@@ -119,8 +115,8 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         BorderCrossing(portCode, otherTerminal, UtcDate(2020, 1, 1), Pcp, 3, 3),
       ).map(ph => BorderCrossingSerialiser.toRow(ph, 0L))
 
-      Await.result(db.run(insert(portCode)(terminal, Pcp, paxHourly)), 2.second)
-      val rows = db.run(dao.get(portCode.iata, otherTerminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
+      Await.result(TestDatabase.run(insert(portCode)(terminal, Pcp, paxHourly)), 2.second)
+      val rows = TestDatabase.run(dao.get(portCode.iata, otherTerminal.toString, UtcDate(2020, 1, 1).toISOString)).futureValue
       rows.toSet.map(ph => BorderCrossingSerialiser.fromRow(ph)) should be(Set())
     }
   }
@@ -138,15 +134,15 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
       BorderCrossing(portCode, terminal, utcDate, EGate, 1, egatePax),
       BorderCrossing(portCode, terminal, utcDate, Pcp, 23, 10),
     ).map(ph => BorderCrossingSerialiser.toRow(ph, 0L))
-    Await.result(db.run(insert(portCode)(terminal, Pcp, paxHourly)), 2.second)
-    Await.result(db.run(insert(portCode)(terminal, EGate, paxHourly)), 2.second)
+    Await.result(TestDatabase.run(insert(portCode)(terminal, Pcp, paxHourly)), 2.second)
+    Await.result(TestDatabase.run(insert(portCode)(terminal, EGate, paxHourly)), 2.second)
   }
 
   "BorderCrossingQueries totalForPortAndDate" should {
     "return the total passengers for a port and local date (spanning 2 utc dates)" in {
       insertHourlyPax(T2, 50, 25, LocalDate(2023, 6, 10))
 
-      val result = db.run(dao.totalForPortAndDate(portCode.iata, None)(global)(LocalDate(2023, 6, 10))).futureValue
+      val result = TestDatabase.run(dao.totalForPortAndDate(portCode.iata, None)(global)(LocalDate(2023, 6, 10))).futureValue
 
       result should be(75)
     }
@@ -156,11 +152,11 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
       insertHourlyPax(T2, 50, 25, LocalDate(2023, 6, 10))
       insertHourlyPax(T3, 50, 25, LocalDate(2023, 6, 10))
 
-      val resultT2 = db.run(dao.totalForPortAndDate(portCode.iata, Option(T2.toString))(global)(LocalDate(2023, 6, 10))).futureValue
+      val resultT2 = TestDatabase.run(dao.totalForPortAndDate(portCode.iata, Option(T2.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
       resultT2 should be(75)
 
-      val resultT3 = db.run(dao.totalForPortAndDate(portCode.iata, Option(T3.toString))(global)(LocalDate(2023, 6, 10))).futureValue
+      val resultT3 = TestDatabase.run(dao.totalForPortAndDate(portCode.iata, Option(T3.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
       resultT3 should be(75)
     }
@@ -170,14 +166,14 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
       insertHourlyPax(T2, 50, 25, LocalDate(2023, 6, 10))
       insertHourlyPax(T3, 100, 50, LocalDate(2023, 6, 10))
 
-      val resultT2 = db.run(dao.hourlyForPortAndDate(portCode.iata, Option(T2.toString))(global)(LocalDate(2023, 6, 10))).futureValue
+      val resultT2 = TestDatabase.run(dao.hourlyForPortAndDate(portCode.iata, Option(T2.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
       resultT2 should be(Map(
         SDate(2023, 6, 9, 23, 0).millisSinceEpoch -> 50,
         SDate(2023, 6, 10, 1, 0).millisSinceEpoch -> 25,
       ))
 
-      val resultT3 = db.run(dao.hourlyForPortAndDate(portCode.iata, Option(T3.toString))(global)(LocalDate(2023, 6, 10))).futureValue
+      val resultT3 = TestDatabase.run(dao.hourlyForPortAndDate(portCode.iata, Option(T3.toString))(global)(LocalDate(2023, 6, 10))).futureValue
 
       resultT3 should be(Map(
         SDate(2023, 6, 9, 23, 0).millisSinceEpoch -> 100,
@@ -195,7 +191,7 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         BorderCrossing(portCode, terminal, UtcDate(2020, 1, 2), Pcp, 2, 2),
         BorderCrossing(portCode, terminal, UtcDate(2020, 1, 3), Pcp, 3, 3),
       ).map(ph => BorderCrossingSerialiser.toRow(ph, 0L))
-      Await.result(db.run(insert(portCode)(terminal, Pcp, paxHourly)), 2.second)
+      Await.result(TestDatabase.run(insert(portCode)(terminal, Pcp, paxHourly)), 2.second)
 
       Seq(
         (1, Seq(BorderCrossing(portCode, terminal, UtcDate(2020, 1, 1), Pcp, 1, 1))),
@@ -203,12 +199,12 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         (3, Seq(BorderCrossing(portCode, terminal, UtcDate(2020, 1, 3), Pcp, 3, 3))),
       ).map {
         case (date, expected) =>
-          val rows = db.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, date).toISOString)).futureValue
+          val rows = TestDatabase.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, date).toISOString)).futureValue
           rows.toSet.map(BorderCrossingSerialiser.fromRow) should be(expected.toSet)
       }
 
       val date = UtcDate(2020, 1, 3)
-      Await.result(db.run(dao.removeAllBefore(date)), 2.second)
+      Await.result(TestDatabase.run(dao.removeAllBefore(date)), 2.second)
 
       Seq(
         (1, Seq.empty),
@@ -216,7 +212,7 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
         (3, Seq(BorderCrossing(portCode, terminal, UtcDate(2020, 1, 3), Pcp, 3, 3))),
       ).map {
         case (date, expected) =>
-          val rows = db.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, date).toISOString)).futureValue
+          val rows = TestDatabase.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, date).toISOString)).futureValue
           rows.toSet.map(BorderCrossingSerialiser.fromRow) should be(expected.toSet)
       }
     }

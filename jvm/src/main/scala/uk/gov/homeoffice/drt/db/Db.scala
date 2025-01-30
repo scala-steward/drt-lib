@@ -1,10 +1,13 @@
 package uk.gov.homeoffice.drt.db
 
-import com.typesafe.config.ConfigFactory
+import scala.concurrent.Future
 
-object Db {
-  val slickProfile = if (ConfigFactory.load().getString("env") != "test")
-    slick.jdbc.PostgresProfile
-  else
-    slick.jdbc.H2Profile
+
+trait CentralDatabase {
+  val profile: slick.jdbc.JdbcProfile
+  val db: profile.backend.Database
+
+  def run[T](action: profile.api.DBIOAction[T, profile.api.NoStream, Nothing]): Future[T] = {
+    db.run(action)
+  }
 }

@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.db.tables
 
+import slick.jdbc.PostgresProfile.api._
 import slick.lifted.Tag
-import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal

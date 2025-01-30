@@ -10,7 +10,7 @@ platform:
 steps:
   - name: Build library
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-debian12-jdk17-node20
     commands:
       - /root/entrypoint.sh
       - sbt +compile
@@ -22,25 +22,9 @@ steps:
       event:
         - push
 
-  - name: Publish library
-    pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
-    commands:
-      - /root/entrypoint.sh
-      - sbt +publish
-    environment:
-      ARTIFACTORY_PASSWORD:
-        from_secret: ARTIFACTORY_PASSWORD
-      ARTIFACTORY_USERNAME: drt_ci
-    when:
-      event:
-        - push
-    depends_on:
-      - Build library
-
   - name: Unit tests
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-debian12-jdk17-node20
     commands:
       - /root/entrypoint.sh
       - sbt --error +test
@@ -54,6 +38,22 @@ steps:
         - push
     depends_on:
       - Build library
+
+  - name: Publish library
+    pull: if-not-exists
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-debian12-jdk17-node20
+    commands:
+      - /root/entrypoint.sh
+      - sbt +publish
+    environment:
+      ARTIFACTORY_PASSWORD:
+        from_secret: ARTIFACTORY_PASSWORD
+      ARTIFACTORY_USERNAME: drt_ci
+    when:
+      event:
+        - push
+    depends_on:
+      - Unit tests
 
   - name: Slack notification
     pull: if-not-exists
@@ -73,7 +73,7 @@ steps:
 
   - name: Code coverage report
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.0.0
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-debian12-jdk17-node20
     commands:
       - /root/entrypoint.sh
       - sbt -mem 4096 --error coverage test | true
@@ -93,7 +93,7 @@ steps:
 
   - name: Scapegoat
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.0.0
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-debian12-jdk17-node20
     commands:
       - /root/entrypoint.sh
       - sbt scapegoat | true
@@ -112,7 +112,7 @@ steps:
 
   - name: Dependency check
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.0.0
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-debian12-jdk17-node20
     commands:
       - /root/entrypoint.sh
       - sbt -mem 4096 dependencyCheck

@@ -15,8 +15,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 
 class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
-  private val db = TestDatabase.db
-
   import TestDatabase.profile.api._
 
   private val portCode: PortCode = PortCode("LHR")
@@ -27,7 +25,7 @@ class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
 
   before {
     Await.result(
-      db.run(DBIO.seq(
+      TestDatabase.run(DBIO.seq(
         dao.table.schema.dropIfExists,
         dao.table.schema.createIfNotExists)
       ), 2.second)
@@ -37,9 +35,9 @@ class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
     "insert records into an empty table" in {
       val flight = generateFlight(123, 1L, PortCode("JFK"))
 
-      Await.result(db.run(dao.insertOrUpdate(portCode)(flight)), 2.second)
+      Await.result(TestDatabase.run(dao.insertOrUpdate(portCode)(flight)), 2.second)
 
-      val rows = Await.result(db.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 123)), 1.second)
+      val rows = Await.result(TestDatabase.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 123)), 1.second)
       rows should be(Option(flight))
     }
 
@@ -47,10 +45,10 @@ class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
       val flight = generateFlight(123, 1L, PortCode("JFK"))
       val flight2 = generateFlight(123, 1L, PortCode("JFK")).copy(apiFlight = flight.apiFlight.copy(Stand = Option("updated stand")))
 
-      Await.result(db.run(dao.insertOrUpdate(portCode)(flight)), 2.second)
-      Await.result(db.run(dao.insertOrUpdate(portCode)(flight2)), 2.second)
+      Await.result(TestDatabase.run(dao.insertOrUpdate(portCode)(flight)), 2.second)
+      Await.result(TestDatabase.run(dao.insertOrUpdate(portCode)(flight2)), 2.second)
 
-      val rows = Await.result(db.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 123)), 1.second)
+      val rows = Await.result(TestDatabase.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 123)), 1.second)
       rows should be(Option(flight2))
     }
   }
@@ -59,10 +57,10 @@ class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
     "remove records from the table" in {
       val flight = generateFlight(123, 1L, PortCode("JFK"))
 
-      Await.result(db.run(dao.insertOrUpdate(portCode)(flight)), 2.second)
-      Await.result(db.run(dao.remove(portCode)(UniqueArrival(123, T1, 1L, PortCode("JFK")))), 2.second)
+      Await.result(TestDatabase.run(dao.insertOrUpdate(portCode)(flight)), 2.second)
+      Await.result(TestDatabase.run(dao.remove(portCode)(UniqueArrival(123, T1, 1L, PortCode("JFK")))), 2.second)
 
-      val rows = Await.result(db.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 123)), 1.second)
+      val rows = Await.result(TestDatabase.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 123)), 1.second)
       rows should be(None)
     }
   }
@@ -72,15 +70,15 @@ class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
       val flight = generateFlight(123, 1L, PortCode("JFK"))
       val flight2 = generateFlight(124, 1L, PortCode("JFK"))
 
-      Await.result(db.run(dao.insertOrUpdate(portCode)(flight)), 2.second)
-      Await.result(db.run(dao.insertOrUpdate(portCode)(flight2)), 2.second)
+      Await.result(TestDatabase.run(dao.insertOrUpdate(portCode)(flight)), 2.second)
+      Await.result(TestDatabase.run(dao.insertOrUpdate(portCode)(flight2)), 2.second)
       Await.result(
-        db.run(dao.removeMulti(portCode)(Seq(
+        TestDatabase.run(dao.removeMulti(portCode)(Seq(
           UniqueArrival(123, T1, 1L, PortCode("JFK")),
           UniqueArrival(124, T1, 1L, PortCode("JFK"))))),
         2.second)
 
-      val rows = Await.result(db.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 123)), 1.second)
+      val rows = Await.result(TestDatabase.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 123)), 1.second)
       rows should be(None)
     }
 
@@ -88,15 +86,15 @@ class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
       val flight = generateFlight(123, 1L, PortCode("JFK"))
       val flight2 = generateFlight(124, 1L, PortCode("JFK"))
 
-      Await.result(db.run(dao.insertOrUpdate(portCode)(flight)), 2.second)
-      Await.result(db.run(dao.insertOrUpdate(portCode)(flight2)), 2.second)
+      Await.result(TestDatabase.run(dao.insertOrUpdate(portCode)(flight)), 2.second)
+      Await.result(TestDatabase.run(dao.insertOrUpdate(portCode)(flight2)), 2.second)
       Await.result(
-        db.run(dao.removeMulti(portCode)(Seq(UniqueArrival(123, T1, 1L, PortCode("JFK"))))),
+        TestDatabase.run(dao.removeMulti(portCode)(Seq(UniqueArrival(123, T1, 1L, PortCode("JFK"))))),
         2.second)
 
-      val rows = Await.result(db.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 123)), 1.second)
+      val rows = Await.result(TestDatabase.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 123)), 1.second)
       rows should be(None)
-      val rows2 = Await.result(db.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 124)), 1.second)
+      val rows2 = Await.result(TestDatabase.run(dao.get(portCode)(PortCode("JFK"), T1, 1L, 124)), 1.second)
       rows2 should be(Option(flight2))
     }
   }
@@ -107,9 +105,9 @@ class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
         generateFlight(125, SDate("2024-11-11").millisSinceEpoch, PortCode("JFK")),
         generateFlight(125, SDate("2024-11-12").millisSinceEpoch, PortCode("JFK")),
         generateFlight(125, SDate("2024-11-13").millisSinceEpoch, PortCode("JFK")),
-      ).map(flight => Await.result(db.run(dao.insertOrUpdate(portCode)(flight)), 2.second))
+      ).map(flight => Await.result(TestDatabase.run(dao.insertOrUpdate(portCode)(flight)), 2.second))
 
-      Await.result(db.run(dao.removeAllBefore(UtcDate(2024, 11,13))), 2.second)
+      Await.result(TestDatabase.run(dao.removeAllBefore(UtcDate(2024, 11,13))), 2.second)
 
       Seq(
         (SDate("2024-11-11").millisSinceEpoch, None),
@@ -117,7 +115,7 @@ class FlightDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
         (SDate("2024-11-13").millisSinceEpoch, Option(generateFlight(125, SDate("2024-11-13").millisSinceEpoch, PortCode("JFK")))),
       ).map {
         case (minute, expected) =>
-          val rows = Await.result(db.run(dao.get(portCode)(PortCode("JFK"), T1, minute, 125)), 1.second)
+          val rows = Await.result(TestDatabase.run(dao.get(portCode)(PortCode("JFK"), T1, minute, 125)), 1.second)
           rows should be(expected)
       }
     }

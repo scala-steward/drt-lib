@@ -15,8 +15,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 
 class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
-  private val db = TestDatabase.db
-
   import TestDatabase.profile.api._
 
   val dao: QueueSlotDao = QueueSlotDao()
@@ -25,7 +23,7 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
 
   before {
     Await.result(
-      db.run(DBIO.seq(
+      TestDatabase.run(DBIO.seq(
         dao.table.schema.dropIfExists,
         dao.table.schema.createIfNotExists)
       ), 2.second)
@@ -48,9 +46,9 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
         lastUpdated = Option(100L)
       )
 
-      Await.result(db.run(dao.insertOrUpdate(PortCode("LHR"), 15)(crunchMinute)), 2.second)
+      Await.result(TestDatabase.run(dao.insertOrUpdate(PortCode("LHR"), 15)(crunchMinute)), 2.second)
 
-      val rows = Await.result(db.run(dao.get(PortCode("LHR"), 15)(T2, EeaDesk, 1L)), 1.second)
+      val rows = Await.result(TestDatabase.run(dao.get(PortCode("LHR"), 15)(T2, EeaDesk, 1L)), 1.second)
       rows should be(Seq(crunchMinute))
     }
 
@@ -80,10 +78,10 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
         maybeDeployedPaxInQueue = Option(104),
       )
 
-      Await.result(db.run(dao.insertOrUpdate(PortCode("LHR"), 15)(crunchMinute)), 2.second)
-      Await.result(db.run(dao.insertOrUpdate(PortCode("LHR"), 15)(crunchMinute2)), 2.second)
+      Await.result(TestDatabase.run(dao.insertOrUpdate(PortCode("LHR"), 15)(crunchMinute)), 2.second)
+      Await.result(TestDatabase.run(dao.insertOrUpdate(PortCode("LHR"), 15)(crunchMinute2)), 2.second)
 
-      val rows = Await.result(db.run(dao.get(PortCode("LHR"), 15)(T2, EeaDesk, 1L)), 1.second)
+      val rows = Await.result(TestDatabase.run(dao.get(PortCode("LHR"), 15)(T2, EeaDesk, 1L)), 1.second)
       rows should be(Seq(crunchMinute2))
     }
   }
@@ -96,9 +94,9 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
         SDate("2024-11-13").millisSinceEpoch,
       ).map(crunchMinute)
 
-      Await.result(db.run(dao.insertOrUpdateMulti(PortCode("LHR"), 15)(crunchMinutes)), 2.second)
+      Await.result(TestDatabase.run(dao.insertOrUpdateMulti(PortCode("LHR"), 15)(crunchMinutes)), 2.second)
 
-      Await.result(db.run(dao.removeAllBefore(UtcDate(2024, 11, 13))), 2.second)
+      Await.result(TestDatabase.run(dao.removeAllBefore(UtcDate(2024, 11, 13))), 2.second)
 
       Seq(
         (SDate("2024-11-11").millisSinceEpoch, Seq.empty),
@@ -106,7 +104,7 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
         (SDate("2024-11-13").millisSinceEpoch, Seq(crunchMinute(SDate("2024-11-13").millisSinceEpoch))),
       ).map {
         case (minute, expected) =>
-          val rows = Await.result(db.run(dao.get(PortCode("LHR"), 15)(T2, EeaDesk, minute)), 1.second)
+          val rows = Await.result(TestDatabase.run(dao.get(PortCode("LHR"), 15)(T2, EeaDesk, minute)), 1.second)
           rows should be(expected)
       }
     }

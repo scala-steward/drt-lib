@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.db.tables
 
+import slick.jdbc.PostgresProfile.api._
 import slick.lifted.Tag
-import uk.gov.homeoffice.drt.db.Db.slickProfile.api._
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.UtcDate
@@ -57,7 +57,7 @@ class BorderCrossingTable(tag: Tag)
 
   def hour: Rep[Int] = column[Int]("hour", O.SqlType("smallint"))
 
-  def passengers: Rep[Int] = column[Int]("passengers", O.SqlType("smallint"))
+  def passengers: Rep[Int] = column[Int]("passengers")
 
   def updatedAt: Rep[Timestamp] = column[java.sql.Timestamp]("updated_at")
 

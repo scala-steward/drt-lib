@@ -14,13 +14,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 
 class StatusDailyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
-  private val db = TestDatabase.db
-
   import TestDatabase.profile.api._
 
   before {
     Await.result(
-      db.run(DBIO.seq(
+      TestDatabase.run(DBIO.seq(
         StatusDailyDao.table.schema.dropIfExists,
         StatusDailyDao.table.schema.createIfNotExists)
       ), 2.second)
@@ -33,10 +31,10 @@ class StatusDailyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
       val statusDaily = StatusDaily(portCode, terminal, LocalDate(2020, 1, 1), Option(1), Option(1), Option(1), Option(1))
 
       val update = StatusDailyDao.insertOrUpdate(portCode)
-      Await.result(db.run(update(statusDaily)), 2.second)
+      Await.result(TestDatabase.run(update(statusDaily)), 2.second)
 
       val get = StatusDailyDao.get(portCode)
-      val maybeStatusDaily = Await.result(db.run(get(terminal, LocalDate(2020, 1, 1))), 1.second)
+      val maybeStatusDaily = Await.result(TestDatabase.run(get(terminal, LocalDate(2020, 1, 1))), 1.second)
 
       maybeStatusDaily should be(Some(statusDaily))
     }
@@ -54,10 +52,10 @@ class StatusDailyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
 
       val insert = StatusDailyDao.insertOrUpdate(portCode)
       statusDailies.foreach { daily =>
-        Await.result(db.run(insert(daily)), 2.second)
+        Await.result(TestDatabase.run(insert(daily)), 2.second)
       }
       val get = StatusDailyDao.get(portCode)
-      val maybeStatus = Await.result(db.run(get(terminal, LocalDate(2020, 1, 1))), 1.second)
+      val maybeStatus = Await.result(TestDatabase.run(get(terminal, LocalDate(2020, 1, 1))), 1.second)
       maybeStatus should be (Some(StatusDaily(portCode, terminal, LocalDate(2020, 1, 1), Option(3), Option(3), Option(3), Option(3))))
     }
 
@@ -67,13 +65,13 @@ class StatusDailyDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
       val statusDaily = StatusDaily(portCode, terminal, LocalDate(2020, 1, 1), Option(1), Option(1), Option(1), Option(1))
 
       val insert = StatusDailyDao.insertOrUpdate(portCode)
-      Await.result(db.run(insert(statusDaily)), 2.second)
+      Await.result(TestDatabase.run(insert(statusDaily)), 2.second)
 
       val update = StatusDailyDao.setUpdatedAt(portCode)(_.paxLoadsUpdatedAt)
-      Await.result(db.run(update(terminal, LocalDate(2020, 1, 1), 2)), 2.second)
+      Await.result(TestDatabase.run(update(terminal, LocalDate(2020, 1, 1), 2)), 2.second)
 
       val get = StatusDailyDao.get(portCode)
-      val maybeStatusDaily = Await.result(db.run(get(terminal, LocalDate(2020, 1, 1))), 1.second)
+      val maybeStatusDaily = Await.result(TestDatabase.run(get(terminal, LocalDate(2020, 1, 1))), 1.second)
 
       maybeStatusDaily should be(Some(statusDaily.copy(paxLoadsUpdatedAt = Option(2))))
     }
