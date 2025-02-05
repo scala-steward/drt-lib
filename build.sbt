@@ -19,7 +19,8 @@ lazy val root = project.in(file(".")).
     logLevel := Level.Debug
   )
 
-lazy val pekkoVersion = "1.0.1"
+lazy val pekkoVersion = "1.1.1"
+lazy val pekkoHttpVersion = "1.1.0"
 //lazy val akkaHttpVersion = "10.6.3" // last version dependent on akka 2.9.5
 lazy val slickVersion = "3.5.2"
 
@@ -59,8 +60,8 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "org.apache.pekko" %% "pekko-actor" % pekkoVersion,
       "org.apache.pekko" %% "pekko-persistence" % pekkoVersion,
       "org.apache.pekko" %% "pekko-persistence-query" % pekkoVersion,
-      "org.apache.pekko" %% "pekko-http" % pekkoVersion,
-      "org.apache.pekko" %% "pekko-http-spray-json" % pekkoVersion,
+      "org.apache.pekko" %% "pekko-http" % pekkoHttpVersion,
+      "org.apache.pekko" %% "pekko-http-spray-json" % pekkoHttpVersion,
       "org.apache.pekko" %% "pekko-slf4j" % pekkoVersion,
       "joda-time" % "joda-time" % jodaVersion,
       "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion,
