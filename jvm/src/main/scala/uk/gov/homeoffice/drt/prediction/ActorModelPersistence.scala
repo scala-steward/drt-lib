@@ -1,9 +1,9 @@
 package uk.gov.homeoffice.drt.prediction
 
-import akka.Done
-import akka.actor.{ActorRef, ActorSystem, PoisonPill, Props}
-import akka.pattern.ask
-import akka.util.Timeout
+import org.apache.pekko.Done
+import org.apache.pekko.actor.{ActorRef, ActorSystem, PoisonPill, Props}
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.util.Timeout
 import org.apache.spark.ml.regression.LinearRegressionModel
 import uk.gov.homeoffice.drt.actor.PredictionModelActor
 import uk.gov.homeoffice.drt.actor.PredictionModelActor._

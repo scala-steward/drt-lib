@@ -1,8 +1,8 @@
 package uk.gov.homeoffice.drt.keycloak
 
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpRequest, HttpResponse}
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.http.scaladsl.model.{ContentTypes, HttpEntity, HttpRequest, HttpResponse}
 import org.specs2.mutable.Specification
 
 import scala.concurrent.duration._

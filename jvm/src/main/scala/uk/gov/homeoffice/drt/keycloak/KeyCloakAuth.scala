@@ -1,10 +1,10 @@
 package uk.gov.homeoffice.drt.keycloak
 
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers.Accept
-import akka.http.scaladsl.unmarshalling.Unmarshal
-import akka.stream.Materializer
+import org.apache.pekko.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import org.apache.pekko.http.scaladsl.model._
+import org.apache.pekko.http.scaladsl.model.headers.Accept
+import org.apache.pekko.http.scaladsl.unmarshalling.Unmarshal
+import org.apache.pekko.stream.Materializer
 import org.slf4j.{Logger, LoggerFactory}
 import spray.json.{DefaultJsonProtocol, JsNumber, JsObject, JsString, JsValue, RootJsonFormat}
 

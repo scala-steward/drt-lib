@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.db.dao
 
-import akka.actor.ActorSystem
-import akka.stream.scaladsl.Sink
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.scaladsl.Sink
 import org.scalatest.BeforeAndAfter
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.actor
 
-import akka.persistence.SnapshotMetadata
+import org.apache.pekko.persistence.SnapshotMetadata
 import org.slf4j.Logger
 import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 

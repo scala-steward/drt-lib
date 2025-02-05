@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.actor
 
-import akka.actor.Props
+import org.apache.pekko.actor.Props
 import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.DataUpdates.FlightUpdates
 import uk.gov.homeoffice.drt.actor.TerminalDayFeedArrivalActor.{GetState, Query}

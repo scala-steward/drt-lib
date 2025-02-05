@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.actor
 
-import akka.persistence.SaveSnapshotSuccess
+import org.apache.pekko.persistence.SaveSnapshotSuccess
 import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.time.SDate

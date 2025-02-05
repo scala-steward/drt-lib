@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.protobuf
 
-import akka.serialization.SerializerWithStringManifest
+import org.apache.pekko.serialization.SerializerWithStringManifest
 import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.protobuf.messages.Alert.{Alert, AlertSnapshotMessage}
 import uk.gov.homeoffice.drt.protobuf.messages.CrunchState.{RemoveMergeArrivalsRequestMessage, _}
