@@ -1,6 +1,6 @@
 import sbt.Keys.libraryDependencies
 
-lazy val scala = "2.13.15"
+lazy val scala = "2.13.16"
 
 ThisBuild / scalaVersion := scala
 ThisBuild / organization := "uk.gov.homeoffice"
@@ -19,9 +19,8 @@ lazy val root = project.in(file(".")).
     logLevel := Level.Debug
   )
 
-lazy val pekkoVersion = "1.1.1"
+lazy val pekkoVersion = "1.1.3"
 lazy val pekkoHttpVersion = "1.1.0"
-//lazy val akkaHttpVersion = "10.6.3" // last version dependent on akka 2.9.5
 lazy val slickVersion = "3.5.2"
 
 lazy val jodaVersion = "2.12.7"
