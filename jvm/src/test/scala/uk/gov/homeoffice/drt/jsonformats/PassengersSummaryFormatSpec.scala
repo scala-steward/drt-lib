@@ -13,12 +13,12 @@ class PassengersSummaryFormatSpec extends AnyWordSpec {
       val passengersSummary = PassengersSummary(
         "regionName",
         "portCode",
-        Some("terminalName"),
+        Option("terminalName"),
         2,
-        1,
         Map(Queues.EeaDesk -> 1),
-        Some(LocalDate(2020, 1, 1)),
-        Some(1)
+        Map(Queues.EeaDesk -> 2),
+        Option(LocalDate(2020, 1, 1)),
+        Option(1),
       )
       val serialised = passengersSummary.toJson
       val deserialised = serialised.convertTo[PassengersSummary]
