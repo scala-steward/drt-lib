@@ -2,7 +2,8 @@ package uk.gov.homeoffice.drt.db.serialisers
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import uk.gov.homeoffice.drt.db.tables.{BorderCrossing, BorderCrossingRow, EGate, Pcp}
+import uk.gov.homeoffice.drt.db.tables.GateTypes.{EGate, Pcp}
+import uk.gov.homeoffice.drt.db.tables.{BorderCrossing, BorderCrossingRow}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.UtcDate
