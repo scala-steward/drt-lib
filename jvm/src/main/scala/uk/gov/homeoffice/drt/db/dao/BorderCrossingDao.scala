@@ -43,6 +43,18 @@ object BorderCrossingDao {
           _.passengers
         }.sum)
 
+  def queueTotalsForPortAndDate(port: String, maybeTerminal: Option[String])
+                               (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Queue, Int], NoStream, Effect.Read] =
+    localDate => filterPortTerminalDate(port, maybeTerminal, localDate).map(rowsToQueueTotals)
+
+  private def rowsToQueueTotals(rows: Seq[BorderCrossingRow]): Map[Queue, Int] =
+    rows
+      .groupBy(_.gateType)
+      .map {
+        case (gateType, queueRows) =>
+          (queueForGateType(gateType), queueRows.map(_.passengers).sum)
+      }
+
   def hourlyForPortAndDate(port: String, maybeTerminal: Option[String])
                           (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Long, Map[Queue, Int]], NoStream, Effect.Read] =
     localDate =>
@@ -58,16 +70,20 @@ object BorderCrossingDao {
                 val hourMillis = SDate(utcDate).addHours(hour).millisSinceEpoch
                 val byQueue = rows.groupBy(_.gateType).map {
                   case (gateType, queueRows) =>
-                    val queue: Queue = gateType match {
-                      case GateTypes.EGate.value => Queues.EGate
-                      case GateTypes.Pcp.value => Queues.QueueDesk
-                    }
+                    val queue: Queue = queueForGateType(gateType)
                     val queueTotal = queueRows.map(_.passengers).sum
                     queue -> queueTotal
                 }
                 hourMillis -> byQueue
             }
         }
+
+  private def queueForGateType(gateType: String): Queue =
+    gateType match {
+      case GateTypes.EGate.value => Queues.EGate
+      case GateTypes.Pcp.value => Queues.QueueDesk
+    }
+
 
   private def filterLocalDate(rows: Seq[BorderCrossingRow], localDate: LocalDate): Seq[BorderCrossingRow] =
     rows.filter { row =>
