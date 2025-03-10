@@ -14,20 +14,20 @@ object Edi extends AirportConfigLike {
   import AirportConfigDefaults._
 
   private object ProcTimesA1 {
-    val gbr = 26.0
-    val eea = 30.9
-    val b5jssk = 42.6
-    val nvn = 68.5
-    val vn = 86.1
+    val gbr = 26.9
+    val eea = 32.6
+    val b5jssk = 46.8
+    val nvn = 74.2
+    val vn = 85.9
     val egates = 47d
   }
 
   private object ProcTimesA2 {
-    val gbr = 29.7
-    val eea = 35.9
-    val b5jssk = 49.9
-    val nvn = 77.3
-    val vn = 92.9
+    val gbr = 29.2
+    val eea = 36.3
+    val b5jssk = 51.0
+    val nvn = 77.5
+    val vn = 91.7
     val egates = 47d
   }
 
