@@ -141,7 +141,7 @@ object Man extends AirportConfigLike {
     flexedQueues = Set(EeaDesk, NonEeaDesk),
     desksByTerminal = Map[Terminal, Int](
       T1 -> 14,
-      T2 -> 11,
+      T2 -> 32,
       T3 -> 9
     ),
     feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, LiveFeedSource, AclFeedSource)
