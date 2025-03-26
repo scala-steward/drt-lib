@@ -66,9 +66,9 @@ object AirportConfigDefaults {
     eeaNonMachineReadableToDesk -> ProcTimes.eea / 60,
     gbrNationalToDesk -> ProcTimes.gbr / 60,
     gbrNationalChildToDesk -> ProcTimes.gbr / 60,
-    b5jsskToEGate -> ProcTimes.egates,
-    eeaMachineReadableToEGate -> ProcTimes.egates,
-    gbrNationalToEgate -> ProcTimes.egates,
+    b5jsskToEGate -> ProcTimes.egates / 60,
+    eeaMachineReadableToEGate -> ProcTimes.egates / 60,
+    gbrNationalToEgate -> ProcTimes.egates / 60,
     visaNationalToDesk -> ProcTimes.vn / 60,
     nonVisaNationalToDesk -> ProcTimes.nvn / 60
   )
