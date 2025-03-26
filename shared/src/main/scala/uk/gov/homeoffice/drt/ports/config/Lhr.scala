@@ -98,7 +98,7 @@ object Lhr extends AirportConfigLike {
         nonVisaNationalToDesk -> ProcTimesT2.nvn / 60,
         visaNationalToFastTrack -> ProcTimesT2.vn / 60,
         nonVisaNationalToFastTrack -> ProcTimesT2.nvn / 60,
-        transitToTransfer -> 0d,
+        transitToTransfer -> 50d / 60,
       ),
       T3 -> Map(
         b5jsskToDesk -> ProcTimesT3.b5jssk / 60,
@@ -115,7 +115,7 @@ object Lhr extends AirportConfigLike {
         nonVisaNationalToDesk -> ProcTimesT3.nvn / 60,
         visaNationalToFastTrack -> ProcTimesT3.vn / 60,
         nonVisaNationalToFastTrack -> ProcTimesT3.nvn / 60,
-        transitToTransfer -> 0d,
+        transitToTransfer -> 50d / 60,
       ),
       T4 -> Map(
         b5jsskToDesk -> ProcTimesT4.b5jssk / 60,
@@ -132,7 +132,7 @@ object Lhr extends AirportConfigLike {
         nonVisaNationalToDesk -> ProcTimesT4.nvn / 60,
         visaNationalToFastTrack -> ProcTimesT4.vn / 60,
         nonVisaNationalToFastTrack -> ProcTimesT4.nvn / 60,
-        transitToTransfer -> 0d,
+        transitToTransfer -> 50d / 60,
       ),
       T5 -> Map(
         b5jsskToDesk -> ProcTimesT5.b5jssk / 60,
@@ -149,7 +149,7 @@ object Lhr extends AirportConfigLike {
         nonVisaNationalToDesk -> ProcTimesT5.nvn / 60,
         visaNationalToFastTrack -> ProcTimesT5.vn / 60,
         nonVisaNationalToFastTrack -> ProcTimesT5.nvn / 60,
-        transitToTransfer -> 0d,
+        transitToTransfer -> 50d / 60,
       )
     ),
     minMaxDesksByTerminalQueue24Hrs = Map(
