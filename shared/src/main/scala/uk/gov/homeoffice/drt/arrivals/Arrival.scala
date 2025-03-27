@@ -209,6 +209,8 @@ case class Arrival(Operator: Option[Operator],
     case _ => false
   }
 
+  def isDiverted: Boolean = Status.description.toLowerCase.contains("diverted")
+
   override def update(incoming: Arrival): Arrival =
     incoming.copy(
       BaggageReclaimId = if (incoming.BaggageReclaimId.exists(_.nonEmpty)) incoming.BaggageReclaimId else this.BaggageReclaimId,
