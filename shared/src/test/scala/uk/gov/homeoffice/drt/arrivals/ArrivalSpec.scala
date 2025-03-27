@@ -183,4 +183,32 @@ class ArrivalSpec extends Specification {
       ArrivalGeneratorShared.arrival(sch = 0L, passengerSources = Map(ApiFeedSource -> Passengers(Option(21), None))).pcpRange(List(ApiFeedSource)) === (0L to 60000L by 60000)
     }
   }
+
+  "isCancelled" >> {
+    "should be true when the flight's status is cancelled" >> {
+      ArrivalGeneratorShared.arrival(status = ArrivalStatus("cancelled")).isCancelled === true
+    }
+    "should be true when the flight's status is canceled" >> {
+      ArrivalGeneratorShared.arrival(status = ArrivalStatus("canceled")).isCancelled === true
+    }
+    "should be true when the flight's status is deleted" >> {
+      ArrivalGeneratorShared.arrival(status = ArrivalStatus("deleted")).isCancelled === true
+    }
+    "should be false for any other status" >> {
+      Seq("scheduled", "landed", "on chocks", "diverted", "estimated", "expected", "arrived", "departed", "unknown").map { status =>
+        ArrivalGeneratorShared.arrival(status = ArrivalStatus(status)).isCancelled === false
+      }
+    }
+  }
+
+  "isDiverted" >> {
+    "should be true when the flight's status is diverted" >> {
+      ArrivalGeneratorShared.arrival(status = ArrivalStatus("diverted")).isDiverted === true
+    }
+    "should be false for any other status" >> {
+      Seq("scheduled", "landed", "on chocks", "cancelled", "canceled", "deleted", "estimated", "expected", "arrived", "departed", "unknown").map { status =>
+        ArrivalGeneratorShared.arrival(status = ArrivalStatus(status)).isDiverted === false
+      }
+    }
+  }
 }
