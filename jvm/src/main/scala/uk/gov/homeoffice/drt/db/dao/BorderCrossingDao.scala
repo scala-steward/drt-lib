@@ -2,9 +2,10 @@ package uk.gov.homeoffice.drt.db.dao
 
 import slick.dbio.Effect
 import slick.jdbc.PostgresProfile.api._
-import uk.gov.homeoffice.drt.db.tables.{BorderCrossingRow, BorderCrossingTable, GateType}
-import uk.gov.homeoffice.drt.ports.PortCode
+import uk.gov.homeoffice.drt.db.tables.{BorderCrossingRow, BorderCrossingTable, GateType, GateTypes}
+import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
+import uk.gov.homeoffice.drt.ports.{PortCode, Queues}
 import uk.gov.homeoffice.drt.time.{LocalDate, SDate, UtcDate}
 
 import scala.concurrent.ExecutionContext
@@ -42,8 +43,20 @@ object BorderCrossingDao {
           _.passengers
         }.sum)
 
+  def queueTotalsForPortAndDate(port: String, maybeTerminal: Option[String])
+                               (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Queue, Int], NoStream, Effect.Read] =
+    localDate => filterPortTerminalDate(port, maybeTerminal, localDate).map(rowsToQueueTotals)
+
+  private def rowsToQueueTotals(rows: Seq[BorderCrossingRow]): Map[Queue, Int] =
+    rows
+      .groupBy(_.gateType)
+      .map {
+        case (gateType, queueRows) =>
+          (queueForGateType(gateType), queueRows.map(_.passengers).sum)
+      }
+
   def hourlyForPortAndDate(port: String, maybeTerminal: Option[String])
-                          (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Long, Int], NoStream, Effect.Read] =
+                          (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Long, Map[Queue, Int]], NoStream, Effect.Read] =
     localDate =>
       filterPortTerminalDate(port, maybeTerminal, localDate)
         .map {
@@ -55,10 +68,22 @@ object BorderCrossingDao {
               case ((date, hour), rows) =>
                 val utcDate = UtcDate.parse(date).getOrElse(throw new Exception(s"Failed to parse UtcDate from $date"))
                 val hourMillis = SDate(utcDate).addHours(hour).millisSinceEpoch
-                val totalCapacity = rows.map(_.passengers).sum
-                hourMillis -> totalCapacity
+                val byQueue = rows.groupBy(_.gateType).map {
+                  case (gateType, queueRows) =>
+                    val queue: Queue = queueForGateType(gateType)
+                    val queueTotal = queueRows.map(_.passengers).sum
+                    queue -> queueTotal
+                }
+                hourMillis -> byQueue
             }
         }
+
+  private def queueForGateType(gateType: String): Queue =
+    gateType match {
+      case GateTypes.EGate.value => Queues.EGate
+      case GateTypes.Pcp.value => Queues.QueueDesk
+    }
+
 
   private def filterLocalDate(rows: Seq[BorderCrossingRow], localDate: LocalDate): Seq[BorderCrossingRow] =
     rows.filter { row =>
