@@ -15,29 +15,29 @@ object Man extends AirportConfigLike {
   import AirportConfigDefaults._
 
   private object ProcTimesT1 {
-    val gbr = 30.8
-    val eea = 40.9
-    val b5jssk = 52.7
-    val nvn = 89.1
-    val vn = 99.9
+    val gbr = 30.4
+    val eea = 41.2
+    val b5jssk = 52.2
+    val nvn = 87.0
+    val vn = 97.8
     val egates = 44d
   }
 
   private object ProcTimesT2 {
-    val gbr = 30.3
-    val eea = 43.4
-    val b5jssk = 59.8
-    val nvn = 101.3
-    val vn = 98.2
+    val gbr = 30.5
+    val eea = 44.4
+    val b5jssk = 59.9
+    val nvn = 99.0
+    val vn = 95.4
     val egates = 51d
   }
 
   private object ProcTimesT3 {
-    val gbr = 31.8
-    val eea = 39.8
-    val b5jssk = 57.0
-    val nvn = 86.4
-    val vn = 91.6
+    val gbr = 31.4
+    val eea = 39.2
+    val b5jssk = 55.8
+    val nvn = 86.8
+    val vn = 90.1
     val egates = 44d
   }
 
@@ -141,7 +141,7 @@ object Man extends AirportConfigLike {
     flexedQueues = Set(EeaDesk, NonEeaDesk),
     desksByTerminal = Map[Terminal, Int](
       T1 -> 14,
-      T2 -> 11,
+      T2 -> 32,
       T3 -> 9
     ),
     feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, LiveFeedSource, AclFeedSource)

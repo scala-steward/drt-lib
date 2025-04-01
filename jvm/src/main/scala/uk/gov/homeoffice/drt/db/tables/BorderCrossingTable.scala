@@ -2,21 +2,26 @@ package uk.gov.homeoffice.drt.db.tables
 
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.Tag
+import uk.gov.homeoffice.drt.db.tables.GateTypes.{EGate, Pcp}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.UtcDate
 
 import java.sql.Timestamp
 
+
 sealed trait GateType {
   def value: String
 }
 
-case object EGate extends GateType {
-  val value: String = "egate"
-}
-case object Pcp extends GateType {
-  val value: String = "pcp"
+object GateTypes {
+  case object EGate extends GateType {
+    val value: String = "egate"
+  }
+
+  case object Pcp extends GateType {
+    val value: String = "pcp"
+  }
 }
 
 object GateType {

@@ -50,11 +50,11 @@ object AirportConfigDefaults {
   )
 
   private object ProcTimes {
-    val gbr = 22.6
-    val eea = 25.9
-    val b5jssk = 46.0
-    val nvn = 91.3
-    val vn = 101.3
+    val gbr = 22.7
+    val eea = 26.2
+    val b5jssk = 45.5
+    val nvn = 91.4
+    val vn = 99.5
     val egates = 36d
   }
 
@@ -66,9 +66,9 @@ object AirportConfigDefaults {
     eeaNonMachineReadableToDesk -> ProcTimes.eea / 60,
     gbrNationalToDesk -> ProcTimes.gbr / 60,
     gbrNationalChildToDesk -> ProcTimes.gbr / 60,
-    b5jsskToEGate -> ProcTimes.egates,
-    eeaMachineReadableToEGate -> ProcTimes.egates,
-    gbrNationalToEgate -> ProcTimes.egates,
+    b5jsskToEGate -> ProcTimes.egates / 60,
+    eeaMachineReadableToEGate -> ProcTimes.egates / 60,
+    gbrNationalToEgate -> ProcTimes.egates / 60,
     visaNationalToDesk -> ProcTimes.vn / 60,
     nonVisaNationalToDesk -> ProcTimes.nvn / 60
   )

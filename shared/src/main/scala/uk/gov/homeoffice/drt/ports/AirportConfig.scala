@@ -92,6 +92,14 @@ case class AirportConfig(portCode: PortCode,
               assert(minMaxDesksByTerminalQueue24Hrs(terminal).contains(tQueue), s"Missing min/max desks for $tQueue for terminal $terminal @ $portCode")
           }
     }
+    terminalProcessingTimes.foreach {
+      case (terminal, procTimes) =>
+        procTimes.foreach {
+          case (paxTypeAndQueue, procTime) =>
+            assert(procTime > 0.3, s"Processing time for $paxTypeAndQueue at $terminal is too low @ $portCode (${procTime * 60} <= 20s)")
+            assert(procTime < 3, s"Processing time for $paxTypeAndQueue at $terminal is too high @ $portCode (${procTime * 60} >= 180s)")
+        }
+    }
   }
 
   def minDesksByTerminalAndQueue24Hrs: Map[Terminal, Map[Queue, IndexedSeq[Int]]] = minMaxDesksByTerminalQueue24Hrs.mapValues(_.mapValues(_._1.toIndexedSeq).view.toMap).view.toMap
