@@ -1,8 +1,8 @@
 package uk.gov.homeoffice.drt.actor
 
-import akka.actor.ActorRef
-import akka.persistence._
-import akka.util.Timeout
+import org.apache.pekko.actor.ActorRef
+import org.apache.pekko.persistence._
+import org.apache.pekko.util.Timeout
 import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.actor.ConfigActor._

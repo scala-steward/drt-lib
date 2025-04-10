@@ -1,8 +1,8 @@
 package uk.gov.homeoffice.drt.services
 
-import akka.actor.{Actor, ActorSystem, Props}
-import akka.testkit.TestKit
-import akka.util.Timeout
+import org.apache.pekko.actor.{Actor, ActorSystem, Props}
+import org.apache.pekko.testkit.TestKit
+import org.apache.pekko.util.Timeout
 import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
 import org.scalatest.wordspec.AnyWordSpecLike
 import uk.gov.homeoffice.drt.actor.commands.Commands.GetState

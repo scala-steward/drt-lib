@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.actor.commands
 
-import akka.actor.ActorRef
+import org.apache.pekko.actor.ActorRef
 
 object Commands {
   object GetState

@@ -1,12 +1,13 @@
 package uk.gov.homeoffice.drt.actor
 
-import akka.actor.ActorSystem
-import akka.pattern.ask
-import akka.persistence.testkit.scaladsl.PersistenceTestKit
-import akka.persistence.testkit.{PersistenceTestKitPlugin, PersistenceTestKitSnapshotPlugin}
-import akka.testkit.{ImplicitSender, TestKit}
-import akka.util.Timeout
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.persistence.testkit.scaladsl.PersistenceTestKit
+import org.apache.pekko.persistence.testkit.{PersistenceTestKitPlugin, PersistenceTestKitSnapshotPlugin}
+import org.apache.pekko.testkit.{ImplicitSender, TestKit}
+import org.apache.pekko.util.Timeout
 import com.typesafe.config.ConfigFactory
+import org.apache.pekko.actor
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
@@ -113,8 +114,8 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
       val feedArrivals = Seq(arrival)
       Await.ready(terminalDayFeedArrivalActor.ask(feedArrivals), 1.second)
       watch(terminalDayFeedArrivalActor)
-      terminalDayFeedArrivalActor ! akka.actor.PoisonPill
-      expectMsgClass(classOf[akka.actor.Terminated])
+      terminalDayFeedArrivalActor ! actor.PoisonPill
+      expectMsgClass(classOf[actor.Terminated])
 
       val terminalDayFeedArrivalActor2 = system.actorOf(props(1))
 
@@ -126,8 +127,8 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
       val feedArrivals = Seq(arrival)
       Await.ready(terminalDayFeedArrivalActor.ask(feedArrivals), 1.second)
       watch(terminalDayFeedArrivalActor)
-      terminalDayFeedArrivalActor ! akka.actor.PoisonPill
-      expectMsgClass(classOf[akka.actor.Terminated])
+      terminalDayFeedArrivalActor ! actor.PoisonPill
+      expectMsgClass(classOf[actor.Terminated])
 
       val terminalDayFeedArrivalActor2 = system.actorOf(props(2))
 
@@ -156,8 +157,8 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
       val feedArrivals = Seq(arrival)
       Await.ready(terminalDayFeedArrivalActor.ask(feedArrivals), 1.second)
       watch(terminalDayFeedArrivalActor)
-      terminalDayFeedArrivalActor ! akka.actor.PoisonPill
-      expectMsgClass(classOf[akka.actor.Terminated])
+      terminalDayFeedArrivalActor ! actor.PoisonPill
+      expectMsgClass(classOf[actor.Terminated])
 
       val terminalDayFeedArrivalActor2 = system.actorOf(props(1))
 
@@ -169,8 +170,8 @@ class TerminalDayFeedArrivalActorTest extends TestKit(ActorSystem("terminal-day-
       val feedArrivals = Seq(arrival)
       Await.ready(terminalDayFeedArrivalActor.ask(feedArrivals), 1.second)
       watch(terminalDayFeedArrivalActor)
-      terminalDayFeedArrivalActor ! akka.actor.PoisonPill
-      expectMsgClass(classOf[akka.actor.Terminated])
+      terminalDayFeedArrivalActor ! actor.PoisonPill
+      expectMsgClass(classOf[actor.Terminated])
 
       val terminalDayFeedArrivalActor2 = system.actorOf(props(2))
 

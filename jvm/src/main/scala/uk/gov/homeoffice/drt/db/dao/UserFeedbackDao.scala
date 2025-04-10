@@ -1,6 +1,6 @@
 package uk.gov.homeoffice.drt.db.dao
 
-import akka.stream.scaladsl.Source
+import org.apache.pekko.stream.scaladsl.Source
 import slick.jdbc.PostgresProfile.api._
 import slick.lifted.TableQuery
 import uk.gov.homeoffice.drt.db.CentralDatabase

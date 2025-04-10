@@ -1,9 +1,9 @@
 package uk.gov.homeoffice.drt.actor.acking
 
-import akka.actor.ActorRef
-import akka.pattern.StatusReply.Ack
-import akka.pattern.ask
-import akka.util.Timeout
+import org.apache.pekko.actor.ActorRef
+import org.apache.pekko.pattern.StatusReply.Ack
+import org.apache.pekko.pattern.ask
+import org.apache.pekko.util.Timeout
 
 import scala.concurrent.ExecutionContext
 

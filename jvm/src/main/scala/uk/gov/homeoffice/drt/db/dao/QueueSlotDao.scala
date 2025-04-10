@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.db.dao
 
-import akka.NotUsed
-import akka.stream.scaladsl.Source
+import org.apache.pekko.NotUsed
+import org.apache.pekko.stream.scaladsl.Source
 import slick.dbio.Effect
 import slick.jdbc.PostgresProfile.api._
 import uk.gov.homeoffice.drt.db.serialisers.QueueSlotSerialiser

@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.actor
 
-import akka.pattern.StatusReply.Ack
-import akka.persistence.{RecoveryCompleted, SnapshotMetadata, SnapshotOffer}
+import org.apache.pekko.pattern.StatusReply.Ack
+import org.apache.pekko.persistence.{RecoveryCompleted, SnapshotMetadata, SnapshotOffer}
 import org.apache.spark.ml.regression.LinearRegressionModel
 import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage

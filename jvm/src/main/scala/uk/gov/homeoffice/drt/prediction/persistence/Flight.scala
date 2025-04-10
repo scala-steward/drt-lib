@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.prediction.persistence
 
-import akka.actor.ActorSystem
-import akka.util.Timeout
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.util.Timeout
 import uk.gov.homeoffice.drt.prediction.category.FlightCategory
 import uk.gov.homeoffice.drt.prediction.{ActorModelPersistence, ModelCategory}
 

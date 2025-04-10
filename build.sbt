@@ -1,6 +1,6 @@
 import sbt.Keys.libraryDependencies
 
-lazy val scala = "2.13.15"
+lazy val scala = "2.13.16"
 
 ThisBuild / scalaVersion := scala
 ThisBuild / organization := "uk.gov.homeoffice"
@@ -19,8 +19,8 @@ lazy val root = project.in(file(".")).
     logLevel := Level.Debug
   )
 
-lazy val akkaVersion = "2.9.5" // last version with license key requirement
-lazy val akkaHttpVersion = "10.6.3" // last version dependent on akka 2.9.5
+lazy val pekkoVersion = "1.1.3"
+lazy val pekkoHttpVersion = "1.1.0"
 lazy val slickVersion = "3.5.2"
 
 lazy val jodaVersion = "2.12.7"
@@ -48,7 +48,6 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "com.outr" %% "scribe-slf4j" % scribeSlf4jVersion
     ),
     resolvers ++= Seq(
-      "Akka library repository".at("https://repo.akka.io/maven"),
       "Artifactory Snapshot Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-snapshot/",
       "Artifactory Release Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-release/"
     )
@@ -56,21 +55,18 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
   jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe" %% "ssl-config-core" % sslConfigCoreVersion,
-      "com.typesafe.akka" %% "akka-actor" % akkaVersion,
-      "com.typesafe.akka" %% "akka-persistence" % akkaVersion,
-      "com.typesafe.akka" %% "akka-persistence-query" % akkaVersion,
-      "com.typesafe.akka" %% "akka-http" % akkaHttpVersion,
-      "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
-      "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
+      "org.apache.pekko" %% "pekko-actor" % pekkoVersion,
+      "org.apache.pekko" %% "pekko-persistence" % pekkoVersion,
+      "org.apache.pekko" %% "pekko-persistence-query" % pekkoVersion,
+      "org.apache.pekko" %% "pekko-http" % pekkoHttpVersion,
+      "org.apache.pekko" %% "pekko-http-spray-json" % pekkoHttpVersion,
+      "org.apache.pekko" %% "pekko-slf4j" % pekkoVersion,
       "joda-time" % "joda-time" % jodaVersion,
       "org.apache.spark" %% "spark-mllib" % sparkMlLibVersion,
-      "com.typesafe.akka" %% "akka-testkit" % akkaVersion % "test",
-      "com.typesafe.akka" %% "akka-persistence-testkit" % akkaVersion % "test",
+      "org.apache.pekko" %% "pekko-testkit" % pekkoVersion % "test",
+      "org.apache.pekko" %% "pekko-persistence-testkit" % pekkoVersion % "test",
       "com.typesafe.slick" %% "slick" % slickVersion,
       "com.h2database" % "h2" % h2Version % Test
-    ),
-    resolvers ++= Seq(
-      "Akka library repository".at("https://repo.akka.io/maven"),
     ),
     Test / parallelExecution := false,
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
