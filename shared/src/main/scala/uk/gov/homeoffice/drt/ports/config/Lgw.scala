@@ -32,6 +32,14 @@ object Lgw extends AirportConfigLike {
     val egates = 47d
   }
 
+  private val egateUptake = 0.81
+
+  private val queueRatios: Map[PaxType, Seq[(Queue, Double)]] = defaultQueueRatios ++ Map(
+    EeaMachineReadable -> List(EGate -> egateUptake, EeaDesk -> (1.0 - egateUptake)),
+    GBRNational -> List(EGate -> egateUptake, EeaDesk -> (1.0 - egateUptake)),
+    B5JPlusNational -> List(EGate -> egateUptake, EeaDesk -> (1.0 - egateUptake)),
+  )
+
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("LGW"),
     portName = "London Gatwick",
@@ -100,14 +108,9 @@ object Lgw extends AirportConfigLike {
     ),
     role = LGW,
     terminalPaxTypeQueueAllocation = Map(
-      N -> (defaultQueueRatios + (EeaMachineReadable -> List(
-        EGate -> 0.8244,
-        EeaDesk -> (1.0 - 0.8244)
-      ))),
-      S -> (defaultQueueRatios + (EeaMachineReadable -> List(
-        EGate -> 0.8375,
-        EeaDesk -> (1.0 - 0.8375)
-      )))),
+      N -> queueRatios,
+      S -> queueRatios
+    ),
     feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, LiveFeedSource, ForecastFeedSource, AclFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),
     desksByTerminal = Map[Terminal, Int](N -> 31, S -> 28)
