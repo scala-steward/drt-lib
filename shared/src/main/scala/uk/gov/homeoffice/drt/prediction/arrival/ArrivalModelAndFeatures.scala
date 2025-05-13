@@ -42,11 +42,15 @@ trait ArrivalModelAndFeatures extends ModelAndFeatures {
   }
 
   def updatePrediction(arrival: Arrival, minimumImprovementPctThreshold: Int, upperThreshold: Option[Int], now: SDateLike): Arrival = {
-    val updatedPredictions: Map[String, Int] = maybePrediction(arrival, minimumImprovementPctThreshold, upperThreshold) match {
-      case None => arrival.Predictions.predictions.removed(targetName)
-      case Some(update) => arrival.Predictions.predictions.updated(targetName, update)
+    val updatedPredictions = maybePrediction(arrival, minimumImprovementPctThreshold, upperThreshold) match {
+      case None =>
+        arrival.Predictions.copy(predictions = arrival.Predictions.predictions.removed(targetName), lastUpdated = now.millisSinceEpoch)
+      case Some(update) if !arrival.Predictions.predictions.get(targetName).contains(update) =>
+        arrival.Predictions.copy(predictions = arrival.Predictions.predictions.updated(targetName, update), lastUpdated = now.millisSinceEpoch)
+      case Some(_) =>
+        arrival.Predictions
     }
-    arrival.copy(Predictions = arrival.Predictions.copy(predictions = updatedPredictions, lastChecked = now.millisSinceEpoch))
+    arrival.copy(Predictions = updatedPredictions)
   }
 
 }

@@ -48,7 +48,7 @@ case class PaxSource(feedSource: FeedSource, passengers: Passengers) {
 
 }
 
-case class Predictions(lastChecked: Long, predictions: Map[String, Int])
+case class Predictions(lastUpdated: Long, predictions: Map[String, Int])
 
 case class Arrival(Operator: Option[Operator],
                    CarrierCode: CarrierCode,
