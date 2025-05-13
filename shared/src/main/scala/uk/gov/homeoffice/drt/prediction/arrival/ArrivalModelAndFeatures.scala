@@ -40,13 +40,4 @@ trait ArrivalModelAndFeatures extends ModelAndFeatures {
     }
     maybeMaybePrediction.flatten
   }
-
-  def updatePrediction(arrival: Arrival, minimumImprovementPctThreshold: Int, upperThreshold: Option[Int], now: SDateLike): Arrival = {
-    val updatedPredictions: Map[String, Int] = maybePrediction(arrival, minimumImprovementPctThreshold, upperThreshold) match {
-      case None => arrival.Predictions.predictions.removed(targetName)
-      case Some(update) => arrival.Predictions.predictions.updated(targetName, update)
-    }
-    arrival.copy(Predictions = arrival.Predictions.copy(predictions = updatedPredictions, lastChecked = now.millisSinceEpoch))
-  }
-
 }

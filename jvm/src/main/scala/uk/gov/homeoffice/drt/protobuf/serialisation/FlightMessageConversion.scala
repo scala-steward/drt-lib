@@ -201,7 +201,7 @@ object FlightMessageConversion {
 
   def apiFlightToFlightMessage(apiFlight: Arrival): FlightMessage = {
     val maybePredictionsMessage = Option(PredictionsMessage(
-      Option(apiFlight.Predictions.lastChecked),
+      Option(apiFlight.Predictions.lastUpdated),
       apiFlight.Predictions.predictions.map(p => PredictionIntMessage(Option(p._1), Option(p._2))).toList
     ))
 
@@ -242,7 +242,7 @@ object FlightMessageConversion {
 
   def predictionsToMessage(predictions: Predictions): PredictionsMessage =
     PredictionsMessage(
-      updatedAt = Option(predictions.lastChecked),
+      updatedAt = Option(predictions.lastUpdated),
       predictions = predictions.predictions.map(predictionIntToMessage).toList
     )
 
