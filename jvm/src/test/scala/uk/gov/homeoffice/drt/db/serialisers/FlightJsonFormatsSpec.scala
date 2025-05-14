@@ -17,5 +17,14 @@ class FlightJsonFormatsSpec extends AnyWordSpec with Matchers with FlightJsonFor
       val expected = Predictions(1747211437085L, Map("walk-time" -> 563, "to-chox" -> 8))
       json.parseJson.convertTo[Predictions] shouldEqual expected
     }
+    "serialise and deserialise without data loss" in {
+      val predictions = Predictions(
+        lastUpdated = 1747211437085L,
+        predictions = Map("walk-time" -> 563, "to-chox" -> 8)
+      )
+      val json = predictions.toJson
+      val deserialized = json.convertTo[Predictions]
+      deserialized shouldEqual predictions
+    }
   }
 }
