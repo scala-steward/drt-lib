@@ -14,7 +14,24 @@ import java.sql.Timestamp
 
 
 trait FlightJsonFormats extends DefaultJsonProtocol {
-  implicit val flightJsonFormat: RootJsonFormat[Predictions] = jsonFormat2(Predictions)
+  implicit object PredictionsJsonFormat extends RootJsonFormat[Predictions] {
+    override def read(json: JsValue): Predictions = json match {
+      case JsObject(fields) =>
+        val lastUpdated = fields.getOrElse("lastUpdated", fields.getOrElse("lastChecked", JsNumber(0))).convertTo[Long]
+        val predictionValues = fields.get("predictions") match {
+          case Some(JsObject(predFields)) =>
+            predFields.collect {
+              case (key, JsNumber(value)) => key -> value.toInt
+            }
+        }
+        Predictions(lastUpdated, predictionValues)
+    }
+
+    override def write(obj: Predictions): JsValue = JsObject(Map(
+      "lastUpdated" -> JsNumber(obj.lastUpdated),
+      "predictions" -> JsObject(obj.predictions.map { case (key, value) => key -> JsNumber(value) })
+    ))
+  }
 
   implicit object FeedSourceJsonFormat extends RootJsonFormat[FeedSource] {
     override def read(json: JsValue): FeedSource = json match {
