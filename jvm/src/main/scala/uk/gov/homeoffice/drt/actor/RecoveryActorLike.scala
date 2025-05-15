@@ -67,6 +67,7 @@ trait RecoveryActorLike extends PersistentActor with RecoveryLogging {
       log.debug(s"Persisting $messageBytes bytes of ${message.getClass}")
 
       context.system.eventStream.publish(message)
+      println(s"\n$persistenceId persisted message ${message.getClass} with size $messageBytes bytes")
       bytesSinceSnapshotCounter += messageBytes
       messagesPersistedSinceSnapshotCounter += 1
       logCounters(bytesSinceSnapshotCounter, messagesPersistedSinceSnapshotCounter, snapshotBytesThreshold, maybeSnapshotInterval)

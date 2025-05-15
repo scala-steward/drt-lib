@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.jsonformats
 
 import spray.json.{DefaultJsonProtocol, JsArray, JsNumber, JsObject, JsString, JsValue, RootJsonFormat, enrichAny}
-import uk.gov.homeoffice.drt.model.{PassengersSummaries, PassengersSummary}
+import uk.gov.homeoffice.drt.models.{PassengersSummaries, PassengersSummary}
 import uk.gov.homeoffice.drt.ports.Queues
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.time.LocalDate

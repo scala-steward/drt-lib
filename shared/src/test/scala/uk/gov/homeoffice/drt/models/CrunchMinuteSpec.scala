@@ -1,4 +1,4 @@
-package uk.gov.homeoffice.drt.model
+package uk.gov.homeoffice.drt.models
 
 import org.specs2.mutable.Specification
 import uk.gov.homeoffice.drt.ports.Queues.EeaDesk

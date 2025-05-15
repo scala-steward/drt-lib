@@ -6,7 +6,7 @@ import slick.dbio.Effect
 import slick.jdbc.PostgresProfile.api._
 import uk.gov.homeoffice.drt.db.serialisers.QueueSlotSerialiser
 import uk.gov.homeoffice.drt.db.tables.{QueueSlotRow, QueueSlotTable}
-import uk.gov.homeoffice.drt.model.CrunchMinute
+import uk.gov.homeoffice.drt.models.CrunchMinute
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
