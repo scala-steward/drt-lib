@@ -4,7 +4,7 @@ import org.slf4j.LoggerFactory
 import uk.gov.homeoffice.drt.Nationality
 import uk.gov.homeoffice.drt.arrivals.CarrierCode
 import uk.gov.homeoffice.drt.arrivals.EventTypes.DC
-import uk.gov.homeoffice.drt.db.AggregatedDbTables
+import uk.gov.homeoffice.drt.db.CentralDatabase
 import uk.gov.homeoffice.drt.models._
 import uk.gov.homeoffice.drt.ports.{PaxAge, PortCode}
 import uk.gov.homeoffice.drt.time.SDate
@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 object ApiManifestProvider {
   private val log = LoggerFactory.getLogger(getClass)
 
-  def apply(tables: AggregatedDbTables)(implicit ec: ExecutionContext): UniqueArrivalKey => Future[Option[VoyageManifest]] =
+  def apply(tables: CentralDatabase)(implicit ec: ExecutionContext): UniqueArrivalKey => Future[Option[VoyageManifest]] =
     uniqueArrivalKey => {
 
       import tables.profile.api._
@@ -56,7 +56,7 @@ object ApiManifestProvider {
             }
           }
 
-      tables.run(query).map {
+      tables.db.run(query).map {
           case pax if pax.isEmpty => None
           case pax =>
             Option(VoyageManifest(

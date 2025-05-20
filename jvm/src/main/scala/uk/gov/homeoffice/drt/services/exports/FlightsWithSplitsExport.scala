@@ -37,10 +37,12 @@ trait FlightsWithSplitsExport {
 
   private def flightToCsvRow(fws: ApiFlightWithSplits, maybeManifest: Option[VoyageManifest]): String = rowValues(fws, maybeManifest).mkString(",")
 
+  def prepend: Option[String] = Option(headings)
+
   def csvStream(flightsStream: Source[(Iterable[ApiFlightWithSplits], VoyageManifests), NotUsed]): Source[String, NotUsed] =
     filterAndSort(flightsStream)
       .map { case (fws, maybeManifest) => flightToCsvRow(fws, maybeManifest) + "\n" }
-      .prepend(Source(List(headings + "\n")))
+      .prepend(Source(List(prepend.map(_ + "\n").getOrElse(""))))
 
   private def filterAndSort(flightsStream: Source[(Iterable[ApiFlightWithSplits], VoyageManifests), NotUsed],
                            ): Source[(ApiFlightWithSplits, Option[VoyageManifest]), NotUsed] =
