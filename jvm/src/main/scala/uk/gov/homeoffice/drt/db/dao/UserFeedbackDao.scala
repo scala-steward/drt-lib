@@ -23,7 +23,7 @@ case class UserFeedbackDao(appDb: CentralDatabase) extends IUserFeedbackDao {
   val table: TableQuery[UserFeedbackTable] = TableQuery[UserFeedbackTable]
 
   override def insertOrUpdate(userFeedbackRow: UserFeedbackRow): Future[Int] = {
-    appDb.db.run(table insertOrUpdate userFeedbackRow)
+    appDb.run(table insertOrUpdate userFeedbackRow)
   }
 
   override def selectAllAsStream(): Source[UserFeedbackRow, _] = {
@@ -31,8 +31,8 @@ case class UserFeedbackDao(appDb: CentralDatabase) extends IUserFeedbackDao {
   }
 
   override def selectAll()(implicit executionContext: ExecutionContext): Future[Seq[UserFeedbackRow]] = {
-    appDb.db.run(table.result).mapTo[Seq[UserFeedbackRow]]
+    appDb.run(table.result).mapTo[Seq[UserFeedbackRow]]
   }
 
-  override def selectByEmail(email: String): Future[Seq[UserFeedbackRow]] = appDb.db.run(table.filter(_.email === email).result)
+  override def selectByEmail(email: String): Future[Seq[UserFeedbackRow]] = appDb.run(table.filter(_.email === email).result)
 }

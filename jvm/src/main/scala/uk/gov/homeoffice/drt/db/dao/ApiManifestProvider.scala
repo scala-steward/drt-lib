@@ -56,7 +56,7 @@ object ApiManifestProvider {
             }
           }
 
-      tables.db.run(query).map {
+      tables.run(query).map {
           case pax if pax.isEmpty => None
           case pax =>
             Option(VoyageManifest(

@@ -23,9 +23,7 @@ trait AggregatedDbTables extends CentralDatabase {
   def run[R](a: DBIOAction[R, NoStream, Nothing]): Future[R]
 
   import profile.api._
-  // NOTE: GetResult mappers for plain SQL are only generated for tables where Slick knows how to map the types of all columns.
 
-  /** DDL for all tables. Call .create to execute. */
   lazy val schema: profile.SchemaDescription = voyageManifestPassengerInfo.schema ++ processedJson.schema ++ processedZip.schema
 
   private val maybeSchema = profile match {
