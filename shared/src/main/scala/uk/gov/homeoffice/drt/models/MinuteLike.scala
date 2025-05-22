@@ -1,4 +1,4 @@
-package uk.gov.homeoffice.drt.model
+package uk.gov.homeoffice.drt.models
 
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch

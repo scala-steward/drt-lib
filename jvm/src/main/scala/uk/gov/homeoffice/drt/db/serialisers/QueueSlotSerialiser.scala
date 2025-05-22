@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.db.serialisers
 
 import uk.gov.homeoffice.drt.db.tables.QueueSlotRow
-import uk.gov.homeoffice.drt.model.CrunchMinute
+import uk.gov.homeoffice.drt.models.CrunchMinute
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
