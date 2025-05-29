@@ -7,6 +7,7 @@ import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.time.LocalDate
 
 import scala.collection.immutable.SortedMap
 
@@ -20,9 +21,9 @@ object Ema extends AirportConfigLike {
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("EMA"),
     portName = "East Midlands",
-    queuesByTerminal = SortedMap(
+    queuesByTerminal = SortedMap(LocalDate(2014, 1, 1) -> SortedMap(
       T1 -> Seq(Queues.QueueDesk, Queues.EGate)
-    ),
+    )),
     divertedQueues = Map(
       Queues.NonEeaDesk -> Queues.QueueDesk,
       Queues.EeaDesk -> Queues.QueueDesk

@@ -1,11 +1,10 @@
 package uk.gov.homeoffice.drt.ports.config
 
 import uk.gov.homeoffice.drt.auth.Roles.NWI
-import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues.{eeaMachineReadableToDesk, eeaNonMachineReadableToDesk, nonVisaNationalToDesk, visaNationalToDesk}
 import uk.gov.homeoffice.drt.ports.Queues._
-import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.time.LocalDate
 
 import scala.collection.immutable.SortedMap
 import scala.concurrent.duration.DurationDouble
@@ -17,9 +16,9 @@ object Nwi extends AirportConfigLike {
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("NWI"),
     portName = "Norwich",
-    queuesByTerminal = SortedMap(
+    queuesByTerminal = SortedMap(LocalDate(2014, 1, 1) -> SortedMap(
       T1 -> Seq(Queues.EeaDesk, Queues.NonEeaDesk)
-    ),
+    )),
     slaByQueue = Map(
       Queues.EeaDesk -> 25,
       Queues.NonEeaDesk -> 45

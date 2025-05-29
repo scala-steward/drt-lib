@@ -6,6 +6,7 @@ import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
 import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.time.LocalDate
 
 import scala.collection.immutable.SortedMap
 
@@ -25,9 +26,9 @@ object Ltn extends AirportConfigLike {
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("LTN"),
     portName = "Luton",
-    queuesByTerminal = SortedMap(
+    queuesByTerminal = SortedMap(LocalDate(2014, 1, 1) -> SortedMap(
       T1 -> Seq(EeaDesk, EGate, NonEeaDesk)
-    ),
+    )),
     slaByQueue = defaultSlas,
     defaultWalkTimeMillis = Map(T1 -> 300000L),
     terminalPaxSplits = Map(T1 -> defaultPaxSplits),

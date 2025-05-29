@@ -3,9 +3,9 @@ package uk.gov.homeoffice.drt.ports.config
 import uk.gov.homeoffice.drt.auth.Roles.LPL
 import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
 import uk.gov.homeoffice.drt.ports.Queues._
-import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.time.LocalDate
 
 import scala.collection.immutable.SortedMap
 
@@ -16,9 +16,9 @@ object Lpl extends AirportConfigLike {
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("LPL"),
     portName = "Liverpool",
-    queuesByTerminal = SortedMap(
+    queuesByTerminal = SortedMap(LocalDate(2014, 1, 1) -> SortedMap(
       T1 -> Seq(Queues.NonEeaDesk, Queues.EeaDesk)
-    ),
+    )),
     slaByQueue = Map(
       Queues.EeaDesk -> 25,
       Queues.NonEeaDesk -> 45

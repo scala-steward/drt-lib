@@ -7,6 +7,7 @@ import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.time.LocalDate
 
 import scala.collection.immutable.SortedMap
 
@@ -27,8 +28,14 @@ object Bhx extends AirportConfigLike {
     portCode = PortCode("BHX"),
     portName = "Birmingham",
     queuesByTerminal = SortedMap(
-      T1 -> Seq(EeaDesk, EGate, NonEeaDesk),
-      T2 -> Seq(EeaDesk, NonEeaDesk)
+      LocalDate(2014, 1, 1) -> SortedMap(
+        T1 -> Seq(EeaDesk, EGate, NonEeaDesk),
+        T2 -> Seq(EeaDesk, NonEeaDesk)
+      ),
+      LocalDate(2025, 6, 4) -> SortedMap(
+        T1 -> Seq(EeaDesk, EGate, NonEeaDesk),
+        T2 -> Seq(QueueDesk)
+      ),
     ),
     slaByQueue = defaultSlas,
     defaultWalkTimeMillis = Map(T1 -> 240000L, T2 -> 240000L),

@@ -4,6 +4,7 @@ import uk.gov.homeoffice.drt.auth.Roles.CWL
 import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.time.LocalDate
 
 import scala.collection.immutable.SortedMap
 
@@ -14,9 +15,9 @@ object Cwl extends AirportConfigLike {
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("CWL"),
     portName = "Cardiff",
-    queuesByTerminal = SortedMap(
+    queuesByTerminal = SortedMap(LocalDate(2014, 1, 1) -> SortedMap(
       T1 -> Seq(Queues.NonEeaDesk, Queues.EeaDesk, Queues.EGate)
-    ),
+    )),
     slaByQueue = Map(
       Queues.EeaDesk -> 25,
       Queues.NonEeaDesk -> 45,
