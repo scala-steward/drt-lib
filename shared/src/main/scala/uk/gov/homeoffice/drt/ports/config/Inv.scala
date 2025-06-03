@@ -17,18 +17,18 @@ object Inv extends AirportConfigLike {
     portCode = PortCode("INV"),
     portName = "Inverness",
     queuesByTerminal = SortedMap(LocalDate(2014, 1, 1) -> SortedMap(
-      T1 -> Seq(Queues.EeaDesk, Queues.NonEeaDesk)
+      T1 -> Seq(EeaDesk, NonEeaDesk)
     )),
     slaByQueue = Map(
-      Queues.EeaDesk -> 25,
-      Queues.NonEeaDesk -> 45
+      EeaDesk -> 25,
+      NonEeaDesk -> 45
     ),
     defaultWalkTimeMillis = Map(T1 -> 1.minutes.toMillis),
     terminalPaxSplits = Map(T1 -> defaultPaxSplitsWithoutEgates),
     terminalProcessingTimes = Map(T1 -> defaultProcessingTimes),
     minMaxDesksByTerminalQueue24Hrs = Map(T1 -> Map(
-      Queues.EeaDesk -> (List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)),
-      Queues.NonEeaDesk -> (List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
+      EeaDesk -> (List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)),
+      NonEeaDesk -> (List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1))
     )),
     eGateBankSizes = Map(),
     role = INV,

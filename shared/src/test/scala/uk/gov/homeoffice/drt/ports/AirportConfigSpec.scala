@@ -5,7 +5,6 @@ import org.specs2.specification.core.Fragment
 import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.Terminals.{T1, T2, Terminal}
 import uk.gov.homeoffice.drt.ports.config._
-import uk.gov.homeoffice.drt.service.QueueConfig
 
 class AirportConfigSpec extends Specification {
   "Airport Config" >> {
@@ -22,9 +21,9 @@ class AirportConfigSpec extends Specification {
     }
 
 
-    splitOrder(Lhr, T2, List(Queues.EGate, Queues.EeaDesk, Queues.NonEeaDesk, Queues.FastTrack))
-    splitOrder(Ema, T1, List(Queues.EGate, Queues.EeaDesk, Queues.NonEeaDesk))
-    splitOrder(Bhx, T1, List(Queues.EGate, Queues.EeaDesk, Queues.NonEeaDesk))
+    splitOrder(Lhr, T2, List(Queues.EeaDesk, Queues.EGate, Queues.NonEeaDesk, Queues.FastTrack))
+    splitOrder(Ema, T1, List(Queues.EeaDesk, Queues.EGate, Queues.NonEeaDesk))
+    splitOrder(Bhx, T1, List(Queues.EeaDesk, Queues.EGate, Queues.NonEeaDesk))
     splitOrder(Bhx, T2, List(Queues.EeaDesk, Queues.NonEeaDesk))
 
 //    "EMA config should give a list of queues with their relevant diversions" >> {

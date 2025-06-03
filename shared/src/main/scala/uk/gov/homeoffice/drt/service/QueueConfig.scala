@@ -1,5 +1,6 @@
 package uk.gov.homeoffice.drt.service
 
+import uk.gov.homeoffice.drt.ports.Queues
 import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.time.LocalDate
@@ -13,11 +14,13 @@ object QueueConfig {
         case (configDate, _) => configDate <= queryDate
       }
 
-      relevantDates.toSeq.reverse.headOption
+      val queues = relevantDates.toSeq.reverse.headOption
         .map {
           case (_, terminalQueues) => terminalQueues.getOrElse(terminal, Seq.empty[Queue])
         }
         .getOrElse(Seq.empty[Queue])
+
+      Queues.queueOrder.filter(queues.contains)
     }
 
   def terminalsForDate(configOverTime: SortedMap[LocalDate, Map[Terminal, Seq[Queue]]]): LocalDate => Seq[Terminal] =
@@ -60,7 +63,7 @@ object QueueConfig {
   def allTerminalsIncludingHistoric(configOverTime: SortedMap[LocalDate, Map[Terminal, Seq[Queue]]]): Seq[Terminal] =
     configOverTime.values.flatMap(_.keys).toSet.toSeq.sorted
 
-  def queuesForDateRangeAndTerminal(configOverTime: SortedMap[LocalDate, Map[Terminal, Seq[Queue]]]): (LocalDate, LocalDate, Terminal) => Set[Queue] =
+  def queuesForDateRangeAndTerminal(configOverTime: SortedMap[LocalDate, Map[Terminal, Seq[Queue]]]): (LocalDate, LocalDate, Terminal) => Seq[Queue] =
     (start: LocalDate, end: LocalDate, terminal: Terminal) => {
       val firstConfigDate = maybeMostRecentDate(configOverTime.keys.filter(_ <= start), start)
       val lastConfigDate = maybeMostRecentDate(configOverTime.keys.filter(_ <= end), end)
@@ -69,15 +72,16 @@ object QueueConfig {
         firstDate <- firstConfigDate
         lastDate <- lastConfigDate
       } yield {
-        configOverTime
+        val queues = configOverTime
           .filter {
             case (d, _) => firstDate <= d && d <= lastDate
           }
           .foldLeft(Set.empty[Queue]) {
             case (agg, (_, config)) => agg ++ config.getOrElse(terminal, Seq.empty)
           }
+        Queues.queueOrder.filter(queues.contains)
       }
 
-      maybeQueues.getOrElse(Set.empty)
+      maybeQueues.getOrElse(Seq.empty)
     }
 }

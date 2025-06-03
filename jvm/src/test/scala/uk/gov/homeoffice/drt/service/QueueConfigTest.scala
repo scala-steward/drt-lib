@@ -34,19 +34,19 @@ class QueueConfigTest extends AnyWordSpec with Matchers {
       val queuesProvider = QueueConfig.queuesForDateRangeAndTerminal(config)
 
       val queues = queuesProvider(LocalDate(2023, 1, 1), LocalDate(2025, 6, 1), terminal)
-      queues shouldEqual Set(EeaDesk, EGate, NonEeaDesk)
+      queues shouldEqual Seq(EeaDesk, EGate, NonEeaDesk)
     }
     "return the all queues configures for the given terminal when the date range spans only one config (2)" in {
       val queuesProvider = QueueConfig.queuesForDateRangeAndTerminal(config)
 
       val queues = queuesProvider(LocalDate(2025, 6, 2), LocalDate(2025, 6, 10), terminal)
-      queues shouldEqual Set(QueueDesk)
+      queues shouldEqual Seq(QueueDesk)
     }
     "return the all queues configures for the given terminal when the date range spans multiple configs" in {
       val queuesProvider = QueueConfig.queuesForDateRangeAndTerminal(config)
 
       val queues = queuesProvider(LocalDate(2014, 1, 1), LocalDate(2025, 6, 10), terminal)
-      queues shouldEqual Set(EeaDesk, EGate, NonEeaDesk, QueueDesk)
+      queues shouldEqual Seq(QueueDesk, EeaDesk, EGate, NonEeaDesk)
     }
   }
 

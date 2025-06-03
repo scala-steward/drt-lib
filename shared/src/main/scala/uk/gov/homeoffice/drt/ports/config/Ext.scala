@@ -18,14 +18,14 @@ object Ext extends AirportConfigLike {
     portCode = PortCode("EXT"),
     portName = "Exeter",
     queuesByTerminal = SortedMap(LocalDate(2014, 1, 1) -> SortedMap(
-      T1 -> Seq(Queues.QueueDesk)
+      T1 -> Seq(QueueDesk)
     )),
     divertedQueues = Map(
-      Queues.NonEeaDesk -> Queues.QueueDesk,
-      Queues.EeaDesk -> Queues.QueueDesk
+      NonEeaDesk -> QueueDesk,
+      EeaDesk -> QueueDesk
     ),
     slaByQueue = Map(
-      Queues.QueueDesk -> 20
+      QueueDesk -> 20
     ),
     defaultWalkTimeMillis = Map(T1 -> 120000L),
     terminalPaxSplits = Map(T1 -> SplitRatios(
@@ -37,7 +37,7 @@ object Ext extends AirportConfigLike {
     )),
     terminalProcessingTimes = Map(T1 -> defaultProcessingTimes),
     minMaxDesksByTerminalQueue24Hrs = Map(T1 -> Map(
-      Queues.QueueDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4)),
+      QueueDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4)),
     )),
     eGateBankSizes = Map(),
     role = EXT,

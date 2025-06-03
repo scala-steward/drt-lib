@@ -22,15 +22,15 @@ object Ema extends AirportConfigLike {
     portCode = PortCode("EMA"),
     portName = "East Midlands",
     queuesByTerminal = SortedMap(LocalDate(2014, 1, 1) -> SortedMap(
-      T1 -> Seq(Queues.QueueDesk, Queues.EGate)
+      T1 -> Seq(QueueDesk, EGate)
     )),
     divertedQueues = Map(
-      Queues.NonEeaDesk -> Queues.QueueDesk,
-      Queues.EeaDesk -> Queues.QueueDesk
+      NonEeaDesk -> QueueDesk,
+      EeaDesk -> QueueDesk
     ),
     slaByQueue = Map(
-      Queues.QueueDesk -> 20,
-      Queues.EGate -> 25
+      QueueDesk -> 20,
+      EGate -> 25
     ),
     defaultWalkTimeMillis = Map(T1 -> 780000L),
     terminalPaxSplits = Map(T1 -> SplitRatios(
@@ -44,8 +44,8 @@ object Ema extends AirportConfigLike {
     terminalProcessingTimes = Map(T1 -> defaultProcessingTimes),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(
-        Queues.EGate -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)),
-        Queues.QueueDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5))
+        EGate -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)),
+        QueueDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5))
       )
     ),
     eGateBankSizes = Map(T1 -> Iterable(5)),
