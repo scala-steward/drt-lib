@@ -4,6 +4,7 @@ import uk.gov.homeoffice.drt.auth.Roles.Role
 import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitRatios
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
+import uk.gov.homeoffice.drt.service.QueueConfig
 import uk.gov.homeoffice.drt.time.LocalDate
 import upickle.default._
 
@@ -115,7 +116,7 @@ case class AirportConfig(portCode: PortCode,
 
   def maxDesksForTerminal24Hrs(tn: Terminal): Map[Queue, IndexedSeq[Int]] = minMaxDesksByTerminalQueue24Hrs.getOrElse(tn, Map()).mapValues(_._2.toIndexedSeq).view.toMap
 
-  val terminals: Iterable[Terminal] = queuesByTerminal.headOption.map(_._2.keys).getOrElse(Iterable.empty)
+  val terminals: LocalDate => Iterable[Terminal] = QueueConfig.terminalsForDate(queuesByTerminal)
 
   val terminalSplitQueueTypes: Map[Terminal, Set[Queue]] = terminalPaxSplits.map {
     case (terminal, splitRatios) =>

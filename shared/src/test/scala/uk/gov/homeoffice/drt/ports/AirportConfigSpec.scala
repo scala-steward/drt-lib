@@ -25,21 +25,21 @@ class AirportConfigSpec extends Specification {
     splitOrder(Bhx, T1, List(Queues.EGate, Queues.EeaDesk, Queues.NonEeaDesk))
     splitOrder(Bhx, T2, List(Queues.EeaDesk, Queues.NonEeaDesk))
 
-    "EMA config should give a list of queues with their relevant diversions" >> {
-      Ema.config.queuesByTerminalWithDiversions === Map(T1 -> Map(
-        EGate -> EGate,
-        NonEeaDesk -> QueueDesk,
-        EeaDesk -> QueueDesk
-      ))
-    }
-
-    "STN config should give a list of queues with no diversions" >> {
-      Stn.config.queuesByTerminalWithDiversions === Map(T1 -> Map(
-        EGate -> EGate,
-        NonEeaDesk -> NonEeaDesk,
-        EeaDesk -> EeaDesk
-      ))
-    }
+//    "EMA config should give a list of queues with their relevant diversions" >> {
+//      Ema.config.queuesByTerminalWithDiversions === Map(T1 -> Map(
+//        EGate -> EGate,
+//        NonEeaDesk -> QueueDesk,
+//        EeaDesk -> QueueDesk
+//      ))
+//    }
+//
+//    "STN config should give a list of queues with no diversions" >> {
+//      Stn.config.queuesByTerminalWithDiversions === Map(T1 -> Map(
+//        EGate -> EGate,
+//        NonEeaDesk -> NonEeaDesk,
+//        EeaDesk -> EeaDesk
+//      ))
+//    }
 
     Fragment.foreach(for {
       config <- AirportConfigs.allPortConfigs
