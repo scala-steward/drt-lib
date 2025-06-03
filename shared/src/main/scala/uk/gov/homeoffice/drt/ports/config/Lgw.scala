@@ -32,7 +32,7 @@ object Lgw extends AirportConfigLike {
     val egates = 47d
   }
 
-  private val egateUptake = 0.81
+  private val egateUptake = 0.89
 
   private val queueRatios: Map[PaxType, Seq[(Queue, Double)]] = defaultQueueRatios ++ Map(
     EeaMachineReadable -> List(EGate -> egateUptake, EeaDesk -> (1.0 - egateUptake)),
