@@ -5,12 +5,14 @@ import org.specs2.specification.core.Fragment
 import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.Terminals.{T1, T2, Terminal}
 import uk.gov.homeoffice.drt.ports.config._
+import uk.gov.homeoffice.drt.service.QueueConfig
 
 class AirportConfigSpec extends Specification {
   "Airport Config" >> {
     Fragment.foreach(for {
       config <- AirportConfigs.allPortConfigs
-      terminal <- config.terminals
+      (date, terminals) <- config.queuesByTerminal
+      terminal <- terminals
       terminalPaxSplits <- config.terminalPaxSplits
     } yield (config, terminal, terminalPaxSplits._2)) {
       case (config, terminal, splitRatios) =>
