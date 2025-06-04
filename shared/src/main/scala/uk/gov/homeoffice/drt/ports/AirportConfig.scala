@@ -68,15 +68,6 @@ case class AirportConfig(portCode: PortCode,
                          aclDisabled: Boolean = false,
                          idealStaffAsDefault: Boolean = false
                         ) {
-//  def queuesByTerminalWithDiversions: Map[Terminal, Map[Queue, Queue]] = queuesByTerminal
-//    .mapValues { queues =>
-//      val diversionQueues = divertedQueues.values.toSet
-//      val nonDivertedQueues = queues
-//        .filterNot(q => diversionQueues.contains(q))
-//        .map(q => (q, q))
-//      (nonDivertedQueues ++ divertedQueues).toMap
-//    }.view.toMap
-
   def assertValid(): Unit = {
     queuesByTerminal.foreach {
       case (date, config) => config.values.flatten.toSet

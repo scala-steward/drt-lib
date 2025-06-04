@@ -10,7 +10,7 @@ class AirportConfigSpec extends Specification {
   "Airport Config" >> {
     Fragment.foreach(for {
       config <- AirportConfigs.allPortConfigs
-      (date, terminals) <- config.queuesByTerminal
+      (_, terminals) <- config.queuesByTerminal
       terminal <- terminals
       terminalPaxSplits <- config.terminalPaxSplits
     } yield (config, terminal, terminalPaxSplits._2)) {
@@ -20,27 +20,10 @@ class AirportConfigSpec extends Specification {
         }
     }
 
-
     splitOrder(Lhr, T2, List(Queues.EeaDesk, Queues.EGate, Queues.NonEeaDesk, Queues.FastTrack))
     splitOrder(Ema, T1, List(Queues.EeaDesk, Queues.EGate, Queues.NonEeaDesk))
     splitOrder(Bhx, T1, List(Queues.EeaDesk, Queues.EGate, Queues.NonEeaDesk))
     splitOrder(Bhx, T2, List(Queues.EeaDesk, Queues.NonEeaDesk))
-
-//    "EMA config should give a list of queues with their relevant diversions" >> {
-//      Ema.config.queuesByTerminalWithDiversions === Map(T1 -> Map(
-//        EGate -> EGate,
-//        NonEeaDesk -> QueueDesk,
-//        EeaDesk -> QueueDesk
-//      ))
-//    }
-//
-//    "STN config should give a list of queues with no diversions" >> {
-//      Stn.config.queuesByTerminalWithDiversions === Map(T1 -> Map(
-//        EGate -> EGate,
-//        NonEeaDesk -> NonEeaDesk,
-//        EeaDesk -> EeaDesk
-//      ))
-//    }
 
     Fragment.foreach(for {
       config <- AirportConfigs.allPortConfigs
@@ -49,6 +32,14 @@ class AirportConfigSpec extends Specification {
       case (config, terminal, terminalPaxTypes) =>
         s"${config.portCode.iata}, $terminal should include all pax types in its queue allocations" >> {
           terminalPaxTypes shouldEqual PaxTypes.allPaxTypes.toSet
+        }
+    }
+
+    Fragment.foreach(AirportConfigs.allPortConfigs) {
+      config =>
+        s"${config.portCode} should have a valid config" >> {
+          config.assertValid()
+          true
         }
     }
   }
