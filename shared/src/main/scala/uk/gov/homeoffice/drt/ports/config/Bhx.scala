@@ -32,7 +32,7 @@ object Bhx extends AirportConfigLike {
         T1 -> Seq(EeaDesk, EGate, NonEeaDesk),
         T2 -> Seq(EeaDesk, NonEeaDesk)
       ),
-      LocalDate(2025, 6, 10) -> SortedMap(
+      LocalDate(2025, 6, 11) -> SortedMap(
         T1 -> Seq(EeaDesk, EGate, NonEeaDesk),
         T2 -> Seq(QueueDesk)
       ),
@@ -99,7 +99,7 @@ object Bhx extends AirportConfigLike {
         NonEeaDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
           List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)),
         QueueDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
-          List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)),
+          List(8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8)),
       )
     ),
     eGateBankSizes = Map(T1 -> Iterable(10, 5)),
