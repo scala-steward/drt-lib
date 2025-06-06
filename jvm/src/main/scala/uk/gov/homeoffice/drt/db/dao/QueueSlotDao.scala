@@ -4,13 +4,14 @@ import org.apache.pekko.NotUsed
 import org.apache.pekko.stream.scaladsl.Source
 import slick.dbio.Effect
 import slick.jdbc.PostgresProfile.api._
+import slick.sql.FixedSqlAction
 import uk.gov.homeoffice.drt.db.serialisers.QueueSlotSerialiser
 import uk.gov.homeoffice.drt.db.tables.{QueueSlotRow, QueueSlotTable}
 import uk.gov.homeoffice.drt.models.CrunchMinute
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.time.{DateRange, SDate, UtcDate}
+import uk.gov.homeoffice.drt.time.{DateRange, UtcDate}
 
 import java.sql.Timestamp
 import scala.concurrent.{ExecutionContext, Future}
@@ -86,7 +87,16 @@ case class QueueSlotDao()
       DBIO.sequence(crunchMinutes.map(insertOrUpdateSingle)).map(_.sum)
   }
 
-  def removeAllBefore: UtcDate => DBIOAction[Int, NoStream, Effect.Write] = date =>
+  def removeTerminalSlots(port: PortCode, slotSize: Int, toRemove: Iterable[(Terminal, Long)]): FixedSqlAction[Int, NoStream, Effect.Write] = {
+    val query = table.filter { row =>
+      toRemove.map { case (terminal, time) =>
+        row.port === port.iata && row.terminal === terminal.toString && row.slotStart === new Timestamp(time) && row.slotLengthMinutes === slotSize
+      }.reduceLeft(_ || _)
+    }
+    query.delete
+  }
+
+  def removeAllBefore(): UtcDate => DBIOAction[Int, NoStream, Effect.Write] = date =>
     table
       .filter(_.slotDateUtc < date.toISOString)
       .delete
