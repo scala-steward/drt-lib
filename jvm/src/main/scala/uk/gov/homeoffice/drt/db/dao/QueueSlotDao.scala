@@ -87,11 +87,13 @@ case class QueueSlotDao()
       DBIO.sequence(crunchMinutes.map(insertOrUpdateSingle)).map(_.sum)
   }
 
-  def removeTerminalSlots(port: PortCode, slotSize: Int, toRemove: Iterable[(Terminal, Long)]): FixedSqlAction[Int, NoStream, Effect.Write] = {
+  def removeTerminalSlots(port: PortCode, terminals: Iterable[Terminal], slotSize: Int, from: Long, to: Long): FixedSqlAction[Int, NoStream, Effect.Write] = {
     val query = table.filter { row =>
-      toRemove.map { case (terminal, time) =>
-        row.port === port.iata && row.terminal === terminal.toString && row.slotStart === new Timestamp(time) && row.slotLengthMinutes === slotSize
-      }.reduceLeft(_ || _)
+      row.port === port.iata &&
+        row.terminal.inSet(terminals.map(_.toString)) &&
+        row.slotStart >= new Timestamp(from) &&
+        row.slotStart <= new Timestamp(to) &&
+        row.slotLengthMinutes === slotSize
     }
     query.delete
   }
