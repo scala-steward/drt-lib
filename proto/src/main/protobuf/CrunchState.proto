@@ -101,10 +101,6 @@ message PaxTypeAndQueueCountMessage {
     repeated SplitAgeCountMessage ages = 6;
 }
 
-message CrunchMinutesMessage {
-    repeated CrunchMinuteMessage minutes = 1;
-}
-
 message CrunchMinuteMessage {
     optional string terminalName = 1;
     optional string queueName = 2;
@@ -122,6 +118,16 @@ message CrunchMinuteMessage {
     optional int32 maybeDeployedPaxInQueue = 14;
 }
 
+message CrunchMinuteRemovalMessage {
+    optional string queueName = 1;
+    optional int64 minute = 2;
+}
+
+message CrunchMinutesMessage {
+    repeated CrunchMinuteMessage minutes = 1;
+    repeated CrunchMinuteRemovalMessage removals = 2;
+}
+
 message PassengersMinuteMessage {
     optional string queueName = 1;
     optional int64 minute = 2;
@@ -129,12 +135,14 @@ message PassengersMinuteMessage {
     optional int64 lastUpdated = 4;
 }
 
-message PassengersMinutesMessage {
-    repeated PassengersMinuteMessage minutes = 1;
+message PassengersMinuteRemovalMessage {
+    optional string queueName = 1;
+    optional int64 minute = 2;
 }
 
-message StaffMinutesMessage {
-    repeated StaffMinuteMessage minutes = 1;
+message PassengersMinutesMessage {
+    repeated PassengersMinuteMessage minutes = 1;
+    repeated PassengersMinuteRemovalMessage removals = 2;
 }
 
 message StaffMinuteMessage {
@@ -146,6 +154,16 @@ message StaffMinuteMessage {
     optional int64 lastUpdated = 7;
 
     optional int32 staff_OLD = 3;
+}
+
+message StaffMinuteRemovalMessage {
+    optional string terminalName = 1;
+    optional int64 minute = 2;
+}
+
+message StaffMinutesMessage {
+    repeated StaffMinuteMessage minutes = 1;
+    repeated StaffMinuteRemovalMessage removals = 2;
 }
 
 message FlightsWithSplitsDiffMessage {
