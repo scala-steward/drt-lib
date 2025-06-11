@@ -84,18 +84,16 @@ case class QueueSlotDao()
     val insertOrUpdateSingle = insertOrUpdate(portCode, slotLengthMinutes)
     (terminal, updates) => {
       val removalTimes = updates.groupBy(_.minute).keys.map(new Timestamp(_))
-      val removalsAction = DBIO.sequence(removalTimes.map { r =>
-        table.filter(row =>
+      table
+        .filter(row =>
           row.port === portCode.iata &&
             row.terminal === terminal.toString &&
             row.slotStart.inSet(removalTimes) &&
             row.slotLengthMinutes === slotLengthMinutes
-        ).delete
-      })
-
-      removalsAction.flatMap { _ =>
-        DBIO.sequence(updates.map(insertOrUpdateSingle)).map(_.sum)
-      }
+        )
+        .delete
+        .flatMap(_ => DBIO.sequence(updates.map(insertOrUpdateSingle)).map(_.sum))
+        .transactionally
     }
   }
 
