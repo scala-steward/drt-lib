@@ -6,7 +6,7 @@ import slick.dbio.Effect
 import slick.jdbc.PostgresProfile.api._
 import uk.gov.homeoffice.drt.db.serialisers.QueueSlotSerialiser
 import uk.gov.homeoffice.drt.db.tables.{QueueSlotRow, QueueSlotTable}
-import uk.gov.homeoffice.drt.models.CrunchMinute
+import uk.gov.homeoffice.drt.models.{CrunchMinute, TQM}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
@@ -80,20 +80,22 @@ case class QueueSlotDao()
       table.insertOrUpdate(toRow(crunchMinute, slotLengthMinutes))
   }
 
-  def replaceSlots(portCode: PortCode, slotLengthMinutes: Int): (Terminal, Iterable[CrunchMinute]) => DBIOAction[Int, NoStream, Effect.Write with Effect.Transactional] = {
+  def replaceSlots(portCode: PortCode, slotLengthMinutes: Int): (Iterable[CrunchMinute], Iterable[TQM]) => DBIOAction[Int, NoStream, Effect.Write with Nothing with Effect.Transactional] = {
     val insertOrUpdateSingle = insertOrUpdate(portCode, slotLengthMinutes)
-    (terminal, updates) => {
-      val removalTimes = updates.groupBy(_.minute).keys.map(new Timestamp(_))
-      table
-        .filter(row =>
-          row.port === portCode.iata &&
-            row.terminal === terminal.toString &&
-            row.slotStart.inSet(removalTimes) &&
-            row.slotLengthMinutes === slotLengthMinutes
-        )
-        .delete
-        .flatMap(_ => DBIO.sequence(updates.map(insertOrUpdateSingle)).map(_.sum))
-        .transactionally
+    (updates, removals) => {
+      val removalActions = removals.map { removal =>
+        table
+          .filter(row =>
+            row.port === portCode.iata &&
+              row.terminal === removal.toString &&
+              row.queue === removal.queue.stringValue &&
+              row.slotStart === new Timestamp(removal.minute) &&
+              row.slotLengthMinutes === slotLengthMinutes
+          )
+          .delete
+      }
+
+      DBIO.sequence(removalActions).flatMap(_ => DBIO.sequence(updates.map(insertOrUpdateSingle))).map(_.size).transactionally
     }
   }
 
