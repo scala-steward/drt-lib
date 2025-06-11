@@ -4,7 +4,6 @@ import org.apache.pekko.NotUsed
 import org.apache.pekko.stream.scaladsl.Source
 import slick.dbio.Effect
 import slick.jdbc.PostgresProfile.api._
-import slick.sql.FixedSqlAction
 import uk.gov.homeoffice.drt.db.serialisers.QueueSlotSerialiser
 import uk.gov.homeoffice.drt.db.tables.{QueueSlotRow, QueueSlotTable}
 import uk.gov.homeoffice.drt.models.CrunchMinute
@@ -81,21 +80,23 @@ case class QueueSlotDao()
       table.insertOrUpdate(toRow(crunchMinute, slotLengthMinutes))
   }
 
-  def insertOrUpdateMulti(portCode: PortCode, slotLengthMinutes: Int): Iterable[CrunchMinute] => DBIOAction[Int, NoStream, Effect.Write with Effect.Transactional] = {
+  def replaceSlots(portCode: PortCode, slotLengthMinutes: Int): (Terminal, Iterable[CrunchMinute]) => DBIOAction[Int, NoStream, Effect.Write with Effect.Transactional] = {
     val insertOrUpdateSingle = insertOrUpdate(portCode, slotLengthMinutes)
-    crunchMinutes =>
-      DBIO.sequence(crunchMinutes.map(insertOrUpdateSingle)).map(_.sum)
-  }
+    (terminal, updates) => {
+      val removalTimes = updates.groupBy(_.minute).keys.map(new Timestamp(_))
+      val removalsAction = DBIO.sequence(removalTimes.map { r =>
+        table.filter(row =>
+          row.port === portCode.iata &&
+            row.terminal === terminal.toString &&
+            row.slotStart.inSet(removalTimes) &&
+            row.slotLengthMinutes === slotLengthMinutes
+        ).delete
+      })
 
-  def removeTerminalSlots(port: PortCode, terminals: Iterable[Terminal], slotSize: Int, from: Long, to: Long): FixedSqlAction[Int, NoStream, Effect.Write] = {
-    val query = table.filter { row =>
-      row.port === port.iata &&
-        row.terminal.inSet(terminals.map(_.toString)) &&
-        row.slotStart >= new Timestamp(from) &&
-        row.slotStart <= new Timestamp(to) &&
-        row.slotLengthMinutes === slotSize
+      removalsAction.flatMap { _ =>
+        DBIO.sequence(updates.map(insertOrUpdateSingle)).map(_.sum)
+      }
     }
-    query.delete
   }
 
   def removeAllBefore(): UtcDate => DBIOAction[Int, NoStream, Effect.Write] = date =>

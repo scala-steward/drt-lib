@@ -7,7 +7,7 @@ import uk.gov.homeoffice.drt.db.TestDatabase
 import uk.gov.homeoffice.drt.models.CrunchMinute
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.EeaDesk
-import uk.gov.homeoffice.drt.ports.Terminals.T2
+import uk.gov.homeoffice.drt.ports.Terminals.{T1, T2}
 import uk.gov.homeoffice.drt.time.{SDate, UtcDate}
 
 import scala.concurrent.Await
@@ -94,7 +94,7 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
         SDate("2024-11-13").millisSinceEpoch,
       ).map(crunchMinute)
 
-      Await.result(TestDatabase.run(dao.insertOrUpdateMulti(PortCode("LHR"), 15)(crunchMinutes)), 2.second)
+      Await.result(TestDatabase.run(dao.replaceSlots(PortCode("LHR"), 15)(T2, crunchMinutes)), 2.second)
 
       Await.result(TestDatabase.run(dao.removeAllBefore()(UtcDate(2024, 11, 13))), 2.second)
 
