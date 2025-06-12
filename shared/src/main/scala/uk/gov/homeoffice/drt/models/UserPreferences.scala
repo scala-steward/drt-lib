@@ -1,12 +1,27 @@
 package uk.gov.homeoffice.drt.models
 
-import upickle.default._
-
 case class UserPreferences(userSelectedPlanningTimePeriod: Int,
                            hidePaxDataSourceDescription: Boolean,
                            showStaffingShiftView: Boolean,
-                           desksAndQueuesIntervalMinutes: Int)
+                           desksAndQueuesIntervalMinutes: Int,
+                           portDashboardIntervalMinutes: Map[String, Int],
+                           portDashboardTerminals: Map[String, Set[String]])
 
 object UserPreferences {
-  implicit val rw: ReadWriter[UserPreferences] = macroRW
+
+  def serializeMap[K, V](data: Map[K, V], valueToString: V => String): String = {
+    data.map { case (key, value) => s"$key:${valueToString(value)}" }.mkString(";")
+  }
+
+  def deserializeMap[V](data: Option[String], valueParser: String => V): Map[String, V] = {
+    data match {
+      case Some(s) if s.nonEmpty =>
+        s.split(";").map(_.split(":") match {
+          case Array(key, value) => key -> valueParser(value)
+          case _ => throw new IllegalArgumentException(s"Invalid format: $s")
+        }).toMap
+      case _ => Map.empty[String, V]
+    }
+  }
+
 }

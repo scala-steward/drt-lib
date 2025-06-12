@@ -55,6 +55,15 @@ object Terminals {
       case "sen" => T1
       case _ => InvalidTerminal
     }
+
+    def numberString(terminal: Terminal): String = terminal match {
+      case T1 => "1"
+      case T2 => "2"
+      case T3 => "3"
+      case T4 => "4"
+      case T5 => "5"
+      case others => others.toString
+    }
   }
 
   case object InvalidTerminal extends Terminal {
