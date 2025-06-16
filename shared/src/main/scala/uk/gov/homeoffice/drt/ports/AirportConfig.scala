@@ -118,10 +118,6 @@ case class AirportConfig(portCode: PortCode,
     q =>
       terminalSplitQueueTypes.getOrElse(terminal, Set()).contains(q)
   }
-
-//  def nonTransferQueues(terminalName: Terminal): Seq[Queue] = queuesByTerminal(terminalName).collect {
-//    case queue if queue != Queues.Transfer => queue
-//  }
 }
 
 object AirportConfig {

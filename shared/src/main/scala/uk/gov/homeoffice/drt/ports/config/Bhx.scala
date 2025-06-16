@@ -32,10 +32,10 @@ object Bhx extends AirportConfigLike {
         T1 -> Seq(EeaDesk, EGate, NonEeaDesk),
         T2 -> Seq(EeaDesk, NonEeaDesk)
       ),
-      LocalDate(2025, 6, 20) -> SortedMap(
-        T1 -> Seq(EeaDesk, EGate, NonEeaDesk),
-        T2 -> Seq(QueueDesk)
-      ),
+//      LocalDate(2025, 7, 2) -> SortedMap(
+//        T1 -> Seq(EeaDesk, EGate, NonEeaDesk),
+//        T2 -> Seq(QueueDesk)
+//      ),
     ),
     slaByQueue = defaultSlas ++ Map(
       QueueDesk -> 60,
