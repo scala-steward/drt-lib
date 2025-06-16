@@ -35,6 +35,28 @@ class TerminalsTest extends AnyWordSpec with Matchers {
         Terminal(name) should ===(expectedTerminal)
       }
     }
+
+    "return correct number strings for terminals" in {
+      val terminalToNumberString = Map(
+        T1 -> "1",
+        T2 -> "2",
+        T3 -> "3",
+        T4 -> "4",
+        T5 -> "5",
+        A1 -> "A1",
+        A2 -> "A2",
+        ACLTER -> "ACLTER",
+        N -> "N",
+        S -> "S",
+        MainApron -> "MainApron",
+        CTA -> "CTA",
+        InvalidTerminal -> ""
+      )
+
+      terminalToNumberString.map { case (terminal, expectedNumberString) =>
+        Terminal.numberString(terminal) should ===(expectedNumberString)
+      }
+    }
   }
 
 }
