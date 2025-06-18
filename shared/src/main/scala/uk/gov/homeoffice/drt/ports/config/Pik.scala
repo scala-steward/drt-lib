@@ -2,10 +2,11 @@ package uk.gov.homeoffice.drt.ports.config
 
 import uk.gov.homeoffice.drt.auth.Roles.PIK
 import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
-import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
+import uk.gov.homeoffice.drt.ports.Queues.{EeaDesk, NonEeaDesk, QueueDesk}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
 import uk.gov.homeoffice.drt.ports.config.AirportConfigDefaults.{defaultPaxSplitsWithoutEgates, defaultProcessingTimes, defaultQueueRatiosWithoutEgates}
+import uk.gov.homeoffice.drt.time.LocalDate
 
 import scala.collection.immutable.SortedMap
 
@@ -14,22 +15,22 @@ object Pik extends AirportConfigLike {
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("PIK"),
     portName = "Glasgow Prestwick",
-    queuesByTerminal = SortedMap(
-      T1 -> Seq(Queues.QueueDesk)
-    ),
+    queuesByTerminal = SortedMap(LocalDate(2014, 1, 1) -> SortedMap(
+      T1 -> Seq(QueueDesk)
+    )),
     divertedQueues = Map(
-      Queues.NonEeaDesk -> Queues.QueueDesk,
-      Queues.EeaDesk -> Queues.QueueDesk
+      NonEeaDesk -> QueueDesk,
+      EeaDesk -> QueueDesk
     ),
     slaByQueue = Map(
-      Queues.QueueDesk -> 20,
+      QueueDesk -> 20,
     ),
     defaultWalkTimeMillis = Map(T1 -> 780000L),
     terminalPaxSplits = Map(T1 -> defaultPaxSplitsWithoutEgates),
     terminalProcessingTimes = Map(T1 -> defaultProcessingTimes),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(
-        Queues.QueueDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5))
+        QueueDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5))
       )
     ),
     eGateBankSizes = Map(T1 -> Iterable()),

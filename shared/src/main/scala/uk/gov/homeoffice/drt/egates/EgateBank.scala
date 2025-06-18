@@ -74,6 +74,13 @@ case class EgateBanksUpdates(updates: List[EgateBanksUpdate]) {
     }
   }
 
+  def forTime(millis: Long): Seq[EgateBank] = {
+    updatesForDate(millis) match {
+      case None => Seq()
+      case Some(applicableUpdate) => applicableUpdate.banks
+    }
+  }
+
   private def startMillis(millis: NumericRange[Long], updates: EgateBanksUpdate): Long =
     if (updates.effectiveFrom < millis.min) millis.min else updates.effectiveFrom
 

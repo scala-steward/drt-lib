@@ -6,11 +6,11 @@ import slick.dbio.Effect
 import slick.jdbc.PostgresProfile.api._
 import uk.gov.homeoffice.drt.db.serialisers.QueueSlotSerialiser
 import uk.gov.homeoffice.drt.db.tables.{QueueSlotRow, QueueSlotTable}
-import uk.gov.homeoffice.drt.models.CrunchMinute
+import uk.gov.homeoffice.drt.models.{CrunchMinute, TQM}
 import uk.gov.homeoffice.drt.ports.PortCode
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.time.{DateRange, SDate, UtcDate}
+import uk.gov.homeoffice.drt.time.{DateRange, UtcDate}
 
 import java.sql.Timestamp
 import scala.concurrent.{ExecutionContext, Future}
@@ -80,13 +80,26 @@ case class QueueSlotDao()
       table.insertOrUpdate(toRow(crunchMinute, slotLengthMinutes))
   }
 
-  def insertOrUpdateMulti(portCode: PortCode, slotLengthMinutes: Int): Iterable[CrunchMinute] => DBIOAction[Int, NoStream, Effect.Write with Effect.Transactional] = {
+  def updateAndRemoveSlots(portCode: PortCode, slotLengthMinutes: Int): (Iterable[CrunchMinute], Iterable[TQM]) => DBIOAction[Int, NoStream, Effect.Write with Nothing with Effect.Transactional] = {
     val insertOrUpdateSingle = insertOrUpdate(portCode, slotLengthMinutes)
-    crunchMinutes =>
-      DBIO.sequence(crunchMinutes.map(insertOrUpdateSingle)).map(_.sum)
+    (updates, removals) => {
+      val removalActions = removals.map { removal =>
+        table
+          .filter(row =>
+            row.port === portCode.iata &&
+              row.terminal === removal.terminal.toString &&
+              row.queue === removal.queue.stringValue &&
+              row.slotStart === new Timestamp(removal.minute) &&
+              row.slotLengthMinutes === slotLengthMinutes
+          )
+          .delete
+      }
+
+      DBIO.sequence(removalActions).flatMap(_ => DBIO.sequence(updates.map(insertOrUpdateSingle))).map(_.size).transactionally
+    }
   }
 
-  def removeAllBefore: UtcDate => DBIOAction[Int, NoStream, Effect.Write] = date =>
+  def removeAllBefore(): UtcDate => DBIOAction[Int, NoStream, Effect.Write] = date =>
     table
       .filter(_.slotDateUtc < date.toISOString)
       .delete

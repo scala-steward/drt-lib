@@ -1,6 +1,7 @@
 package uk.gov.homeoffice.drt.ports
 
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
+import uk.gov.homeoffice.drt.time.LocalDate
 import upickle.default._
 
 object Queues {
@@ -15,7 +16,7 @@ object Queues {
 
   case object Closed extends QueueStatus
 
-  case class QueueFallbacks(queues: Map[Terminal, Seq[Queue]]) {
+  case class QueueFallbacks(queues: (LocalDate, Terminal) => Seq[Queue]) {
     val fallbacks: PartialFunction[(Queue, PaxType), Seq[Queue]] = {
       case (EGate, _: EeaPaxType) => Seq(EeaDesk, QueueDesk, NonEeaDesk)
       case (EGate, _: NonEeaPaxType) => Seq(NonEeaDesk, QueueDesk, EeaDesk)
@@ -24,8 +25,8 @@ object Queues {
       case (_, _) => Seq()
     }
 
-    def availableFallbacks(terminal: Terminal, queue: Queue, paxType: PaxType): Iterable[Queue] = {
-      val availableQueues: List[Queue] = queues.get(terminal).toList.flatten
+    def availableFallbacks(terminal: Terminal, queue: Queue, paxType: PaxType, date: LocalDate): Seq[Queue] = {
+      val availableQueues = queues(date, terminal)
       fallbacks((queue, paxType)).filter(availableQueues.contains)
     }
   }
@@ -86,9 +87,9 @@ object Queues {
     override val stringValue: String = "queuedesk"
   }
 
-  val queueOrder: List[Queue] = List(QueueDesk, EGate, EeaDesk, NonEeaDesk, FastTrack)
+  val queueOrder: List[Queue] = List(QueueDesk, EeaDesk, EGate, NonEeaDesk, FastTrack)
 
-  def inOrder(queuesToSort: Seq[Queue]): Seq[Queue] = queueOrder.filter(q => queuesToSort.contains(q))
+  def inOrder(queuesToSort: Seq[Queue]): Seq[Queue] = queueOrder.filter(queuesToSort.contains)
 
   val displayName: Function[Queue, String] = {
     case EeaDesk => "EEA"

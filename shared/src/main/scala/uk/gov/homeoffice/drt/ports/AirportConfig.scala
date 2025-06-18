@@ -4,6 +4,8 @@ import uk.gov.homeoffice.drt.auth.Roles.Role
 import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.SplitRatios
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
+import uk.gov.homeoffice.drt.service.QueueConfig
+import uk.gov.homeoffice.drt.time.LocalDate
 import upickle.default._
 
 import scala.collection.immutable.SortedMap
@@ -30,7 +32,7 @@ object PortCode {
 
 case class AirportConfig(portCode: PortCode,
                          portName: String,
-                         queuesByTerminal: SortedMap[Terminal, Seq[Queue]],
+                         queuesByTerminal: SortedMap[LocalDate, SortedMap[Terminal, Seq[Queue]]],
                          divertedQueues: Map[Queue, Queue] = Map(),
                          flexedQueues: Set[Queue] = Set(),
                          slaByQueue: Map[Queue, Int],
@@ -66,31 +68,26 @@ case class AirportConfig(portCode: PortCode,
                          aclDisabled: Boolean = false,
                          idealStaffAsDefault: Boolean = false
                         ) {
-  def queuesByTerminalWithDiversions: Map[Terminal, Map[Queue, Queue]] = queuesByTerminal
-    .mapValues { queues =>
-      val diversionQueues = divertedQueues.values.toSet
-      val nonDivertedQueues = queues
-        .filterNot(q => diversionQueues.contains(q))
-        .map(q => (q, q))
-      (nonDivertedQueues ++ divertedQueues).toMap
-    }.view.toMap
-
   def assertValid(): Unit = {
-    queuesByTerminal.values.flatten.toSet
-      .filterNot(_ == Transfer)
-      .foreach {
-        queue: Queue =>
-          assert(slaByQueue.contains(queue), s"Missing sla for $queue @ $portCode")
-      }
     queuesByTerminal.foreach {
-      case (terminal, tQueues) =>
-        assert(minMaxDesksByTerminalQueue24Hrs.contains(terminal), s"Missing min/max desks for terminal $terminal @ $portCode")
-        tQueues
-          .filterNot(_ == Transfer)
-          .foreach {
-            tQueue =>
-              assert(minMaxDesksByTerminalQueue24Hrs(terminal).contains(tQueue), s"Missing min/max desks for $tQueue for terminal $terminal @ $portCode")
-          }
+      case (date, config) => config.values.flatten.toSet
+        .filterNot(_ == Transfer)
+        .foreach {
+          queue: Queue =>
+            assert(slaByQueue.contains(queue), s"Missing sla: ${date.toISOString} $queue @ $portCode")
+        }
+    }
+    queuesByTerminal.foreach {
+      case (date, config) => config.foreach {
+        case (terminal, tQueues) =>
+          assert(minMaxDesksByTerminalQueue24Hrs.contains(terminal), s"Missing min/max desks: ${date.toISOString} $terminal @ $portCode")
+          tQueues
+            .filterNot(_ == Transfer)
+            .foreach {
+              tQueue =>
+                assert(minMaxDesksByTerminalQueue24Hrs(terminal).contains(tQueue), s"Missing min/max desks: ${date.toISOString} $tQueue for terminal $terminal @ $portCode")
+            }
+      }
     }
     terminalProcessingTimes.foreach {
       case (terminal, procTimes) =>
@@ -110,7 +107,7 @@ case class AirportConfig(portCode: PortCode,
 
   def maxDesksForTerminal24Hrs(tn: Terminal): Map[Queue, IndexedSeq[Int]] = minMaxDesksByTerminalQueue24Hrs.getOrElse(tn, Map()).mapValues(_._2.toIndexedSeq).view.toMap
 
-  val terminals: Iterable[Terminal] = queuesByTerminal.keys
+  val terminals: LocalDate => Iterable[Terminal] = QueueConfig.terminalsForDate(queuesByTerminal)
 
   val terminalSplitQueueTypes: Map[Terminal, Set[Queue]] = terminalPaxSplits.map {
     case (terminal, splitRatios) =>
@@ -120,10 +117,6 @@ case class AirportConfig(portCode: PortCode,
   def queueTypeSplitOrder(terminal: Terminal): List[Queue] = Queues.queueOrder.filter {
     q =>
       terminalSplitQueueTypes.getOrElse(terminal, Set()).contains(q)
-  }
-
-  def nonTransferQueues(terminalName: Terminal): Seq[Queue] = queuesByTerminal(terminalName).collect {
-    case queue if queue != Queues.Transfer => queue
   }
 }
 

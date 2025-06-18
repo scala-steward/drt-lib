@@ -6,6 +6,7 @@ import uk.gov.homeoffice.drt.ports.PaxTypesAndQueues._
 import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.time.LocalDate
 
 import scala.collection.immutable.SortedMap
 
@@ -34,10 +35,10 @@ object Edi extends AirportConfigLike {
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("EDI"),
     portName = "Edinburgh",
-    queuesByTerminal = SortedMap(
+    queuesByTerminal = SortedMap(LocalDate(2014, 1, 1) -> SortedMap(
       A1 -> Seq(EeaDesk, EGate, NonEeaDesk),
       A2 -> Seq(EeaDesk, EGate, NonEeaDesk)
-    ),
+    )),
     slaByQueue = defaultSlas,
     defaultWalkTimeMillis = Map(A1 -> 180000L, A2 -> 120000L),
     terminalPaxSplits = List(A1, A2).map(t => (t, defaultPaxSplits)).toMap,

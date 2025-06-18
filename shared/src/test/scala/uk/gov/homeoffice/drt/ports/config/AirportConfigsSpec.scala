@@ -1,11 +1,7 @@
 package uk.gov.homeoffice.drt.ports.config
 
 import org.specs2.mutable.Specification
-import uk.gov.homeoffice.drt.auth.Roles.LHR
-import uk.gov.homeoffice.drt.ports.Terminals.{T1, Terminal}
 import uk.gov.homeoffice.drt.ports._
-
-import scala.collection.immutable.SortedMap
 
 class AirportConfigsSpec extends Specification {
 
@@ -36,7 +32,8 @@ class AirportConfigsSpec extends Specification {
     "All Airport config queues must be defined in Queues" in {
       for {
         port <- AirportConfigs.allPortConfigs
-        queueName <- port.queuesByTerminal.values.flatten
+        (_, queues) <- port.queuesByTerminal.values.flatten
+        queueName <- queues
       } yield {
         Queues.displayName(queueName).aka(s"$queueName not found in Queues") mustNotEqual None
       }

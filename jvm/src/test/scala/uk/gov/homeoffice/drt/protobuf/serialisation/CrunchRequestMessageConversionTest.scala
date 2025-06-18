@@ -11,7 +11,7 @@ class CrunchRequestMessageConversionTest extends AnyWordSpec with Matchers {
     "Serialise and deserialise a CrunchRequest without losing anything" in {
       val request = TerminalUpdateRequest(T1, LocalDate(2021, 1, 1))
       val result = CrunchRequestMessageConversion.terminalUpdateRequestToMessage(request)
-      val deserialised = CrunchRequestMessageConversion.terminalUpdateRequestsFromMessage(Seq(T1))(result)
+      val deserialised = CrunchRequestMessageConversion.terminalUpdateRequestsFromMessage(_ => Seq(T1))(result)
 
       deserialised should ===(Seq(request))
     }

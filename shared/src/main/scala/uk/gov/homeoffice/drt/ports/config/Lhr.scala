@@ -7,6 +7,7 @@ import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.time.LocalDate
 
 import scala.collection.immutable.SortedMap
 
@@ -63,12 +64,12 @@ object Lhr extends AirportConfigLike {
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("LHR"),
     portName = "London Heathrow",
-    queuesByTerminal = SortedMap(
+    queuesByTerminal = SortedMap(LocalDate(2014, 1, 1) -> SortedMap(
       T2 -> Seq(EeaDesk, EGate, NonEeaDesk, FastTrack, Transfer),
       T3 -> Seq(EeaDesk, EGate, NonEeaDesk, FastTrack, Transfer),
       T4 -> Seq(EeaDesk, EGate, NonEeaDesk, FastTrack, Transfer),
       T5 -> Seq(EeaDesk, EGate, NonEeaDesk, FastTrack, Transfer)
-    ),
+    )),
     slaByQueue = Map(EeaDesk -> 25, EGate -> 15, NonEeaDesk -> 45, FastTrack -> 15),
     crunchOffsetMinutes = 120,
     defaultWalkTimeMillis = Map(T2 -> 900000L, T3 -> 660000L, T4 -> 900000L, T5 -> 660000L),

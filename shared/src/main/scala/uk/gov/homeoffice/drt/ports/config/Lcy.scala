@@ -7,6 +7,7 @@ import uk.gov.homeoffice.drt.ports.Queues._
 import uk.gov.homeoffice.drt.ports.SplitRatiosNs.{SplitRatio, SplitRatios, SplitSources}
 import uk.gov.homeoffice.drt.ports.Terminals._
 import uk.gov.homeoffice.drt.ports._
+import uk.gov.homeoffice.drt.time.LocalDate
 import uk.gov.homeoffice.drt.time.MilliTimes.oneMinuteMillis
 
 import scala.collection.immutable.SortedMap
@@ -18,13 +19,13 @@ object Lcy extends AirportConfigLike {
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("LCY"),
     portName = "London City",
-    queuesByTerminal = SortedMap(
-      T1 -> Seq(Queues.NonEeaDesk, Queues.EeaDesk, Queues.EGate)
-    ),
+    queuesByTerminal = SortedMap(LocalDate(2014, 1, 1) -> SortedMap(
+      T1 -> Seq(EeaDesk, EGate, NonEeaDesk)
+    )),
     slaByQueue = Map(
-      Queues.EeaDesk -> 25,
-      Queues.NonEeaDesk -> 45,
-      Queues.EGate -> 25
+      EeaDesk -> 25,
+      NonEeaDesk -> 45,
+      EGate -> 25
     ),
     defaultWalkTimeMillis = Map(T1 -> 2 * oneMinuteMillis),
     terminalPaxSplits = Map(T1 -> SplitRatios(
@@ -38,9 +39,9 @@ object Lcy extends AirportConfigLike {
     terminalProcessingTimes = Map(T1 -> defaultProcessingTimes),
     minMaxDesksByTerminalQueue24Hrs = Map(
       T1 -> Map(
-        Queues.EGate -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)),
-        Queues.EeaDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5)),
-        Queues.NonEeaDesk -> (List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), List(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4))
+        EGate -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)),
+        EeaDesk -> (List(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1), List(5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5)),
+        NonEeaDesk -> (List(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), List(4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4))
       )
     ),
     eGateBankSizes = Map(T1 -> Iterable(10)),

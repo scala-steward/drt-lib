@@ -4,7 +4,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.actor.commands._
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
-import uk.gov.homeoffice.drt.protobuf.messages.CrunchState.{CrunchRequestMessage, MergeArrivalsRequestMessage, RemoveCrunchRequestMessage, RemoveMergeArrivalsRequestMessage}
+import uk.gov.homeoffice.drt.protobuf.messages.CrunchState.{CrunchRequestMessage, MergeArrivalsRequestMessage, RemoveCrunchRequestMessage}
 import uk.gov.homeoffice.drt.time.{LocalDate, UtcDate}
 
 object CrunchRequestMessageConversion {
@@ -33,11 +33,11 @@ object CrunchRequestMessageConversion {
     )
   }
 
-  def terminalUpdateRequestsFromMessage(terminals: Iterable[Terminal]): CrunchRequestMessage => Seq[TerminalUpdateRequest] = {
+  def terminalUpdateRequestsFromMessage(terminals: LocalDate => Iterable[Terminal]): CrunchRequestMessage => Seq[TerminalUpdateRequest] = {
     case CrunchRequestMessage(Some(year), Some(month), Some(day), _, _, maybeTerminalName) =>
       maybeTerminalName match {
         case None =>
-          terminals.map(TerminalUpdateRequest(_, LocalDate(year, month, day))).toSeq
+          terminals(LocalDate(year, month, day)).map(TerminalUpdateRequest(_, LocalDate(year, month, day))).toSeq
         case Some(terminalName) =>
           Seq(TerminalUpdateRequest(Terminal(terminalName), LocalDate(year, month, day)))
       }
