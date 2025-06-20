@@ -25,14 +25,16 @@ object Queues {
       case (_, _) => Seq()
     }
 
-    def availableFallbacks(terminal: Terminal, queue: Queue, paxType: PaxType, date: LocalDate): Seq[Queue] = {
-      val availableQueues = queues(date, terminal)
-      fallbacks((queue, paxType)).filter(availableQueues.contains)
-    }
+    def availableFallbacks(terminal: Terminal): (Queue, PaxType, LocalDate) => Seq[Queue] =
+      (queue, paxType, date) => {
+        val availableQueues = queues(date, terminal)
+        fallbacks((queue, paxType)).filter(availableQueues.contains)
+      }
   }
 
   sealed trait Queue extends ClassNameForToString with Ordered[Queue] {
     override def compare(that: Queue): Int = toString.compareTo(that.toString)
+
     val stringValue: String
   }
 

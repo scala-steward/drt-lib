@@ -9,7 +9,7 @@ import uk.gov.homeoffice.drt.db.serialisers.FlightSerialiser
 import uk.gov.homeoffice.drt.db.tables.{FlightRow, FlightTable}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.ports.{FeedSource, PortCode}
-import uk.gov.homeoffice.drt.time.{DateRange, LocalDate, SDate, UtcDate}
+import uk.gov.homeoffice.drt.time.{DateLike, DateRange, LocalDate, SDate, UtcDate}
 
 import java.sql.Timestamp
 import scala.concurrent.{ExecutionContext, Future}
@@ -22,7 +22,7 @@ case class FlightDao()
   def flightsForPcpDateRange(portCode: PortCode,
                              paxFeedSourceOrder: List[FeedSource],
                              execute: DBIOAction[(UtcDate, Seq[ApiFlightWithSplits]), NoStream, Effect.Read] => Future[(UtcDate, Seq[ApiFlightWithSplits])]
-                            ): (LocalDate, LocalDate, Seq[Terminal]) => Source[(UtcDate, Seq[ApiFlightWithSplits]), NotUsed] = {
+                            ): (DateLike, DateLike, Seq[Terminal]) => Source[(UtcDate, Seq[ApiFlightWithSplits]), NotUsed] = {
     val getFlights = getForTerminalsUtcDate(portCode)
 
     (start, end, terminals) =>
