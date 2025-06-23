@@ -33,7 +33,7 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
   def insert(portCode: PortCode): (Terminal, GateType, Iterable[BorderCrossingRow]) => DBIOAction[Int, NoStream, Effect.Write] =
     dao.replaceHours(portCode)
 
-  "BorderCrossingQueries replaceHours" should {
+  "replaceHours" should {
     "insert records into an empty table" in {
       val portCode = PortCode("LHR")
       val terminal = T2
@@ -140,7 +140,7 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
     Await.result(TestDatabase.run(insert(portCode)(terminal, EGate, paxHourly)), 2.second)
   }
 
-  "BorderCrossingQueries totalForPortAndDate" should {
+  "totalForPortAndDate" should {
     "return the total passengers for a port and local date (spanning 2 utc dates)" in {
       insertHourlyPax(T2, 50, 25, LocalDate(2023, 6, 10))
 
@@ -184,7 +184,7 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
     }
   }
 
-  "BorderCrossingQueries removeAllBefore" should {
+  "removeAllBefore" should {
     "only remove rows with a date earlier than the data specified" in {
       val portCode = PortCode("LHR")
       val terminal = T2
@@ -217,6 +217,83 @@ class BorderCrossingDaoTest extends AnyWordSpec with Matchers with BeforeAndAfte
           val rows = TestDatabase.run(dao.get(portCode.iata, terminal.toString, UtcDate(2020, 1, date).toISOString)).futureValue
           rows.toSet.map(BorderCrossingSerialiser.fromRow) should be(expected.toSet)
       }
+    }
+  }
+
+  "filterDate" should {
+    val portCode = PortCode("LHR")
+    val terminal = T2
+
+    "filter rows by utc date" in {
+      val paxHourly = Seq(
+        BorderCrossing(portCode, terminal, UtcDate(2025, 5, 1), Pcp, 1, 1),
+        BorderCrossing(portCode, terminal, UtcDate(2025, 5, 2), Pcp, 2, 2),
+        BorderCrossing(portCode, terminal, UtcDate(2025, 5, 3), Pcp, 3, 3),
+      ).map(ph => BorderCrossingSerialiser.toRow(ph, 0L))
+      Await.result(TestDatabase.run(insert(portCode)(terminal, Pcp, paxHourly)), 2.second)
+
+      val rows = TestDatabase.run(dao.get(portCode.iata, terminal.toString, UtcDate(2025, 5, 2).toISOString)).futureValue
+      rows.toSet.map(BorderCrossingSerialiser.fromRow) should be(Set(BorderCrossing(portCode, terminal, UtcDate(2025, 5, 2), Pcp, 2, 2)))
+    }
+    "filter rows by local date - 23:00 to 23:00 in utc" in {
+      val paxHourly = Seq(
+        BorderCrossing(portCode, terminal, UtcDate(2025, 5, 1), Pcp, 22, 1),
+        BorderCrossing(portCode, terminal, UtcDate(2025, 5, 1), Pcp, 23, 2),
+        BorderCrossing(portCode, terminal, UtcDate(2025, 5, 2), Pcp, 0, 3),
+        BorderCrossing(portCode, terminal, UtcDate(2025, 5, 2), Pcp, 1, 4),
+      ).map(ph => BorderCrossingSerialiser.toRow(ph, 0L))
+
+      val result = BorderCrossingDao.filterDate(paxHourly, LocalDate(2025, 5, 2))
+        .map(BorderCrossingSerialiser.fromRow)
+
+      result should ===(Seq(
+        BorderCrossing(portCode, terminal, UtcDate(2025, 5, 1), Pcp, 23, 2),
+        BorderCrossing(portCode, terminal, UtcDate(2025, 5, 2), Pcp, 0, 3),
+        BorderCrossing(portCode, terminal, UtcDate(2025, 5, 2), Pcp, 1, 4)
+      ))
+    }
+  }
+
+  "queueTotalsForPortAndDate" should {
+    "return the total pax for a port and local date that has pax spanning 2 utc dates" in {
+      (SDate("2025-05-01T20:00").millisSinceEpoch to SDate("2025-05-03T20:00").millisSinceEpoch by 1.hour.toMillis).map { millis =>
+        val sdate = SDate(millis)
+        val date = sdate.toUtcDate
+        val hour = sdate.getHours
+        val paxHourly = List(
+          BorderCrossing(portCode, T1, date, EGate, hour, 1),
+          BorderCrossing(portCode, T1, date, Pcp, hour, 2),
+        ).map(ph => BorderCrossingSerialiser.toRow(ph, 0L))
+        Await.result(TestDatabase.run(insert(portCode)(T1, EGate, paxHourly)), 2.second)
+        Await.result(TestDatabase.run(insert(portCode)(T1, Pcp, paxHourly)), 2.second)
+      }
+
+      val result = TestDatabase.run(dao.queueTotalsForPortAndDate(portCode.iata, None)(global)(LocalDate(2025, 5, 2))).futureValue
+
+      result should be(Map(
+        Queues.EGate -> 24,
+        QueueDesk -> 48
+      ))
+    }
+    "return the total pax for a port and utc date" in {
+      (SDate("2025-05-01T20:00").millisSinceEpoch to SDate("2025-05-03T20:00").millisSinceEpoch by 1.hour.toMillis).map { millis =>
+        val sdate = SDate(millis)
+        val date = sdate.toUtcDate
+        val hour = sdate.getHours
+        val paxHourly = List(
+          BorderCrossing(portCode, T1, date, EGate, hour, 1),
+          BorderCrossing(portCode, T1, date, Pcp, hour, 2),
+        ).map(ph => BorderCrossingSerialiser.toRow(ph, 0L))
+        Await.result(TestDatabase.run(insert(portCode)(T1, EGate, paxHourly)), 2.second)
+        Await.result(TestDatabase.run(insert(portCode)(T1, Pcp, paxHourly)), 2.second)
+      }
+
+      val result = TestDatabase.run(dao.queueTotalsForPortAndDate(portCode.iata, None)(global)(UtcDate(2025, 5, 2))).futureValue
+
+      result should be(Map(
+        Queues.EGate -> 24,
+        QueueDesk -> 48
+      ))
     }
   }
 }
