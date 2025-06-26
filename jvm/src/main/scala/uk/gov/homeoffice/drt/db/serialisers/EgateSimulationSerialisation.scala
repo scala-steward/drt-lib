@@ -16,9 +16,9 @@ case class EgateSimulationRequest(startDate: UtcDate,
 case class EgateSimulation(uuid: String,
                            request: EgateSimulationRequest,
                            status: String,
+                           content: Option[String],
                            createdAt: SDateLike,
                           )
-
 
 object EgateSimulationSerialisation {
   def apply(row: EgateSimulationRow): EgateSimulation =
@@ -32,6 +32,7 @@ object EgateSimulationSerialisation {
         parentChildRatio = row.parentChildRatio,
       ),
       status = row.status,
+      content = row.content,
       createdAt = SDate(row.createdAt.getTime),
     )
 
@@ -44,6 +45,7 @@ object EgateSimulationSerialisation {
       uptakePercentage = simulation.request.uptakePercentage,
       parentChildRatio = simulation.request.parentChildRatio,
       status = simulation.status,
+      content = simulation.content,
       createdAt = new Timestamp(simulation.createdAt.millisSinceEpoch),
     )
 }

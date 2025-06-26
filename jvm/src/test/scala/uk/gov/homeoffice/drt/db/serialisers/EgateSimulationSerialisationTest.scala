@@ -17,6 +17,7 @@ class EgateSimulationSerialisationTest extends AnyWordSpec {
           parentChildRatio = 1.5,
         ),
         status = "active",
+        content = Some("simulation content"),
         createdAt = SDate("2023-10-01T12:00:00Z"),
       )
 

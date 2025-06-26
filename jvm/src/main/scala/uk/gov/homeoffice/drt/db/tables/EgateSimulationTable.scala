@@ -11,6 +11,7 @@ case class EgateSimulationRow(uuid: String,
                               uptakePercentage: Double,
                               parentChildRatio: Double,
                               status: String,
+                              content: Option[String],
                               createdAt: Timestamp,
                              )
 
@@ -30,10 +31,12 @@ class EgateSimulationTable(tag: Tag) extends Table[EgateSimulationRow](tag, "ega
 
   def status: Rep[String] = column[String]("status", O.Length(64, varying = true))
 
+  def content: Rep[Option[String]] = column[Option[String]]("content")
+
   def createdAt: Rep[Timestamp] = column[Timestamp]("created_at")
 
 
-  def * = (uuid, startDate, endDate, terminal, uptakePercentage, parentChildRatio, status, createdAt) <> (EgateSimulationRow.tupled, EgateSimulationRow.unapply)
+  def * = (uuid, startDate, endDate, terminal, uptakePercentage, parentChildRatio, status, content, createdAt) <> (EgateSimulationRow.tupled, EgateSimulationRow.unapply)
 
   val key = primaryKey("egate_simulation_idx", (startDate, endDate, terminal, uptakePercentage, parentChildRatio))
 

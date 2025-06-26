@@ -39,6 +39,7 @@ class EgateSimulationDaoTest extends AnyWordSpec with Matchers with BeforeAndAft
       uptakePercentage = 50,
       parentChildRatio = 0.5),
     status = "active",
+    content = None,
     createdAt = date,
   )
 
@@ -55,7 +56,7 @@ class EgateSimulationDaoTest extends AnyWordSpec with Matchers with BeforeAndAft
 
       Await.result(TestDatabase.run(dao.insertOrUpdate(initialSimulation)), 2.second)
 
-      val updatedSimulation = initialSimulation.copy(status = "completed")
+      val updatedSimulation = initialSimulation.copy(status = "completed", content = Some("nice csv content"))
       Await.result(TestDatabase.run(dao.insertOrUpdate(updatedSimulation)), 2.second)
 
       val retrievedSimulation = Await.result(TestDatabase.run(dao.get(updatedSimulation.uuid)), 2.second)

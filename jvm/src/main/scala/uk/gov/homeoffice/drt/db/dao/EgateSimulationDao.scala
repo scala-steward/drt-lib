@@ -14,10 +14,6 @@ case class EgateSimulationDao()
                              (implicit ec: ExecutionContext) {
   val table: TableQuery[EgateSimulationTable] = TableQuery[EgateSimulationTable]
 
-  def printlnCreateStatements(): Unit = {
-    println(table.schema.createStatements.mkString(";\n") + ";")
-  }
-
   def get(uuid: String): DBIOAction[Option[EgateSimulation], NoStream, Effect.Read] =
     table
       .filter(_.uuid === uuid)
@@ -36,8 +32,6 @@ case class EgateSimulationDao()
       .result
       .map(_.map(r => EgateSimulationSerialisation(r)).headOption)
 
-  def insertOrUpdate: EgateSimulation => DBIOAction[Int, NoStream, Effect.Write with Effect.Transactional] = {
-    simulation =>
-      table.insertOrUpdate(EgateSimulationSerialisation(simulation))
-  }
+  def insertOrUpdate(simulation: EgateSimulation): DBIOAction[Int, NoStream, Effect.Write with Effect.Transactional] =
+    table.insertOrUpdate(EgateSimulationSerialisation(simulation))
 }
