@@ -13,15 +13,30 @@ case class EgateSimulationRequest(startDate: UtcDate,
                                   parentChildRatio: Double,
                                  )
 
+case class EgateSimulationResponse(csvContent: String,
+                                   averageDifference: Double,
+                                   standardDeviation: Double,
+                                  )
+
 case class EgateSimulation(uuid: String,
                            request: EgateSimulationRequest,
                            status: String,
-                           content: Option[String],
+                           response: Option[EgateSimulationResponse],
                            createdAt: SDateLike,
                           )
 
 object EgateSimulationSerialisation {
-  def apply(row: EgateSimulationRow): EgateSimulation =
+  def apply(row: EgateSimulationRow): EgateSimulation = {
+    val maybeResponse = for {
+      content <- row.content
+      averageDifference <- row.averageDifference
+      standardDeviation <- row.standardDeviation
+    } yield EgateSimulationResponse(
+      csvContent = content,
+      averageDifference = averageDifference,
+      standardDeviation = standardDeviation,
+    )
+
     EgateSimulation(
       uuid = row.uuid,
       EgateSimulationRequest(
@@ -32,9 +47,10 @@ object EgateSimulationSerialisation {
         parentChildRatio = row.parentChildRatio,
       ),
       status = row.status,
-      content = row.content,
+      response = maybeResponse,
       createdAt = SDate(row.createdAt.getTime),
     )
+  }
 
   def apply(simulation: EgateSimulation): EgateSimulationRow =
     EgateSimulationRow(
@@ -45,7 +61,9 @@ object EgateSimulationSerialisation {
       uptakePercentage = simulation.request.uptakePercentage,
       parentChildRatio = simulation.request.parentChildRatio,
       status = simulation.status,
-      content = simulation.content,
+      content = simulation.response.map(_.csvContent),
+      averageDifference = simulation.response.map(_.averageDifference),
+      standardDeviation = simulation.response. map(_.standardDeviation),
       createdAt = new Timestamp(simulation.createdAt.millisSinceEpoch),
     )
 }

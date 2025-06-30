@@ -4,7 +4,7 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.homeoffice.drt.db.TestDatabase
-import uk.gov.homeoffice.drt.db.serialisers.{EgateSimulation, EgateSimulationRequest}
+import uk.gov.homeoffice.drt.db.serialisers.{EgateSimulation, EgateSimulationRequest, EgateSimulationResponse}
 import uk.gov.homeoffice.drt.ports.Terminals.T1
 import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 
@@ -39,7 +39,11 @@ class EgateSimulationDaoTest extends AnyWordSpec with Matchers with BeforeAndAft
       uptakePercentage = 50,
       parentChildRatio = 0.5),
     status = "active",
-    content = None,
+    response = Some(EgateSimulationResponse(
+      csvContent = "header1,header2\nvalue1,value2",
+      averageDifference = 5.0,
+      standardDeviation = 1.0,
+    )),
     createdAt = date,
   )
 
@@ -56,7 +60,7 @@ class EgateSimulationDaoTest extends AnyWordSpec with Matchers with BeforeAndAft
 
       Await.result(TestDatabase.run(dao.insertOrUpdate(initialSimulation)), 2.second)
 
-      val updatedSimulation = initialSimulation.copy(status = "completed", content = Some("nice csv content"))
+      val updatedSimulation = initialSimulation.copy(status = "completed", response = Some(EgateSimulationResponse("nice csv content", 6.0, 1.5)))
       Await.result(TestDatabase.run(dao.insertOrUpdate(updatedSimulation)), 2.second)
 
       val retrievedSimulation = Await.result(TestDatabase.run(dao.get(updatedSimulation.uuid)), 2.second)
