@@ -5,15 +5,19 @@ import slick.jdbc.PostgresProfile.api._
 import java.sql.Timestamp
 
 case class EgateSimulationRow(uuid: String,
+                              port: String,
+                              terminal: String,
                               startDate: Timestamp,
                               endDate: Timestamp,
-                              terminal: String,
                               uptakePercentage: Double,
                               parentChildRatio: Double,
                               status: String,
                               csvContent: Option[String],
-                              averageDifference: Option[Double] = None,
-                              standardDeviation: Option[Double] = None,
+                              meanAbsolutePercentageError: Option[Double],
+                              standardDeviation: Option[Double],
+                              bias: Option[Double],
+                              correlationCoefficient: Option[Double],
+                              rSquaredError: Option[Double],
                               createdAt: Timestamp,
                              )
 
@@ -21,11 +25,13 @@ case class EgateSimulationRow(uuid: String,
 class EgateSimulationTable(tag: Tag) extends Table[EgateSimulationRow](tag, "egate_simulation") {
   def uuid: Rep[String] = column[String]("id", O.Length(255, varying = true))
 
+  def port: Rep[String] = column[String]("port", O.Length(64, varying = true))
+
+  def terminal: Rep[String] = column[String]("terminal", O.Length(64, varying = true))
+
   def startDate: Rep[Timestamp] = column[Timestamp]("start_date")
 
   def endDate: Rep[Timestamp] = column[Timestamp]("end_date")
-
-  def terminal: Rep[String] = column[String]("terminal", O.Length(64, varying = true))
 
   def uptakePercentage: Rep[Double] = column[Double]("uptake_percentage")
 
@@ -35,14 +41,21 @@ class EgateSimulationTable(tag: Tag) extends Table[EgateSimulationRow](tag, "ega
 
   def csvContent: Rep[Option[String]] = column[Option[String]]("csv_content")
 
-  def averageDifference: Rep[Option[Double]] = column[Option[Double]]("average_difference")
+  def meanAbsolutePercentageError: Rep[Option[Double]] = column[Option[Double]]("mean_absolute_percentage_error")
 
   def standardDeviation: Rep[Option[Double]] = column[Option[Double]]("standard_deviation")
+
+  def bias: Rep[Option[Double]] = column[Option[Double]]("bias")
+
+  def correlationCoefficient: Rep[Option[Double]] = column[Option[Double]]("correlation_coefficient")
+
+  def rSquaredError: Rep[Option[Double]] = column[Option[Double]]("r_squared_error")
 
   def createdAt: Rep[Timestamp] = column[Timestamp]("created_at")
 
 
-  def * = (uuid, startDate, endDate, terminal, uptakePercentage, parentChildRatio, status, csvContent, averageDifference, standardDeviation, createdAt) <> (EgateSimulationRow.tupled, EgateSimulationRow.unapply)
+  def * = (uuid, port, terminal, startDate, endDate, uptakePercentage, parentChildRatio, status, csvContent,
+    meanAbsolutePercentageError, standardDeviation, bias, correlationCoefficient, rSquaredError, createdAt) <> (EgateSimulationRow.tupled, EgateSimulationRow.unapply)
 
   val key = primaryKey("egate_simulation_idx", (startDate, endDate, terminal, uptakePercentage, parentChildRatio))
 
