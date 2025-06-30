@@ -11,7 +11,7 @@ case class EgateSimulationRow(uuid: String,
                               uptakePercentage: Double,
                               parentChildRatio: Double,
                               status: String,
-                              content: Option[String],
+                              csvContent: Option[String],
                               averageDifference: Option[Double] = None,
                               standardDeviation: Option[Double] = None,
                               createdAt: Timestamp,
@@ -33,7 +33,7 @@ class EgateSimulationTable(tag: Tag) extends Table[EgateSimulationRow](tag, "ega
 
   def status: Rep[String] = column[String]("status", O.Length(64, varying = true))
 
-  def content: Rep[Option[String]] = column[Option[String]]("content")
+  def csvContent: Rep[Option[String]] = column[Option[String]]("csv_content")
 
   def averageDifference: Rep[Option[Double]] = column[Option[Double]]("average_difference")
 
@@ -42,7 +42,7 @@ class EgateSimulationTable(tag: Tag) extends Table[EgateSimulationRow](tag, "ega
   def createdAt: Rep[Timestamp] = column[Timestamp]("created_at")
 
 
-  def * = (uuid, startDate, endDate, terminal, uptakePercentage, parentChildRatio, status, content, averageDifference, standardDeviation, createdAt) <> (EgateSimulationRow.tupled, EgateSimulationRow.unapply)
+  def * = (uuid, startDate, endDate, terminal, uptakePercentage, parentChildRatio, status, csvContent, averageDifference, standardDeviation, createdAt) <> (EgateSimulationRow.tupled, EgateSimulationRow.unapply)
 
   val key = primaryKey("egate_simulation_idx", (startDate, endDate, terminal, uptakePercentage, parentChildRatio))
 

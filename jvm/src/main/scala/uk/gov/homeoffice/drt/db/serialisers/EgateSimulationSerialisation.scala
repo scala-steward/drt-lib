@@ -28,11 +28,11 @@ case class EgateSimulation(uuid: String,
 object EgateSimulationSerialisation {
   def apply(row: EgateSimulationRow): EgateSimulation = {
     val maybeResponse = for {
-      content <- row.content
+      csvContent <- row.csvContent
       averageDifference <- row.averageDifference
       standardDeviation <- row.standardDeviation
     } yield EgateSimulationResponse(
-      csvContent = content,
+      csvContent = csvContent,
       averageDifference = averageDifference,
       standardDeviation = standardDeviation,
     )
@@ -61,7 +61,7 @@ object EgateSimulationSerialisation {
       uptakePercentage = simulation.request.uptakePercentage,
       parentChildRatio = simulation.request.parentChildRatio,
       status = simulation.status,
-      content = simulation.response.map(_.csvContent),
+      csvContent = simulation.response.map(_.csvContent),
       averageDifference = simulation.response.map(_.averageDifference),
       standardDeviation = simulation.response. map(_.standardDeviation),
       createdAt = new Timestamp(simulation.createdAt.millisSinceEpoch),
