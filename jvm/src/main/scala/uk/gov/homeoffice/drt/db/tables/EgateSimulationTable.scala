@@ -57,7 +57,7 @@ class EgateSimulationTable(tag: Tag) extends Table[EgateSimulationRow](tag, "ega
   def * = (uuid, port, terminal, startDate, endDate, uptakePercentage, parentChildRatio, status, csvContent,
     meanAbsolutePercentageError, standardDeviation, bias, correlationCoefficient, rSquaredError, createdAt) <> (EgateSimulationRow.tupled, EgateSimulationRow.unapply)
 
-  val key = primaryKey("egate_simulation_idx", (startDate, endDate, terminal, uptakePercentage, parentChildRatio))
+  val key = primaryKey("egate_simulation_idx", (port, terminal, startDate, endDate, uptakePercentage, parentChildRatio))
 
   val uuidIndex = index("egate_simulation_parameters_uuid", uuid, unique = true)
 }
