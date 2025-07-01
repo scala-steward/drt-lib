@@ -6,7 +6,7 @@ import uk.gov.homeoffice.drt.db.tables.{BorderCrossingRow, BorderCrossingTable, 
 import uk.gov.homeoffice.drt.ports.Queues.Queue
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.ports.{PortCode, Queues}
-import uk.gov.homeoffice.drt.time.{LocalDate, SDate, UtcDate}
+import uk.gov.homeoffice.drt.time.{DateLike, LocalDate, SDate, UtcDate}
 
 import scala.concurrent.ExecutionContext
 
@@ -36,16 +36,14 @@ object BorderCrossingDao {
       .result
 
   def totalForPortAndDate(port: String, maybeTerminal: Option[String])
-                         (implicit ec: ExecutionContext): LocalDate => DBIOAction[Int, NoStream, Effect.Read] =
-    localDate =>
-      filterPortTerminalDate(port, maybeTerminal, localDate)
-        .map(_.map {
-          _.passengers
-        }.sum)
+                         (implicit ec: ExecutionContext): DateLike => DBIOAction[Int, NoStream, Effect.Read] =
+    date =>
+      filterPortTerminalDate(port, maybeTerminal, date)
+        .map(_.map(_.passengers).sum)
 
   def queueTotalsForPortAndDate(port: String, maybeTerminal: Option[String])
-                               (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Queue, Int], NoStream, Effect.Read] =
-    localDate => filterPortTerminalDate(port, maybeTerminal, localDate).map(rowsToQueueTotals)
+                               (implicit ec: ExecutionContext): DateLike => DBIOAction[Map[Queue, Int], NoStream, Effect.Read] =
+    date => filterPortTerminalDate(port, maybeTerminal, date).map(rowsToQueueTotals)
 
   private def rowsToQueueTotals(rows: Seq[BorderCrossingRow]): Map[Queue, Int] =
     rows
@@ -56,9 +54,9 @@ object BorderCrossingDao {
       }
 
   def hourlyForPortAndDate(port: String, maybeTerminal: Option[String])
-                          (implicit ec: ExecutionContext): LocalDate => DBIOAction[Map[Long, Map[Queue, Int]], NoStream, Effect.Read] =
-    localDate =>
-      filterPortTerminalDate(port, maybeTerminal, localDate)
+                          (implicit ec: ExecutionContext): DateLike => DBIOAction[Map[Long, Map[Queue, Int]], NoStream, Effect.Read] =
+    date =>
+      filterPortTerminalDate(port, maybeTerminal, date)
         .map {
           _
             .groupBy { r =>
@@ -85,16 +83,20 @@ object BorderCrossingDao {
     }
 
 
-  private def filterLocalDate(rows: Seq[BorderCrossingRow], localDate: LocalDate): Seq[BorderCrossingRow] =
+  def filterDate(rows: Seq[BorderCrossingRow], date: DateLike): Seq[BorderCrossingRow] =
     rows.filter { row =>
-      val utcDate = UtcDate.parse(row.dateUtc).getOrElse(throw new Exception(s"Failed to parse UtcDate from ${row.dateUtc}"))
-      val rowLocalDate = SDate(utcDate).addHours(row.hour).toLocalDate
-      rowLocalDate == localDate
+      val rowUtcDate = UtcDate.parse(row.dateUtc).getOrElse(throw new Exception(s"Failed to parse UtcDate from ${row.dateUtc}"))
+      date match {
+        case localDate: LocalDate =>
+          SDate(rowUtcDate).addHours(row.hour).toLocalDate == localDate
+        case utcDate: UtcDate =>
+          SDate(rowUtcDate).addHours(row.hour).toUtcDate == utcDate
+      }
     }
 
-  private def filterPortTerminalDate(port: String, maybeTerminal: Option[String], localDate: LocalDate)
+  private def filterPortTerminalDate(port: String, maybeTerminal: Option[String], date: DateLike)
                                     (implicit ec: ExecutionContext): DBIOAction[Seq[BorderCrossingRow], NoStream, Effect.Read] = {
-    val sdate = SDate(localDate)
+    val sdate = SDate(date)
     val startUtcDate = sdate.getLocalLastMidnight.toUtcDate
     val endUtcDate = sdate.getLocalNextMidnight.addMinutes(-1).toUtcDate
     val utcDates = Set(startUtcDate, endUtcDate)
@@ -107,7 +109,7 @@ object BorderCrossingDao {
       }
       .filter(_.dateUtc inSet utcDates.map(_.toISOString))
       .result
-      .map(rows => filterLocalDate(rows, localDate))
+      .map(rows => filterDate(rows, date))
   }
 
   def removeAllBefore: UtcDate => DBIOAction[Int, NoStream, Effect.Write] = date =>

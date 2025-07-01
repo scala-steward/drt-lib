@@ -9,7 +9,7 @@ import uk.gov.homeoffice.drt.db.serialisers.FlightSerialiser
 import uk.gov.homeoffice.drt.db.tables.{FlightRow, FlightTable}
 import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.ports.{FeedSource, PortCode}
-import uk.gov.homeoffice.drt.time.{DateRange, LocalDate, SDate, UtcDate}
+import uk.gov.homeoffice.drt.time.{DateLike, DateRange, LocalDate, SDate, UtcDate}
 
 import java.sql.Timestamp
 import scala.concurrent.{ExecutionContext, Future}
@@ -22,11 +22,13 @@ case class FlightDao()
   def flightsForPcpDateRange(portCode: PortCode,
                              paxFeedSourceOrder: List[FeedSource],
                              execute: DBIOAction[(UtcDate, Seq[ApiFlightWithSplits]), NoStream, Effect.Read] => Future[(UtcDate, Seq[ApiFlightWithSplits])]
-                            ): (LocalDate, LocalDate, Seq[Terminal]) => Source[(UtcDate, Seq[ApiFlightWithSplits]), NotUsed] = {
+                            ): (DateLike, DateLike, Seq[Terminal]) => Source[(UtcDate, Seq[ApiFlightWithSplits]), NotUsed] = {
     val getFlights = getForTerminalsUtcDate(portCode)
 
     (start, end, terminals) =>
-      val utcStart = SDate(start).addDays(-1).toUtcDate
+      val startSdate = SDate(start)
+      val endSdate = SDate(end).addDays(1).addMinutes(-1)
+      val utcStart = startSdate.addDays(-1).toUtcDate
       val endPlusADay = SDate(end).addDays(1).toUtcDate
       val utcEnd = UtcDate(endPlusADay.year, endPlusADay.month, endPlusADay.day)
       Source(DateRange(utcStart, utcEnd))
@@ -34,7 +36,7 @@ case class FlightDao()
           execute(
             getFlights(terminals, date)
               .map { flights =>
-                val relevantFlightsForDates = flights.filter(_.apiFlight.hasPcpDuring(SDate(start), SDate(end).addDays(1).addMinutes(-1), paxFeedSourceOrder))
+                val relevantFlightsForDates = flights.filter(_.apiFlight.hasPcpDuring(startSdate, endSdate, paxFeedSourceOrder))
                 date -> relevantFlightsForDates
               }
           )
