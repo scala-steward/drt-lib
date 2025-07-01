@@ -26,7 +26,9 @@ case class FlightDao()
     val getFlights = getForTerminalsUtcDate(portCode)
 
     (start, end, terminals) =>
-      val utcStart = SDate(start).addDays(-1).toUtcDate
+      val startSdate = SDate(start)
+      val endSdate = SDate(end).addDays(1).addMinutes(-1)
+      val utcStart = startSdate.addDays(-1).toUtcDate
       val endPlusADay = SDate(end).addDays(1).toUtcDate
       val utcEnd = UtcDate(endPlusADay.year, endPlusADay.month, endPlusADay.day)
       Source(DateRange(utcStart, utcEnd))
@@ -34,7 +36,7 @@ case class FlightDao()
           execute(
             getFlights(terminals, date)
               .map { flights =>
-                val relevantFlightsForDates = flights.filter(_.apiFlight.hasPcpDuring(SDate(start), SDate(end).addDays(1).addMinutes(-1), paxFeedSourceOrder))
+                val relevantFlightsForDates = flights.filter(_.apiFlight.hasPcpDuring(startSdate, endSdate, paxFeedSourceOrder))
                 date -> relevantFlightsForDates
               }
           )
