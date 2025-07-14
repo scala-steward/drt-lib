@@ -11,9 +11,9 @@ import java.sql.Timestamp
 case class EgateEligibility(port: PortCode,
                            terminal: Terminal,
                            dateUtc: UtcDate,
-                           totalPassengers: Double,
-                           egatePassengers: Double,
-                           egateUnderAgePassengers: Double,
+                           totalPassengers: Int,
+                           egatePassengers: Int,
+                           egateUnderAgePassengers: Int,
                            createdAt: SDateLike,
                           )
 

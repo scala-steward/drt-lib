@@ -7,9 +7,9 @@ import java.sql.Timestamp
 case class EgateEligibilityRow(port: String,
                                terminal: String,
                                dateUtc: String,
-                               totalPassengers: Double,
-                               egatePassengers: Double,
-                               egateUnderAgePassengers: Double,
+                               totalPassengers: Int,
+                               egatePassengers: Int,
+                               egateUnderAgePassengers: Int,
                                createdAt: Timestamp,
                               )
 
@@ -21,11 +21,11 @@ class EgateEligibilityTable(tag: Tag) extends Table[EgateEligibilityRow](tag, "e
 
   def dateUtc: Rep[String] = column[String]("date_utc")
 
-  def totalPassengers: Rep[Double] = column[Double]("total_passengers")
+  def totalPassengers: Rep[Int] = column[Int]("total_passengers")
 
-  def egatePassengers: Rep[Double] = column[Double]("egate_passengers")
+  def egatePassengers: Rep[Int] = column[Int]("egate_passengers")
 
-  def egateUnderAgePassengers: Rep[Double] = column[Double]("egate_under_age_passengers")
+  def egateUnderAgePassengers: Rep[Int] = column[Int]("egate_under_age_passengers")
 
   def createdAt: Rep[Timestamp] = column[Timestamp]("created_at")
 

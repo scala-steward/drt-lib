@@ -32,9 +32,9 @@ class EgateEligibilityDaoTest extends AnyWordSpec with Matchers with BeforeAndAf
         port = PortCode("LHR"),
         terminal = T1,
         dateUtc = UtcDate(2023, 10, 1),
-        totalPassengers = 1000.0,
-        egatePassengers = 800.0,
-        egateUnderAgePassengers = 200.0,
+        totalPassengers = 1000,
+        egatePassengers = 800,
+        egateUnderAgePassengers = 200,
         createdAt = SDate("2023-10-01T12:00:00Z")
       )
 
@@ -49,15 +49,15 @@ class EgateEligibilityDaoTest extends AnyWordSpec with Matchers with BeforeAndAf
         port = PortCode("LHR"),
         terminal = T1,
         dateUtc = UtcDate(2023, 10, 1),
-        totalPassengers = 1000.0,
-        egatePassengers = 800.0,
-        egateUnderAgePassengers = 200.0,
+        totalPassengers = 1000,
+        egatePassengers = 800,
+        egateUnderAgePassengers = 200,
         createdAt = SDate("2023-10-01T12:00:00Z")
       )
 
       Await.result(TestDatabase.run(dao.insertOrUpdate(eligibility)), 2.second)
 
-      val updatedEligibility = eligibility.copy(totalPassengers = 1200.0)
+      val updatedEligibility = eligibility.copy(totalPassengers = 1200)
       Await.result(TestDatabase.run(dao.insertOrUpdate(updatedEligibility)), 2.second)
 
       val retrievedEligibility = Await.result(TestDatabase.run(dao.get(updatedEligibility.port, updatedEligibility.terminal, updatedEligibility.dateUtc)), 2.second)
@@ -71,9 +71,9 @@ class EgateEligibilityDaoTest extends AnyWordSpec with Matchers with BeforeAndAf
         port = PortCode("LHR"),
         terminal = T1,
         dateUtc = UtcDate(2023, 10, 1),
-        totalPassengers = 1000.0,
-        egatePassengers = 800.0,
-        egateUnderAgePassengers = 200.0,
+        totalPassengers = 1000,
+        egatePassengers = 800,
+        egateUnderAgePassengers = 200,
         createdAt = SDate("2023-10-01T12:00:00Z")
       )
 

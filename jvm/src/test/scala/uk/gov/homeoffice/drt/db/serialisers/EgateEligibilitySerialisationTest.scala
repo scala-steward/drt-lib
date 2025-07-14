@@ -12,9 +12,9 @@ class EgateEligibilitySerialisationTest extends AnyWordSpec {
         port = PortCode("LHR"),
         terminal = T1,
         dateUtc = UtcDate(2023, 10, 1),
-        totalPassengers = 1000.0,
-        egatePassengers = 800.0,
-        egateUnderAgePassengers = 200.0,
+        totalPassengers = 1000,
+        egatePassengers = 800,
+        egateUnderAgePassengers = 200,
         createdAt = SDate("2023-10-01T12:00:00Z")
       )
 
