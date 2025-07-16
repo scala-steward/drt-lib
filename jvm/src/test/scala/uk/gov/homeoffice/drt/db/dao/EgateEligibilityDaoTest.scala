@@ -18,6 +18,8 @@ class EgateEligibilityDaoTest extends AnyWordSpec with Matchers with BeforeAndAf
 
   private val dao: EgateEligibilityDao = EgateEligibilityDao()
 
+  SchemaUtils.printStatements(dao.table.schema.createStatements)
+
   before {
     Await.result(
       TestDatabase.run(DBIO.seq(
@@ -33,8 +35,8 @@ class EgateEligibilityDaoTest extends AnyWordSpec with Matchers with BeforeAndAf
         terminal = T1,
         dateUtc = UtcDate(2023, 10, 1),
         totalPassengers = 1000,
-        egatePassengers = 800,
-        egateUnderAgePassengers = 200,
+        egateEligiblePct = 800,
+        egateUnderAgePct = 200,
         createdAt = SDate("2023-10-01T12:00:00Z")
       )
 
@@ -50,8 +52,8 @@ class EgateEligibilityDaoTest extends AnyWordSpec with Matchers with BeforeAndAf
         terminal = T1,
         dateUtc = UtcDate(2023, 10, 1),
         totalPassengers = 1000,
-        egatePassengers = 800,
-        egateUnderAgePassengers = 200,
+        egateEligiblePct = 800,
+        egateUnderAgePct = 200,
         createdAt = SDate("2023-10-01T12:00:00Z")
       )
 
@@ -72,8 +74,8 @@ class EgateEligibilityDaoTest extends AnyWordSpec with Matchers with BeforeAndAf
         terminal = T1,
         dateUtc = UtcDate(2023, 10, 1),
         totalPassengers = 1000,
-        egatePassengers = 800,
-        egateUnderAgePassengers = 200,
+        egateEligiblePct = 800,
+        egateUnderAgePct = 200,
         createdAt = SDate("2023-10-01T12:00:00Z")
       )
 

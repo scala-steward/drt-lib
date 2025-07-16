@@ -9,12 +9,12 @@ import java.sql.Timestamp
 
 
 case class EgateEligibility(port: PortCode,
-                           terminal: Terminal,
-                           dateUtc: UtcDate,
-                           totalPassengers: Int,
-                           egatePassengers: Int,
-                           egateUnderAgePassengers: Int,
-                           createdAt: SDateLike,
+                            terminal: Terminal,
+                            dateUtc: UtcDate,
+                            totalPassengers: Int,
+                            egateEligiblePct: Double,
+                            egateUnderAgePct: Double,
+                            createdAt: SDateLike,
                           )
 
 object EgateEligibilitySerialisation {
@@ -24,8 +24,8 @@ object EgateEligibilitySerialisation {
       terminal = Terminal(row.terminal),
       dateUtc = UtcDate.parse(row.dateUtc).getOrElse(throw new Exception(s"Failed to parse dateUtc: ${row.dateUtc}")),
       totalPassengers = row.totalPassengers,
-      egatePassengers = row.egatePassengers,
-      egateUnderAgePassengers = row.egateUnderAgePassengers,
+      egateEligiblePct = row.egateEligiblePct,
+      egateUnderAgePct = row.egateUnderAgePct,
       createdAt = SDate(row.createdAt.getTime)
     )
 
@@ -35,8 +35,8 @@ object EgateEligibilitySerialisation {
       terminal = simulation.terminal.toString,
       dateUtc = simulation.dateUtc.toISOString,
       totalPassengers = simulation.totalPassengers,
-      egatePassengers = simulation.egatePassengers,
-      egateUnderAgePassengers = simulation.egateUnderAgePassengers,
+      egateEligiblePct = simulation.egateEligiblePct,
+      egateUnderAgePct = simulation.egateUnderAgePct,
       createdAt = new Timestamp(simulation.createdAt.millisSinceEpoch)
     )
 }

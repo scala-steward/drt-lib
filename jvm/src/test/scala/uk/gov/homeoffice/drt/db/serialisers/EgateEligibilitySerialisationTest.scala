@@ -13,8 +13,8 @@ class EgateEligibilitySerialisationTest extends AnyWordSpec {
         terminal = T1,
         dateUtc = UtcDate(2023, 10, 1),
         totalPassengers = 1000,
-        egatePassengers = 800,
-        egateUnderAgePassengers = 200,
+        egateEligiblePct = 800,
+        egateUnderAgePct = 200,
         createdAt = SDate("2023-10-01T12:00:00Z")
       )
 

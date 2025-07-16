@@ -8,8 +8,8 @@ case class EgateEligibilityRow(port: String,
                                terminal: String,
                                dateUtc: String,
                                totalPassengers: Int,
-                               egatePassengers: Int,
-                               egateUnderAgePassengers: Int,
+                               egateEligiblePct: Double,
+                               egateUnderAgePct: Double,
                                createdAt: Timestamp,
                               )
 
@@ -23,14 +23,14 @@ class EgateEligibilityTable(tag: Tag) extends Table[EgateEligibilityRow](tag, "e
 
   def totalPassengers: Rep[Int] = column[Int]("total_passengers")
 
-  def egatePassengers: Rep[Int] = column[Int]("egate_passengers")
+  def egateEligiblePct: Rep[Double] = column[Double]("egate_eligible_pct")
 
-  def egateUnderAgePassengers: Rep[Int] = column[Int]("egate_under_age_passengers")
+  def egateUnderAgePct: Rep[Double] = column[Double]("egate_under_age_pct")
 
   def createdAt: Rep[Timestamp] = column[Timestamp]("created_at")
 
 
-  def * = (port, terminal, dateUtc, totalPassengers, egatePassengers, egateUnderAgePassengers, createdAt) <> (EgateEligibilityRow.tupled, EgateEligibilityRow.unapply)
+  def * = (port, terminal, dateUtc, totalPassengers, egateEligiblePct, egateUnderAgePct, createdAt) <> (EgateEligibilityRow.tupled, EgateEligibilityRow.unapply)
 
   val key = primaryKey("egate_eligibility_idx", (port, terminal, dateUtc))
 }
