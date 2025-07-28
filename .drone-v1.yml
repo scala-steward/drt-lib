@@ -73,7 +73,7 @@ steps:
 
   - name: Code coverage report
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-debian12-jdk17-node20
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-debian12-jdk17-node20
     commands:
       - /root/entrypoint.sh
       - sbt -mem 4096 --error coverage test | true
@@ -93,7 +93,7 @@ steps:
 
   - name: Scapegoat
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-debian12-jdk17-node20
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-debian12-jdk17-node20
     commands:
       - /root/entrypoint.sh
       - sbt scapegoat | true
@@ -112,23 +112,24 @@ steps:
 
   - name: Dependency check
     pull: if-not-exists
-    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs::v1.4.0-debian12-jdk17-node20
+    image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-debian12-jdk17-node20
     commands:
       - /root/entrypoint.sh
-      - sbt -mem 4096 dependencyCheck
+      - sbt -Dlog4j2.level=info dependencyCheck
     environment:
-      NVD_BASE_URL: http://nvdmirror:8008
+      JAVA_OPTS: -Xmx2g
+      NVD_API_KEY:
+        from_secret: NVD_API_KEY_SECRET
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
       ARTIFACTORY_USERNAME: drt_ci
-      ENV_LOG_LEVEL: ERROR
     when:
-      event:
-        - push
       branch:
         - master
+      event:
+        - push
     depends_on:
-      - Scapegoat
+      - Publish library
 
   - name: Sonar scanner
     pull: if-not-exists
@@ -145,9 +146,4 @@ steps:
     depends_on:
       - Dependency check
 
-services:
-  - name: NVD mirror service
-    image: sspringett/nvdmirror
-    ports:
-      - 8008
 ...

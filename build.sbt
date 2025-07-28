@@ -34,6 +34,7 @@ lazy val scribeSlf4jVersion = "3.16.0"
 lazy val h2Version = "2.3.232"
 lazy val sslConfigCoreVersion = "0.6.1"
 
+
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .in(file("."))
   .settings(

@@ -20,3 +20,9 @@ dist/*
 out
 *.sc
 
+#vcode
+.metals
+.bloop
+.bloop/*
+.vscode
+metals*
