@@ -10,7 +10,7 @@ ThisBuild / version := "v" + sys.env.getOrElse("DRONE_BUILD_NUMBER", sys.env.get
 val artifactory = "https://artifactory.digital.homeoffice.gov.uk/"
 
 lazy val root = project.in(file(".")).
-  aggregate(crossJS, crossJVM).
+  aggregate(cross.js, cross.jvm).
   settings(
     name := "drt-lib",
     publish := {},
@@ -83,14 +83,4 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
   )
   .jsSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
-  )
-
-lazy val crossJS = cross.js
-  .settings(
-    coverageEnabled := false
-  )
-
-lazy val crossJVM = cross.jvm
-  .settings(
-    coverageEnabled := true
   )
