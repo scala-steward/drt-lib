@@ -10,7 +10,7 @@ ThisBuild / version := "v" + sys.env.getOrElse("DRONE_BUILD_NUMBER", sys.env.get
 val artifactory = "https://artifactory.digital.homeoffice.gov.uk/"
 
 lazy val root = project.in(file(".")).
-  aggregate(cross.js, cross.jvm).
+  aggregate(crossJS, crossJVM).
   settings(
     name := "drt-lib",
     publish := {},
@@ -52,8 +52,8 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "Artifactory Snapshot Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-snapshot/",
       "Artifactory Release Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-release/"
     )
-  ).
-  jvmSettings(
+  )
+  .jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe" %% "ssl-config-core" % sslConfigCoreVersion,
       "org.apache.pekko" %% "pekko-actor" % pekkoVersion,
@@ -80,7 +80,17 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
         file("/usr/bin/protoc")
     },
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
-  ).
-  jsSettings(
+  )
+  .jsSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
+  )
+
+lazy val crossJS = cross.js
+  .settings(
+    coverageEnabled := false
+  )
+
+lazy val crossJVM = cross.jvm
+  .settings(
+    coverageEnabled := true
   )
