@@ -86,8 +86,10 @@ steps:
     when:
       event:
         - push
+      branch:
+        - master
     depends_on:
-      - Unit tests
+      - Publish library
 
   - name: Scapegoat
     pull: if-not-exists
