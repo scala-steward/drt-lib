@@ -129,7 +129,7 @@ steps:
       event:
         - push
     depends_on:
-      - Publish library
+      - Code coverage report
 
   - name: Sonar scanner
     pull: if-not-exists
