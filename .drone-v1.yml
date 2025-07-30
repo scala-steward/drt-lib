@@ -85,8 +85,8 @@ steps:
     when:
       event:
         - push
-#      branch:
-#        - master
+      branch:
+        - master
     depends_on:
       - Unit tests
 
