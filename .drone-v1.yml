@@ -77,7 +77,7 @@ steps:
     commands:
       - /root/entrypoint.sh
       - rm -rf target project/target */target .scoverage
-      - sbt -mem 4096 clean crossJVM/coverage crossJVM/test crossJVM/coverageReport
+      - sbt -mem 4096 clean coverage test coverageReport
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
