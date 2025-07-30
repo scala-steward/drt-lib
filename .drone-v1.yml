@@ -76,7 +76,8 @@ steps:
     image: quay.io/ukhomeofficedigital/scala-sbt-nodejs:v1.4.0-debian12-jdk17-node20
     commands:
       - /root/entrypoint.sh
-      - sbt -mem 4096 crossJVM/coverage crossJVM/test crossJVM/coverageReport
+      - rm -rf target project/target */target .scoverage
+      - sbt -mem 4096 clean crossJVM/coverage crossJVM/test crossJVM/coverageReport
     environment:
       ARTIFACTORY_PASSWORD:
         from_secret: ARTIFACTORY_PASSWORD
