@@ -17,11 +17,11 @@ object Stn extends AirportConfigLike {
   import AirportConfigDefaults._
 
   private object ProcTimes {
-    val gbr = 31.1
-    val eea = 38.8
-    val b5jssk = 52.9
-    val nvn = 85.9
-    val vn = 90.3
+    val gbr = 31.0
+    val eea = 40.0
+    val b5jssk = 53.0
+    val nvn = 87.0
+    val vn = 88.0
     val egates = 45d
   }
 

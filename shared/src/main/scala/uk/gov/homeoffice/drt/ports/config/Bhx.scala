@@ -16,11 +16,11 @@ object Bhx extends AirportConfigLike {
   import AirportConfigDefaults._
 
   private object ProcTimes {
-    val gbr = 23.7
-    val eea = 36.4
-    val b5jssk = 52.1
-    val nvn = 86.5
-    val vn = 91.4
+    val gbr = 24.0
+    val eea = 37.0
+    val b5jssk = 52.0
+    val nvn = 87.0
+    val vn = 88.0
     val egates = 48d
   }
 

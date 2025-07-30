@@ -50,11 +50,11 @@ object AirportConfigDefaults {
   )
 
   private object ProcTimes {
-    val gbr = 22.7
-    val eea = 26.2
-    val b5jssk = 45.5
-    val nvn = 91.4
-    val vn = 99.5
+    val gbr = 22.0
+    val eea = 26.0
+    val b5jssk = 45.0
+    val nvn = 91.0
+    val vn = 94.0
     val egates = 36d
   }
 
