@@ -52,8 +52,8 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "Artifactory Snapshot Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-snapshot/",
       "Artifactory Release Realm" at "https://artifactory.digital.homeoffice.gov.uk/artifactory/libs-release/"
     )
-  ).
-  jvmSettings(
+  )
+  .jvmSettings(
     libraryDependencies ++= Seq(
       "com.typesafe" %% "ssl-config-core" % sslConfigCoreVersion,
       "org.apache.pekko" %% "pekko-actor" % pekkoVersion,
@@ -80,7 +80,7 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
         file("/usr/bin/protoc")
     },
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
-  ).
-  jsSettings(
+  )
+  .jsSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
   )
