@@ -25,6 +25,7 @@ case class EgateSimulationDao()
       .filter(r =>
         r.startDate === new Timestamp(SDate(request.startDate).millisSinceEpoch) &&
           r.endDate === new Timestamp(SDate(request.endDate).millisSinceEpoch) &&
+          r.port === request.portCode.toString &&
           r.terminal === request.terminal.toString &&
           r.uptakePercentage === request.uptakePercentage &&
           r.parentChildRatio === request.parentChildRatio
