@@ -89,7 +89,6 @@ case class StaffShiftsDao(db: CentralDatabase) extends IStaffShiftsDao {
       staffShiftsTable.filter { s =>
         s.port === port &&
           s.terminal === terminal &&
-          s.startDate <= staffShiftRow.startDate &&
           (s.endDate.isEmpty || s.endDate.map(_ > staffShiftRow.startDate).getOrElse(false))
       }.sortBy(_.startDate.desc).result
     ).map(_.map(fromStaffShiftRow))

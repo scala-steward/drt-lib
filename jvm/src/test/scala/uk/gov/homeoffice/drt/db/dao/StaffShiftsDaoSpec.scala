@@ -188,7 +188,7 @@ class StaffShiftsDaoSpec extends Specification with BeforeEach {
 
     }
 
-    "getOverlappingStaffShifts should not return shifts where start date is later than search shift and end Date empty or one month or later" in {
+    "getOverlappingStaffShifts should return shifts where end date is before than search shift start start" in {
       val baseShift, searchShift = getStaffShiftRow
       val oneMonthLater = localDateAddMonth(baseShift.startDate, 1)
       val overlappingShift = baseShift.copy(
@@ -204,7 +204,8 @@ class StaffShiftsDaoSpec extends Specification with BeforeEach {
         1.second
       )
       result.map(_.shiftName) must contain(baseShift.shiftName)
-      result.size === 1
+      result.map(_.shiftName) must contain("MonthLater")
+      result.size === 2
     }
 
     "getOverlappingStaffShifts should not return shifts where start date is before search shift and end Date previous one month" in {
