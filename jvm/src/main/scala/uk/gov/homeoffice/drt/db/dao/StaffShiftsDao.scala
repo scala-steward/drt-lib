@@ -146,7 +146,6 @@ case class StaffShiftsDao(db: CentralDatabase) extends IStaffShiftsDao {
         s.port === newShiftRow.port &&
           s.terminal === newShiftRow.terminal &&
           s.startDate >= newShiftRow.startDate &&
-          s.startTime >= newShiftRow.startTime &&
           s.startTime >= lowerBoundStr &&
           s.startTime < upperBoundStr
       }.sortBy(_.startDate.desc).result.headOption
