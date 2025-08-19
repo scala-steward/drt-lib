@@ -58,4 +58,58 @@ class UserPreferencesTest extends AnyWordSpec with Matchers {
       deserialized shouldEqual input
     }
   }
+
+  "deserialize JSON-like data correctly" in {
+    val json = Map(
+      "userSelectedPlanningTimePeriod" -> "60",
+      "hidePaxDataSourceDescription" -> "true",
+      "showStaffingShiftView" -> "true",
+      "desksAndQueuesIntervalMinutes" -> "60",
+      "portDashboardIntervalMinutes" -> "lhr:15;bhx:15",
+      "portDashboardTerminals" -> "lhr:T2,T3,T4,T5;bhx:"
+    )
+
+    val prefs = UserPreferences(
+      userSelectedPlanningTimePeriod = json("userSelectedPlanningTimePeriod").toInt,
+      hidePaxDataSourceDescription = json("hidePaxDataSourceDescription").toBoolean,
+      showStaffingShiftView = json("showStaffingShiftView").toBoolean,
+      desksAndQueuesIntervalMinutes = json("desksAndQueuesIntervalMinutes").toInt,
+      portDashboardIntervalMinutes = UserPreferences.deserializeMap(Some(json("portDashboardIntervalMinutes")), _.toInt),
+      portDashboardTerminals = UserPreferences.deserializeMap(Some(json("portDashboardTerminals")), _.split(",").filter(_.nonEmpty).toSet)
+    )
+
+    prefs.userSelectedPlanningTimePeriod shouldEqual 60
+    prefs.hidePaxDataSourceDescription shouldEqual true
+    prefs.showStaffingShiftView shouldEqual true
+    prefs.desksAndQueuesIntervalMinutes shouldEqual 60
+    prefs.portDashboardIntervalMinutes shouldEqual Map("lhr" -> 15, "bhx" -> 15)
+    prefs.portDashboardTerminals shouldEqual Map("lhr" -> Set("T2", "T3", "T4", "T5"), "bhx" -> Set())
+  }
+
+  "deserialize json like data should be deserialized correctly when multiple port has none selected" in {
+    val json = Map(
+      "userSelectedPlanningTimePeriod" -> "60",
+      "hidePaxDataSourceDescription" -> "true",
+      "showStaffingShiftView" -> "true",
+      "desksAndQueuesIntervalMinutes" -> "60",
+      "portDashboardIntervalMinutes" -> "lhr:15;bhx:15",
+      "portDashboardTerminals" -> "lhr:;bhx:"
+    )
+
+    val prefs = UserPreferences(
+      userSelectedPlanningTimePeriod = json("userSelectedPlanningTimePeriod").toInt,
+      hidePaxDataSourceDescription = json("hidePaxDataSourceDescription").toBoolean,
+      showStaffingShiftView = json("showStaffingShiftView").toBoolean,
+      desksAndQueuesIntervalMinutes = json("desksAndQueuesIntervalMinutes").toInt,
+      portDashboardIntervalMinutes = UserPreferences.deserializeMap(Some(json("portDashboardIntervalMinutes")), _.toInt),
+      portDashboardTerminals = UserPreferences.deserializeMap(Some(json("portDashboardTerminals")), _.split(",").filter(_.nonEmpty).toSet)
+    )
+
+    prefs.userSelectedPlanningTimePeriod shouldEqual 60
+    prefs.hidePaxDataSourceDescription shouldEqual true
+    prefs.showStaffingShiftView shouldEqual true
+    prefs.desksAndQueuesIntervalMinutes shouldEqual 60
+    prefs.portDashboardIntervalMinutes shouldEqual Map("lhr" -> 15, "bhx" -> 15)
+    prefs.portDashboardTerminals shouldEqual Map("lhr" -> Set(), "bhx" -> Set())
+  }
 }
