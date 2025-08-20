@@ -26,7 +26,7 @@ case class TestHolidayV2()
                       ) extends OneToManyFeature[Arrival] with FeatureColumnsV2.HolidayLike {
   override val label: String = "testHoliday"
   override val prefix: String = "th"
-  override val hols: Seq[(LocalDate, LocalDate)] = Seq(
+  override val dates: Seq[(LocalDate, LocalDate)] = Seq(
     (LocalDate(2023, 1, 1), LocalDate(2023, 1, 7)),
     (LocalDate(2024, 1, 1), LocalDate(2024, 1, 10)),
   )
