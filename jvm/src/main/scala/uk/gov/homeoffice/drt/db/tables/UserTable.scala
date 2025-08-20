@@ -129,7 +129,7 @@ case class UserTable(tables: AggregatedDbTables) extends UserTableLike {
         Option(userPreferences.showStaffingShiftView),
         Option(userPreferences.desksAndQueuesIntervalMinutes),
         Option(serializeMap(userPreferences.portDashboardIntervalMinutes, (value: Int) => value.toString)),
-        Option(serializeMap(userPreferences.portDashboardTerminals, (values: Set[String]) => values.mkString(",")))
+        Option(serializeMap(userPreferences.portDashboardTerminals, (values: Set[String]) => values.filter(_.nonEmpty).mkString(",")))
       ))
 
     tables.run(query).recover {
