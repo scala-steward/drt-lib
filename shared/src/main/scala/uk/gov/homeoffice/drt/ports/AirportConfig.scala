@@ -107,7 +107,9 @@ case class AirportConfig(portCode: PortCode,
 
   def maxDesksForTerminal24Hrs(tn: Terminal): Map[Queue, IndexedSeq[Int]] = minMaxDesksByTerminalQueue24Hrs.getOrElse(tn, Map()).mapValues(_._2.toIndexedSeq).view.toMap
 
-  val terminals: LocalDate => Iterable[Terminal] = QueueConfig.terminalsForDate(queuesByTerminal)
+  val terminalsForDate: LocalDate => Iterable[Terminal] = QueueConfig.terminalsForDate(queuesByTerminal)
+
+  val terminalsForDateRange: (LocalDate, LocalDate) => Iterable[Terminal] = QueueConfig.terminalsForDateRange(queuesByTerminal)
 
   val terminalSplitQueueTypes: Map[Terminal, Set[Queue]] = terminalPaxSplits.map {
     case (terminal, splitRatios) =>
