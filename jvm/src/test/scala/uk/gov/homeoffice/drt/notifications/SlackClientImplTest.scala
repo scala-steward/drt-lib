@@ -3,6 +3,7 @@ package uk.gov.homeoffice.drt.notifications
 import org.apache.pekko.actor.ActorSystem
 import org.apache.pekko.http.scaladsl.model.HttpResponse
 import org.apache.pekko.stream.Materializer
+import org.apache.pekko.testkit.TestProbe
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.homeoffice.drt.HttpClient
@@ -21,7 +22,7 @@ class SlackClientImplTest extends AnyWordSpec with Matchers {
     "send a message via a mock httpclient" in {
       implicit val system: ActorSystem = ActorSystem()
       implicit val mat: Materializer = Materializer.matFromSystem(ActorSystem())
-      val probe = org.apache.pekko.testkit.TestProbe()
+      val probe = TestProbe()
 
       val mockHttpClient = new HttpClient {
         override def send(httpRequest: org.apache.pekko.http.scaladsl.model.HttpRequest): Future[HttpResponse] = {
