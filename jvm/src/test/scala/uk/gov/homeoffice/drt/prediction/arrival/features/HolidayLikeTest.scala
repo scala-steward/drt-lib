@@ -55,6 +55,7 @@ class HolidayLikeTest extends AnyWordSpec with Matchers {
         SummerHalfTerm(),
         Term3b(),
         SummerHoliday(),
+        SummerHolidayScotland(),
       )
         .foreach { holiday =>
           val nowInOneMonth: () => SDateLike = () => SDate.now().addMonths(1)
