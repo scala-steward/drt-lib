@@ -382,6 +382,9 @@ object FeatureColumnsV2 {
   }
 
   trait HolidayLike {
+    val sDateTs: Long => SDateLike
+    implicit val sDateLocalDate: LocalDate => SDateLike
+
     val dates: Seq[(LocalDate, LocalDate)]
 
     private lazy val ranges: Map[(LocalDate, LocalDate), Seq[LocalDate]] = dates.map {
@@ -396,8 +399,16 @@ object FeatureColumnsV2 {
         startAndEnd -> rangeBaseValues(range.length, baseValue)
     }
 
-    val sDateTs: Long => SDateLike
-    implicit val sDateLocalDate: LocalDate => SDateLike
+    def hasMissingDate()(implicit now: () => SDateLike) = {
+      val today = now()
+      val sixMonthsAgo = today.addMonths(-6).toLocalDate
+      val inSixMonths = today.addMonths(6).toLocalDate
+      val existsWithin6Months = dates.exists { case (start, end) =>
+        (sixMonthsAgo <= start && start <= inSixMonths) || (sixMonthsAgo <= end && end <= inSixMonths)
+      }
+      !existsWithin6Months
+    }
+
     val value: Arrival => Option[String] = (a: Arrival) => dayOfHoliday(sDateTs(a.Scheduled).toLocalDate)
 
     def localDateRange(start: LocalDate, end: LocalDate)
