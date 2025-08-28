@@ -218,10 +218,10 @@ object Lhr extends AirportConfigLike {
     feedSources = Seq(ApiFeedSource, LiveBaseFeedSource, LiveFeedSource, ForecastFeedSource, AclFeedSource),
     flexedQueues = Set(EeaDesk, NonEeaDesk),
     desksByTerminal = Map[Terminal, Int](
-      T2 -> 36,
+      T2 -> 29,
       T3 -> 28,
       T4 -> 39,
-      T5 -> 34
+      T5 -> 27,
     )
   )
 }
