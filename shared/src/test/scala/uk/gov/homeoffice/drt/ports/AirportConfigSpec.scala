@@ -20,7 +20,7 @@ class AirportConfigSpec extends Specification {
         }
     }
 
-    splitOrder(Lhr, T2, List(Queues.EeaDesk, Queues.EGate, Queues.NonEeaDesk, Queues.FastTrack))
+    splitOrder(Lhr, T2, List(Queues.EeaDesk, Queues.EGate, Queues.NonEeaDesk))
     splitOrder(Ema, T1, List(Queues.EeaDesk, Queues.EGate, Queues.NonEeaDesk))
     splitOrder(Bhx, T1, List(Queues.EeaDesk, Queues.EGate, Queues.NonEeaDesk))
     splitOrder(Bhx, T2, List(Queues.EeaDesk, Queues.NonEeaDesk))
