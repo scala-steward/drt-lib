@@ -167,4 +167,16 @@ object SDate {
     "December",
   )
 
+  def firstDayOfWeek(today: SDateLike): SDateLike = {
+    val dayOfWeek = today.getDayOfWeek
+    val daysToSubtract = if (dayOfWeek == 1) 0 else dayOfWeek - 1
+    today.addDays(-daysToSubtract)
+  }
+
+  def lastDayOfWeek(today: SDateLike): SDateLike = {
+    val dayOfWeek = today.getDayOfWeek
+    val daysToAdd = if (dayOfWeek == 7) 0 else 7 - dayOfWeek
+    today.addDays(daysToAdd)
+  }
+
 }
