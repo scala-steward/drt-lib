@@ -80,7 +80,7 @@ case class QueueSlotDao()
       table.insertOrUpdate(toRow(crunchMinute, slotLengthMinutes))
   }
 
-  def updateAndRemoveSlots(portCode: PortCode, slotLengthMinutes: Int): Iterable[CrunchMinute] => DBIOAction[Int, NoStream, Effect.Write with Nothing with Effect.Transactional] = {
+  def updateSlots(portCode: PortCode, slotLengthMinutes: Int): Iterable[CrunchMinute] => DBIOAction[Int, NoStream, Effect.Write with Nothing with Effect.Transactional] = {
     val insertOrUpdateSingle = insertOrUpdate(portCode, slotLengthMinutes)
     updates =>
       DBIO.sequence(updates.map(insertOrUpdateSingle)).map(_.size)
