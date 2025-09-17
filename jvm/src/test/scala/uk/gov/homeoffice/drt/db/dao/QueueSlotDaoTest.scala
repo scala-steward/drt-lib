@@ -94,7 +94,7 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
         SDate("2024-11-13").millisSinceEpoch,
       ).map(crunchMinute)
 
-      Await.result(TestDatabase.run(dao.updateAndRemoveSlots(PortCode("LHR"), 15)(crunchMinutes, Seq.empty)), 2.second)
+      Await.result(TestDatabase.run(dao.updateAndRemoveSlots(PortCode("LHR"), 15)(crunchMinutes)), 2.second)
 
       Await.result(TestDatabase.run(dao.removeAllBefore()(UtcDate(2024, 11, 13))), 2.second)
 
