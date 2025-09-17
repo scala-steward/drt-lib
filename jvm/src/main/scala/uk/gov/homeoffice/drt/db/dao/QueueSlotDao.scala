@@ -80,23 +80,10 @@ case class QueueSlotDao()
       table.insertOrUpdate(toRow(crunchMinute, slotLengthMinutes))
   }
 
-  def updateAndRemoveSlots(portCode: PortCode, slotLengthMinutes: Int): (Iterable[CrunchMinute], Iterable[TQM]) => DBIOAction[Int, NoStream, Effect.Write with Nothing with Effect.Transactional] = {
+  def updateAndRemoveSlots(portCode: PortCode, slotLengthMinutes: Int): Iterable[CrunchMinute] => DBIOAction[Int, NoStream, Effect.Write with Nothing with Effect.Transactional] = {
     val insertOrUpdateSingle = insertOrUpdate(portCode, slotLengthMinutes)
-    (updates, removals) => {
-      val removalActions = removals.map { removal =>
-        table
-          .filter(row =>
-            row.port === portCode.iata &&
-              row.terminal === removal.terminal.toString &&
-              row.queue === removal.queue.stringValue &&
-              row.slotStart === new Timestamp(removal.minute) &&
-              row.slotLengthMinutes === slotLengthMinutes
-          )
-          .delete
-      }
-
-      DBIO.sequence(removalActions).flatMap(_ => DBIO.sequence(updates.map(insertOrUpdateSingle))).map(_.size).transactionally
-    }
+    updates =>
+      DBIO.sequence(updates.map(insertOrUpdateSingle)).map(_.size)
   }
 
   def removeAllBefore(): UtcDate => DBIOAction[Int, NoStream, Effect.Write] = date =>
