@@ -2,7 +2,7 @@ package uk.gov.homeoffice.drt.db
 
 import slick.dbio.{DBIOAction, NoStream}
 import slick.jdbc.PostgresProfile
-import uk.gov.homeoffice.drt.db.tables.{ArrivalStatsRow, FlightTable, ProcessedJsonRow, ProcessedZipRow, QueueSlotTable, StaffShiftRow, StatusDailyTable, UserRow, VoyageManifestPassengerInfoRow}
+import uk.gov.homeoffice.drt.db.tables._
 
 import java.sql.Timestamp
 import scala.concurrent.Future
@@ -159,5 +159,6 @@ trait AggregatedDbTables extends CentralDatabase {
   val flight = new TableQuery(tag => new FlightTable(tag))
   val queueSlot = new TableQuery(tag => new QueueSlotTable(tag))
   val staffShifts = new TableQuery(tag => new StaffShiftsTable(tag))
-  val tables = Seq(arrivalStats, processedZip, processedJson, statusDaily, voyageManifestPassengerInfo, flight, queueSlot, staffShifts)
+  val shiftMetaInfo = new TableQuery(tag => new ShiftMetaInfoTable(tag))
+  val tables = Seq(arrivalStats, processedZip, processedJson, statusDaily, voyageManifestPassengerInfo, flight, queueSlot, staffShifts, shiftMetaInfo)
 }
