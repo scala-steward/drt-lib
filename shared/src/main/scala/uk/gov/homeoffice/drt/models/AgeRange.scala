@@ -14,8 +14,8 @@ case class AgeRange(bottom: Int, top: Option[Int]) extends PaxAgeRange {
   }
 
   def title: String = top match {
-    case Some(top) => s"$bottom-$top"
-    case _ => s">$bottom"
+    case Some(top) => s"$bottom to $top"
+    case _ => s"$bottom and over"
   }
 }
 
