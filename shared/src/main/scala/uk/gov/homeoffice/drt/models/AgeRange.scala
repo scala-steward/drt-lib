@@ -38,13 +38,13 @@ object PaxAgeRange {
       (title: Value) => parse(title.str)
     )
 
-  def parse(title: String): PaxAgeRange = title.split("-").toList match {
+  def parse(title: String): PaxAgeRange = title.split(" to ").toList match {
     case _ if title == UnknownAge.title =>
       UnknownAge
     case top :: bottom :: Nil =>
       AgeRange(top.toInt, bottom.toInt)
     case bottom :: Nil =>
-      AgeRange(bottom.replace(">", "").toInt)
+      AgeRange(bottom.replace(" and over", "").toInt)
   }
 }
 
