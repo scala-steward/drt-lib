@@ -14,8 +14,8 @@ case class AgeRange(bottom: Int, top: Option[Int]) extends PaxAgeRange {
   }
 
   def title: String = top match {
-    case Some(top) => s"$bottom-$top"
-    case _ => s">$bottom"
+    case Some(top) => s"$bottom to $top"
+    case _ => s"$bottom and over"
   }
 }
 
@@ -38,13 +38,13 @@ object PaxAgeRange {
       (title: Value) => parse(title.str)
     )
 
-  def parse(title: String): PaxAgeRange = title.split("-").toList match {
+  def parse(title: String): PaxAgeRange = title.split(" to ").toList match {
     case _ if title == UnknownAge.title =>
       UnknownAge
     case top :: bottom :: Nil =>
       AgeRange(top.toInt, bottom.toInt)
     case bottom :: Nil =>
-      AgeRange(bottom.replace(">", "").toInt)
+      AgeRange(bottom.replace(" and over", "").toInt)
   }
 }
 

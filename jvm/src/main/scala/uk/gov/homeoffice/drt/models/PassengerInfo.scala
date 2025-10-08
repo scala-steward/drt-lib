@@ -9,16 +9,17 @@ object PassengerInfo {
   def ageRangesForDate(scheduled: Option[SDateLike]): List[AgeRange] = {
     val egateEligibilityAgeRanges = scheduled match {
       case Some(date) if date < SDate(egateAgeEligibilityDateChange) =>
-        List(AgeRange(0, 11), AgeRange(12, 24))
+        List(AgeRange(0, 11), AgeRange(12, 17))
       case _ =>
-        List(AgeRange(0, 9), AgeRange(10, 24))
+        List(AgeRange(0, 9), AgeRange(10, 17))
     }
 
     egateEligibilityAgeRanges ++
       List(
+        AgeRange(18, 24),
         AgeRange(25, 49),
         AgeRange(50, 65),
-        AgeRange(65),
+        AgeRange(66),
       )
   }
 
