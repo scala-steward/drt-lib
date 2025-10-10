@@ -6,6 +6,7 @@ import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 
 object PassengerInfo {
   private val egateAgeEligibilityDateChange = "2023-07-25T00:00:00"
+
   def ageRangesForDate(scheduled: Option[SDateLike]): List[AgeRange] = {
     val egateEligibilityAgeRanges = scheduled match {
       case Some(date) if date < SDate(egateAgeEligibilityDateChange) =>
@@ -36,12 +37,13 @@ object PassengerInfo {
     .getOrElse(UnknownAge)
 
   def manifestToAgeRangeCount(manifest: VoyageManifest): Map[PaxAgeRange, Int] = {
-    manifest
+    val paxGroups = manifest
       .uniquePassengers
       .groupBy(_.age.map(ageRangeForAge(_, manifest.scheduleArrivalDateTime)).getOrElse(UnknownAge))
       .map {
         case (ageRange, paxProfiles) => (ageRange, paxProfiles.size)
       }
+    ageRangesForDate(manifest.scheduleArrivalDateTime).map(ar => (ar, paxGroups.getOrElse(ar, 0))).toMap
   }
 
   def manifestToNationalityCount(manifest: VoyageManifest): Map[Nationality, Int] =
