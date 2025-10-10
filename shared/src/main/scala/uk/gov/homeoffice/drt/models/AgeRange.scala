@@ -3,7 +3,7 @@ package uk.gov.homeoffice.drt.models
 import ujson.Value.Value
 import upickle.default.{macroRW, _}
 
-trait PaxAgeRange {
+trait PaxAgeRange extends Ordered[PaxAgeRange] {
   def title: String
 }
 
@@ -17,10 +17,24 @@ case class AgeRange(bottom: Int, top: Option[Int]) extends PaxAgeRange {
     case Some(top) => s"$bottom to $top"
     case _ => s"$bottom and over"
   }
+
+  override def compare(that: PaxAgeRange): Int = that match {
+    case AgeRange(thatBottom, _) if this.bottom != thatBottom => this.bottom - thatBottom
+    case AgeRange(_, Some(thatTop)) if this.top.isDefined && this.top.get != thatTop => this.top.get - thatTop
+    case AgeRange(_, None) if this.top.isDefined => -1
+    case AgeRange(_, None) if this.top.isEmpty => 0
+    case UnknownAge => 1
+    case _ => 0
+  }
 }
 
 case object UnknownAge extends PaxAgeRange {
   def title: String = "Unknown"
+
+  override def compare(that: PaxAgeRange): Int = that match {
+    case UnknownAge => 0
+    case _ => 1
+  }
 }
 
 object AgeRange {

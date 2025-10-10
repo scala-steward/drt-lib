@@ -4,6 +4,8 @@ import uk.gov.homeoffice.drt.Nationality
 import uk.gov.homeoffice.drt.ports.{PaxAge, PaxType}
 import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 
+import scala.collection.SortedMap
+
 object PassengerInfo {
   private val egateAgeEligibilityDateChange = "2023-07-25T00:00:00"
 
@@ -36,7 +38,7 @@ object PassengerInfo {
     }
     .getOrElse(UnknownAge)
 
-  def manifestToAgeRangeCount(manifest: VoyageManifest): Map[PaxAgeRange, Int] = {
+  def manifestToAgeRangeCount(manifest: VoyageManifest): SortedMap[PaxAgeRange, Int] = {
     val paxGroups = manifest
       .uniquePassengers
       .groupBy(_.age.map(ageRangeForAge(_, manifest.scheduleArrivalDateTime)).getOrElse(UnknownAge))
@@ -45,8 +47,8 @@ object PassengerInfo {
       }
 
     val maybeUnknownAge = paxGroups.filter(_._1 == UnknownAge)
-    
-    maybeUnknownAge ++ ageRangesForDate(manifest.scheduleArrivalDateTime)
+
+    SortedMap.empty[PaxAgeRange, Int] ++ maybeUnknownAge ++ ageRangesForDate(manifest.scheduleArrivalDateTime)
       .map(ar => (ar, paxGroups.getOrElse(ar, 0)))
       .toMap
   }
