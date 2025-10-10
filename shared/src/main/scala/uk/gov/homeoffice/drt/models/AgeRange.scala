@@ -23,7 +23,7 @@ case class AgeRange(bottom: Int, top: Option[Int]) extends PaxAgeRange {
     case AgeRange(_, Some(thatTop)) if this.top.isDefined && this.top.get != thatTop => this.top.get - thatTop
     case AgeRange(_, None) if this.top.isDefined => -1
     case AgeRange(_, None) if this.top.isEmpty => 0
-    case UnknownAge => 1
+    case UnknownAge => -1
     case _ => 0
   }
 }
