@@ -4,8 +4,10 @@ import uk.gov.homeoffice.drt.Nationality
 import uk.gov.homeoffice.drt.ports.PaxType
 import upickle.default._
 
+import scala.collection.SortedMap
+
 case class FlightManifestSummary(arrivalKey: ManifestKey,
-                                 ageRanges: Map[PaxAgeRange, Int],
+                                 ageRanges: SortedMap[PaxAgeRange, Int],
                                  nationalities: Map[Nationality, Int],
                                  paxTypes: Map[PaxType, Int]
                                 ) {
