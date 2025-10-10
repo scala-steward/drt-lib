@@ -14,6 +14,8 @@ trait IShiftStaffRollingDaoLike {
   def upsertShiftStaffRolling(shiftStaffRolling: ShiftStaffRolling): Future[Int]
 
   def getShiftStaffRolling(port: String, terminal: String): Future[Seq[ShiftStaffRolling]]
+
+  def latestShiftStaffRolling(port: String, terminal: String): Future[Option[ShiftStaffRolling]]
 }
 
 case class ShiftStaffRollingDao(central: CentralDatabase)(implicit ex: ExecutionContext) extends IShiftStaffRollingDaoLike {
@@ -46,4 +48,22 @@ case class ShiftStaffRollingDao(central: CentralDatabase)(implicit ex: Execution
         row.updatedAt.getTime,
         row.triggeredBy)))
   }
+
+  override def latestShiftStaffRolling(port: String, terminal: String): Future[Option[ShiftStaffRolling]] = {
+    val query = shiftStaffRollingTable
+      .filter(row => row.port === port && row.terminal === terminal)
+      .sortBy(_.rollingEndDate.desc)
+      .result
+    central.db.run(query).map(_.headOption.map(row =>
+      ShiftStaffRolling(
+        row.port,
+        row.terminal,
+        row.rollingStartDate.getTime,
+        row.rollingEndDate.getTime,
+        row.updatedAt.getTime,
+        row.triggeredBy
+      )
+    ))
+  }
+
 }

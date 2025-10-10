@@ -7,18 +7,18 @@ import uk.gov.homeoffice.drt.db.TestDatabase
 import uk.gov.homeoffice.drt.db.TestDatabase.profile.api._
 import uk.gov.homeoffice.drt.db.tables.ShiftStaffRollingRow
 import uk.gov.homeoffice.drt.time.SDate
-import uk.gov.homeoffice.drt.time.TimeZoneHelper.europeLondonTimeZone
 
 import java.time.Instant
+import java.util.TimeZone
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 
 class ShiftStaffRollingDaoSpec extends Specification with BeforeEach {
   sequential
+  TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
 
   val dao: ShiftStaffRollingDao = ShiftStaffRollingDao(TestDatabase)
-
   override def before: Unit = {
     Await.result(
       TestDatabase.run(DBIO.seq(
@@ -79,6 +79,20 @@ class ShiftStaffRollingDaoSpec extends Specification with BeforeEach {
       val selectResult: Seq[ShiftStaffRolling] = Await.result(dao.getShiftStaffRolling("LHR", "T5"), 1.second)
 
       selectResult.head === shiftStaffRolling
+    }
+
+    "insert multiple records and get the latest one" in {
+      val shiftStaffRolling = getShiftStaffRolling.copy(port = "MAN")
+      val shiftStaffRolling2 = shiftStaffRolling.copy(port = "MAN", updatedAt = currentTimeInMillis + 1000, rollingStartDate = SDate("2024-06-01").millisSinceEpoch, rollingEndDate = SDate("2024-06-05").millisSinceEpoch)
+      val shiftStaffRolling3 = shiftStaffRolling.copy(port = "MAN", updatedAt = currentTimeInMillis + 2000, rollingStartDate = SDate("2024-06-06").millisSinceEpoch, rollingEndDate = SDate("2024-06-10").millisSinceEpoch)
+
+      Await.result(dao.upsertShiftStaffRolling(shiftStaffRolling), 1.second)
+      Await.result(dao.upsertShiftStaffRolling(shiftStaffRolling2), 1.second)
+      Await.result(dao.upsertShiftStaffRolling(shiftStaffRolling3), 1.second)
+
+      val selectResult: Option[ShiftStaffRolling] = Await.result(dao.latestShiftStaffRolling("MAN", "T5"), 1.second)
+
+      selectResult === Option(shiftStaffRolling3)
     }
   }
 }
