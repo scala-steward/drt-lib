@@ -43,7 +43,12 @@ object PassengerInfo {
       .map {
         case (ageRange, paxProfiles) => (ageRange, paxProfiles.size)
       }
-    ageRangesForDate(manifest.scheduleArrivalDateTime).map(ar => (ar, paxGroups.getOrElse(ar, 0))).toMap
+
+    val maybeUnknownAge = paxGroups.filter(_._1 == UnknownAge)
+    
+    maybeUnknownAge ++ ageRangesForDate(manifest.scheduleArrivalDateTime)
+      .map(ar => (ar, paxGroups.getOrElse(ar, 0)))
+      .toMap
   }
 
   def manifestToNationalityCount(manifest: VoyageManifest): Map[Nationality, Int] =
