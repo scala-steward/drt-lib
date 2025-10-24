@@ -9,6 +9,8 @@ import uk.gov.homeoffice.drt.ports.Terminals.Terminal
 import uk.gov.homeoffice.drt.ports.{AclFeedSource, FeedSource, ForecastFeedSource}
 import uk.gov.homeoffice.drt.protobuf.serialisation.FeedArrivalMessageConversion
 
+import scala.concurrent.ExecutionContext
+
 
 object TerminalDayFeedArrivalActor {
   trait Query
@@ -88,6 +90,8 @@ class TerminalDayFeedArrivalActor[A <: FeedArrival](year: Int,
                                                     override val stateFromSnapshotMessage: GeneratedMessage => Map[UniqueArrival, A],
                                                     override val maxSnapshotInterval: Int = 250,
                                                    ) extends PartitionActor[Map[UniqueArrival, A]] {
+  implicit val ec: ExecutionContext = context.dispatcher
+  
   override def persistenceId: String = f"${feedSource.id}-feed-arrivals-${terminal.toString.toLowerCase}-$year-$month%02d-$day%02d"
 
   override def emptyState: Map[UniqueArrival, A] = Map.empty

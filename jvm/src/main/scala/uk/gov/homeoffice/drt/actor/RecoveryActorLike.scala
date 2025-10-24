@@ -7,6 +7,7 @@ import scalapb.GeneratedMessage
 import uk.gov.homeoffice.drt.time.MilliDate.MillisSinceEpoch
 import uk.gov.homeoffice.drt.time.SDate
 
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Try}
 
 object Sizes {
@@ -15,6 +16,8 @@ object Sizes {
 
 trait RecoveryActorLike extends PersistentActor with RecoveryLogging {
   protected val log: Logger
+
+  implicit val ec: ExecutionContext
 
   val recoveryStartMillis: MillisSinceEpoch = SDate.now().millisSinceEpoch
   var messageRecoveryStartMillis: Option[MillisSinceEpoch] = None
@@ -61,10 +64,12 @@ trait RecoveryActorLike extends PersistentActor with RecoveryLogging {
 
   def persistAndMaybeSnapshot(message: GeneratedMessage): Unit = persistAndMaybeSnapshotWithAck(message, List())
 
-  def persistAndMaybeSnapshotWithAck(messageToPersist: GeneratedMessage, acks: List[(ActorRef, Any)]): Unit = {
+  def persistAndMaybeSnapshotWithAck(messageToPersist: GeneratedMessage,
+                                     acks: List[(ActorRef, Any)],
+                                     maybePostPersist: Option[() => Future[_]] = None,
+                                    ): Unit = {
     persist(messageToPersist) { message =>
       val messageBytes = message.serializedSize
-      log.debug(s"Persisting $messageBytes bytes of ${message.getClass}")
 
       context.system.eventStream.publish(message)
 
@@ -76,9 +81,14 @@ trait RecoveryActorLike extends PersistentActor with RecoveryLogging {
         takeSnapshot(stateToMessage)
         maybeAckAfterSnapshot = acks
       } else {
-        acks.foreach {
+        val executeAcks = () => acks.foreach {
           case (replyTo, ackMsg) =>
             replyTo ! ackMsg
+        }
+
+        maybePostPersist match {
+          case Some(postPersist) => postPersist().foreach(_ => executeAcks())
+          case None => executeAcks()
         }
       }
     }

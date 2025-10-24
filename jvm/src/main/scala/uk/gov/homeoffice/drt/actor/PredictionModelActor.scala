@@ -1,7 +1,7 @@
 package uk.gov.homeoffice.drt.actor
 
 import org.apache.pekko.pattern.StatusReply.Ack
-import org.apache.pekko.persistence.{RecoveryCompleted, SnapshotMetadata, SnapshotOffer}
+import org.apache.pekko.persistence.SnapshotMetadata
 import org.apache.spark.ml.regression.LinearRegressionModel
 import org.slf4j.{Logger, LoggerFactory}
 import scalapb.GeneratedMessage
@@ -12,7 +12,7 @@ import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, ModelAndFe
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.{ModelAndFeaturesMessage, ModelsAndFeaturesMessage, RemoveModelMessage}
 import uk.gov.homeoffice.drt.time.{LocalDate, SDate, SDateLike}
 
-import scala.util.{Failure, Try}
+import scala.concurrent.ExecutionContext
 
 object PredictionModelActor {
   case class Models(models: Map[String, ModelAndFeatures])
@@ -90,6 +90,7 @@ class PredictionModelActor(val now: () => SDateLike,
                            identifier: WithId,
                            override val maybePointInTime: Option[Long],
                           ) extends RecoveryActorLike {
+  implicit val ec: ExecutionContext = context.dispatcher
 
   import uk.gov.homeoffice.drt.protobuf.serialisation.ModelAndFeaturesConversion._
 
