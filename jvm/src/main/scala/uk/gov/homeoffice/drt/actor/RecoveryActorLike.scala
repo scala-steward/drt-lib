@@ -17,8 +17,6 @@ object Sizes {
 trait RecoveryActorLike extends PersistentActor with RecoveryLogging {
   protected val log: Logger
 
-  implicit val ec: ExecutionContext
-
   val recoveryStartMillis: MillisSinceEpoch = SDate.now().millisSinceEpoch
   var messageRecoveryStartMillis: Option[MillisSinceEpoch] = None
   val maybePointInTime: Option[Long] = None
@@ -68,6 +66,8 @@ trait RecoveryActorLike extends PersistentActor with RecoveryLogging {
                                      acks: List[(ActorRef, Any)],
                                      maybePostPersist: Option[() => Future[_]] = None,
                                     ): Unit = {
+    implicit val ec = context.dispatcher
+
     persist(messageToPersist) { message =>
       val messageBytes = message.serializedSize
 
