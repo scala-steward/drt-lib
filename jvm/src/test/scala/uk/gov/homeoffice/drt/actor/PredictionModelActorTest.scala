@@ -13,10 +13,14 @@ import uk.gov.homeoffice.drt.prediction.{FeaturesWithOneToManyValues, Regression
 import uk.gov.homeoffice.drt.protobuf.messages.ModelAndFeatures.ModelAndFeaturesMessage
 import uk.gov.homeoffice.drt.time.{SDate, SDateLike}
 
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
 class MockPredictionModelActor(probeRef: ActorRef) extends PredictionModelActor(() => SDate.now(), FlightCategory, TerminalFlightNumberOrigin("T1", 100, "JFK"), None) {
-  override def persistAndMaybeSnapshotWithAck(messageToPersist: GeneratedMessage, maybeAck:List[(ActorRef, Any)]): Unit = {
+  override def persistAndMaybeSnapshotWithAck(messageToPersist: GeneratedMessage,
+                                              maybeAck:List[(ActorRef, Any)],
+                                              maybePostPersist: Option[() => Future[_]] = None,
+                                             ): Unit = {
     probeRef ! messageToPersist
   }
 }
