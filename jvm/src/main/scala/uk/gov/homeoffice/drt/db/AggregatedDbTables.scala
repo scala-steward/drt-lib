@@ -157,9 +157,10 @@ trait AggregatedDbTables extends CentralDatabase {
   val user = new TableQuery(tag => new UserTable(tag))
   val statusDaily = new TableQuery(tag => new StatusDailyTable(tag))
   val flight = new TableQuery(tag => new FlightTable(tag))
+  val capacity = new TableQuery(tag => new CapacityHourlyTable(tag))
   val queueSlot = new TableQuery(tag => new QueueSlotTable(tag))
   val staffShifts = new TableQuery(tag => new StaffShiftsTable(tag))
   val shiftMetaInfo = new TableQuery(tag => new ShiftMetaInfoTable(tag))
   val shiftStaffingRolling = new TableQuery(tag => new ShiftStaffRollingTable(tag))
-  val tables = Seq(arrivalStats, processedZip, processedJson, statusDaily, voyageManifestPassengerInfo, flight, queueSlot, staffShifts, shiftMetaInfo, shiftStaffingRolling)
+  val tables = Seq(arrivalStats, processedZip, processedJson, statusDaily, voyageManifestPassengerInfo, flight, capacity, queueSlot, staffShifts, shiftMetaInfo, shiftStaffingRolling)
 }
