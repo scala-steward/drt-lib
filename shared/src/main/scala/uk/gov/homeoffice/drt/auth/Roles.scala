@@ -42,6 +42,7 @@ object Roles {
     StaffEdit,
     TerminalDashboard,
     ViewConfig,
+    StaffWarnings,
     SuperAdmin,
     AccessOnlyProd,
     AccessOnlyPreprod,
@@ -303,6 +304,10 @@ object Roles {
 
   case object EnhancedApiView extends Role {
     override val name: String = "enhanced-api-view"
+  }
+
+  case object StaffWarnings extends Role {
+    override val name: String = "staff-warnings"
   }
 
   case object Debug extends Role {
