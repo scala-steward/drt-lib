@@ -17,7 +17,7 @@ object Bhx extends AirportConfigLike {
 
   private object ProcTimes {
     val gbr = 23.0
-    val eea = 37.0
+    val eea = 36.0
     val b5jssk = 50.0
     val nvn = 89.0
     val vn = 85.0
