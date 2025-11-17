@@ -16,20 +16,20 @@ object Lgw extends AirportConfigLike {
   import AirportConfigDefaults._
 
   private object ProcTimesNorth {
-    val gbr = 30.0
-    val eea = 39.0
-    val b5jssk = 51.0
-    val nvn = 91.0
-    val vn = 98.0
+    val gbr = 28.0
+    val eea = 38.0
+    val b5jssk = 47.0
+    val nvn = 88.0
+    val vn = 93.0
     val egates = 47d
   }
 
   private object ProcTimesSouth {
-    val gbr = 31.0
-    val eea = 40.0
-    val b5jssk = 52.0
-    val nvn = 90.0
-    val vn = 102.0
+    val gbr = 30.0
+    val eea = 39.0
+    val b5jssk = 50.0
+    val nvn = 89.0
+    val vn = 97.0
     val egates = 47d
   }
 
