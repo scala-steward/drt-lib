@@ -16,29 +16,29 @@ object Man extends AirportConfigLike {
   import AirportConfigDefaults._
 
   private object ProcTimesT1 {
-    val gbr = 30.0
+    val gbr = 29.0
     val eea = 41.0
-    val b5jssk = 51.0
-    val nvn = 84.0
-    val vn = 91.0
+    val b5jssk = 50.0
+    val nvn = 81.0
+    val vn = 87.0
     val egates = 44d
   }
 
   private object ProcTimesT2 {
-    val gbr = 30.0
+    val gbr = 28.0
     val eea = 44.0
-    val b5jssk = 59.0
-    val nvn = 97.0
-    val vn = 90.0
+    val b5jssk = 58.0
+    val nvn = 96.0
+    val vn = 88.0
     val egates = 51d
   }
 
   private object ProcTimesT3 {
-    val gbr = 30.0
+    val gbr = 29.0
     val eea = 39.0
-    val b5jssk = 56.0
+    val b5jssk = 58.0
     val nvn = 86.0
-    val vn = 84.0
+    val vn = 81.0
     val egates = 44d
   }
 
