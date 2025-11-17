@@ -1,16 +1,15 @@
 package uk.gov.homeoffice.drt
 
 import org.apache.pekko.actor.ActorSystem
-import org.apache.pekko.http.scaladsl.Http
-import org.apache.pekko.http.scaladsl.model.{HttpRequest, StatusCodes}
+import org.apache.pekko.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCodes}
 import org.apache.pekko.stream.Materializer
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.homeoffice.drt.auth.Roles
 
-import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 class ProdHttpClientTest extends AnyWordSpec with Matchers {
   "ProdHttpClient" should {
@@ -34,7 +33,11 @@ class ProdHttpClientTest extends AnyWordSpec with Matchers {
       implicit val system: ActorSystem = ActorSystem()
       implicit val mat: Materializer = Materializer(system)
 
-      val client = ProdHttpClient(request => Http().singleRequest(request))
+      val mockResponse = HttpResponse(status = StatusCodes.OK)
+      val mockSendRequest: HttpRequest => Future[HttpResponse] = _ => Future.successful(mockResponse)
+
+      val client = ProdHttpClient(mockSendRequest)
+
       val request = HttpRequest(uri = "https://httpbin.org/get")
       val responseFuture = client.send(request)
       val response = Await.result(responseFuture, 10.seconds)
