@@ -74,12 +74,12 @@ class StaffShiftsDaoSpec extends Specification with BeforeEach {
 
     "delete a staff shift" in {
       val staffShiftsDao = StaffShiftsDao(TestDatabase)
-      val staffShiftRow = getStaffShiftRow
+      val staffShiftRow: Shift = getStaffShiftRow
 
       Await.result(staffShiftsDao.insertOrUpdate(staffShiftRow), 1.second)
 
-      val deleteResult = Await.result(staffShiftsDao.deleteStaffShift("LHR", "T5", "Morning"), 1.second)
-      deleteResult === 1
+      val deleteResult = Await.result(staffShiftsDao.deleteStaffShift(staffShiftRow.port, staffShiftRow.terminal, staffShiftRow.shiftName, staffShiftRow.startDate, staffShiftRow.startTime), 1.second)
+      deleteResult.get === staffShiftRow
 
       val selectResult = Await.result(staffShiftsDao.getStaffShiftsByPortAndTerminal("LHR", "T5"), 1.second)
       selectResult.isEmpty === true
