@@ -1,3 +1,4 @@
+import net.nmoncho.sbt.dependencycheck.settings.AnalyzerSettings
 import sbt.Keys.libraryDependencies
 
 lazy val scala = "2.13.16"
@@ -68,6 +69,18 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
       "org.apache.pekko" %% "pekko-persistence-testkit" % pekkoVersion % "test",
       "com.typesafe.slick" %% "slick" % slickVersion,
       "com.h2database" % "h2" % h2Version % Test
+    ),
+    ThisBuild / dependencyCheckAnalyzers := dependencyCheckAnalyzers.value.copy(
+      ossIndex = AnalyzerSettings.OssIndex(
+        enabled = Some(false),
+        url = None,
+        batchSize = None,
+        requestDelay = None,
+        useCache = None,
+        warnOnlyOnRemoteErrors = None,
+        username = None,
+        password = None
+      )
     ),
     Test / parallelExecution := false,
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),

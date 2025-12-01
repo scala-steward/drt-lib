@@ -124,8 +124,8 @@ steps:
         from_secret: ARTIFACTORY_PASSWORD
       ARTIFACTORY_USERNAME: drt_ci
     when:
-      branch:
-        - master
+#      branch:
+#        - master
       event:
         - push
     depends_on:
