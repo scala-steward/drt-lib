@@ -73,18 +73,17 @@ case class StaffShiftsDao(db: CentralDatabase)(implicit ec: ExecutionContext) ex
 
   def deleteStaffShift(port: String, terminal: String, shiftName: String, shiftStartDate: LocalDate, startTime: String): Future[Option[Shift]] = {
     val startDate = convertToSqlDate(shiftStartDate)
-
-    val shiftToBeDeletedOptFut = getStaffShift(port, terminal, shiftName, shiftStartDate, startTime)
     val deleteAction = staffShiftsTable
-      .filter(row =>
-        row.port === port &&
-          row.terminal === terminal &&
-          row.shiftName === shiftName &&
-          row.startDate === startDate &&
-          row.startTime === startTime
-      ).delete
+      .filter(r => r.port === port &&
+        r.terminal === terminal &&
+        r.shiftName === shiftName &&
+        r.startDate === startDate &&
+        r.startTime === startTime).delete
 
-    db.run(deleteAction).flatMap(_ => shiftToBeDeletedOptFut)
+    getStaffShift(port, terminal, shiftName, shiftStartDate, startTime)
+      .flatMap { shiftOpt =>
+        db.run(deleteAction).map(_ => shiftOpt)
+      }
   }
 
   override def deleteStaffShifts(): Future[Int] = db.run(staffShiftsTable.delete)
