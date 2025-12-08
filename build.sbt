@@ -21,7 +21,7 @@ lazy val root = project.in(file(".")).
   )
 
 lazy val pekkoVersion = "1.1.3"
-lazy val pekkoHttpVersion = "1.1.0"
+lazy val pekkoHttpVersion = "1.2.0"
 lazy val slickVersion = "3.5.2"
 
 lazy val jodaVersion = "2.12.7"
@@ -33,7 +33,6 @@ lazy val csvCommonsVersion = "1.13.0"
 lazy val catsVersion = "2.12.0"
 lazy val scribeSlf4jVersion = "3.16.0"
 lazy val h2Version = "2.3.232"
-lazy val sslConfigCoreVersion = "0.6.1"
 
 
 lazy val cross = crossProject(JVMPlatform, JSPlatform)
@@ -56,7 +55,6 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
   )
   .jvmSettings(
     libraryDependencies ++= Seq(
-      "com.typesafe" %% "ssl-config-core" % sslConfigCoreVersion,
       "org.apache.pekko" %% "pekko-actor" % pekkoVersion,
       "org.apache.pekko" %% "pekko-persistence" % pekkoVersion,
       "org.apache.pekko" %% "pekko-persistence-query" % pekkoVersion,

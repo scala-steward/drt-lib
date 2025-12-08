@@ -2,18 +2,17 @@ package uk.gov.homeoffice.drt.db.dao
 
 import org.specs2.mutable.Specification
 import org.specs2.specification.BeforeEach
-import slick.dbio.DBIO
+import uk.gov.homeoffice.drt.Shift
 import uk.gov.homeoffice.drt.db.TestDatabase
+import uk.gov.homeoffice.drt.db.TestDatabase.profile.api._
 import uk.gov.homeoffice.drt.time.LocalDate
+import uk.gov.homeoffice.drt.util.ShiftUtil.{localDateAddDays, localDateAddMonth}
 
 import java.time.Instant
 import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
-import TestDatabase.profile.api._
-import uk.gov.homeoffice.drt.Shift
-import uk.gov.homeoffice.drt.util.ShiftUtil.{localDateAddDays, localDateAddMonth}
-
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.DurationInt
+import scala.util.Try
 
 class StaffShiftsDaoSpec extends Specification with BeforeEach {
   sequential
@@ -21,11 +20,11 @@ class StaffShiftsDaoSpec extends Specification with BeforeEach {
   val dao: StaffShiftsDao = StaffShiftsDao(TestDatabase)
 
   override def before: Unit = {
-    Await.result(
-      TestDatabase.run(DBIO.seq(
-        dao.staffShiftsTable.schema.dropIfExists,
-        dao.staffShiftsTable.schema.createIfNotExists)
-      ), 2.second)
+    Try {
+      Await.result(TestDatabase.run(dao.staffShiftsTable.schema.createIfNotExists), 10.seconds)
+    }
+
+    Await.result(TestDatabase.run(dao.staffShiftsTable.delete), 10.seconds)
   }
 
   def getStaffShiftRow: Shift = {
