@@ -31,7 +31,7 @@ lazy val scalaTestVersion = "3.2.19"
 lazy val specs2Version = "4.23.0"
 lazy val csvCommonsVersion = "1.14.1"
 lazy val catsVersion = "2.13.0"
-lazy val scribeSlf4jVersion = "3.16.1"
+lazy val scribeSlf4jVersion = "3.17.0"
 lazy val h2Version = "2.4.240"
 
 
