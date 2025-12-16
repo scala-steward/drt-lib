@@ -20,7 +20,7 @@ lazy val root = project.in(file(".")).
     logLevel := Level.Debug
   )
 
-lazy val pekkoVersion = "1.1.5"
+lazy val pekkoVersion = "1.4.0"
 lazy val pekkoHttpVersion = "1.2.0"
 lazy val slickVersion = "3.5.2"
 
