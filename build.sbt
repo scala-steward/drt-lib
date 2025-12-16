@@ -83,13 +83,6 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
     Test / parallelExecution := false,
     Compile / PB.targets := Seq(scalapb.gen() -> (Compile / sourceManaged).value),
     Compile / PB.protoSources := Seq(file("proto/src/main/protobuf")),
-    Compile / PB.protocExecutable := {
-      val osName = System.getProperty("os.name").toLowerCase
-      if (osName.contains("mac"))
-        file("/opt/homebrew/bin/protoc")
-      else
-        file("/usr/bin/protoc")
-    },
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
   )
   .jsSettings(

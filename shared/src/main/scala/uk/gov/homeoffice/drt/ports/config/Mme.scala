@@ -16,7 +16,7 @@ object Mme extends AirportConfigLike {
 
   val config: AirportConfig = AirportConfig(
     portCode = PortCode("MME"),
-    portName = "Teeside International",
+    portName = "Teesside International",
     queuesByTerminal = SortedMap(LocalDate(2014, 1, 1) -> SortedMap(
       T1 -> Seq(QueueDesk)
     )),
