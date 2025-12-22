@@ -1,4 +1,4 @@
-import net.nmoncho.sbt.dependencycheck.settings.AnalyzerSettings
+import net.nmoncho.sbt.dependencycheck.settings.{AnalyzerSettings, NvdApiSettings}
 import sbt.Keys.libraryDependencies
 
 lazy val scala = "2.13.16"
@@ -88,3 +88,7 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
   .jsSettings(
     publishTo := Some("release" at artifactory + "artifactory/libs-release")
   )
+
+val nvdAPIKey = sys.env.getOrElse("NVD_API_KEY", "")
+
+dependencyCheckNvdApi := NvdApiSettings(apiKey = nvdAPIKey)
