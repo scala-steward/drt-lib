@@ -91,4 +91,4 @@ lazy val cross = crossProject(JVMPlatform, JSPlatform)
 
 val nvdAPIKey = sys.env.getOrElse("NVD_API_KEY", "")
 
-dependencyCheckNvdApi := NvdApiSettings(apiKey = nvdAPIKey)
+ThisBuild / dependencyCheckNvdApi := NvdApiSettings(apiKey = nvdAPIKey)
