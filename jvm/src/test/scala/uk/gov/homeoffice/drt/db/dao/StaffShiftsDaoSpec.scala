@@ -78,7 +78,7 @@ class StaffShiftsDaoSpec extends Specification with BeforeEach {
       Await.result(staffShiftsDao.insertOrUpdate(staffShiftRow), 1.second)
 
       val deleteResult = Await.result(staffShiftsDao.deleteStaffShift(staffShiftRow.port, staffShiftRow.terminal, staffShiftRow.shiftName, staffShiftRow.startDate, staffShiftRow.startTime), 1.second)
-      deleteResult.get === staffShiftRow
+      deleteResult.get.copy(createdAt = staffShiftRow.createdAt) === staffShiftRow
 
       val selectResult = Await.result(staffShiftsDao.getStaffShiftsByPortAndTerminal("LHR", "T5"), 1.second)
       selectResult.isEmpty === true
