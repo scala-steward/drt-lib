@@ -30,8 +30,8 @@ class ShiftStaffRollingDaoSpec extends Specification with BeforeEach {
     Await.result(TestDatabase.run(dao.shiftStaffRollingTable.delete), 10.seconds)
   }
 
-  val startDate = SDate("2024-06-01", DateTimeZone.forID("Europe/London")).millisSinceEpoch
-  val endDate = SDate("2024-06-02", DateTimeZone.forID("Europe/London")).millisSinceEpoch
+  val startDate = SDate("2024-06-01", DateTimeZone.UTC).millisSinceEpoch
+  val endDate = SDate("2024-06-02", DateTimeZone.UTC).millisSinceEpoch
 
   def getShiftStaffRolling: ShiftStaffRolling = {
     val currentTimeInMillis = SDate.now().millisSinceEpoch
@@ -90,11 +90,11 @@ class ShiftStaffRollingDaoSpec extends Specification with BeforeEach {
       val currentTimeInMillis = SDate.now().millisSinceEpoch
       val shiftStaffRolling = getShiftStaffRolling.copy(port = "MAN", updatedAt = currentTimeInMillis)
       val shiftStaffRolling2 = shiftStaffRolling.copy(port = "MAN", updatedAt = currentTimeInMillis + 1000,
-        rollingStartDate = SDate("2024-06-01", DateTimeZone.forID("Europe/London")).millisSinceEpoch,
-        rollingEndDate = SDate("2024-06-05", DateTimeZone.forID("Europe/London")).millisSinceEpoch)
+        rollingStartDate = SDate("2024-06-01", DateTimeZone.UTC).millisSinceEpoch,
+        rollingEndDate = SDate("2024-06-05", DateTimeZone.UTC).millisSinceEpoch)
       val shiftStaffRolling3 = shiftStaffRolling.copy(port = "MAN", updatedAt = currentTimeInMillis + 2000,
-        rollingStartDate = SDate("2024-06-06", DateTimeZone.forID("Europe/London")).millisSinceEpoch,
-        rollingEndDate = SDate("2024-06-10", DateTimeZone.forID("Europe/London")).millisSinceEpoch)
+        rollingStartDate = SDate("2024-06-06", DateTimeZone.UTC).millisSinceEpoch,
+        rollingEndDate = SDate("2024-06-10", DateTimeZone.UTC).millisSinceEpoch)
 
       Await.result(dao.upsertShiftStaffRolling(shiftStaffRolling), 5.seconds)
       Await.result(dao.upsertShiftStaffRolling(shiftStaffRolling2), 5.seconds)
