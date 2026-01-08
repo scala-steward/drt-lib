@@ -1,5 +1,6 @@
 package uk.gov.homeoffice.drt.db.dao
 
+import org.joda.time.DateTimeZone
 import org.specs2.mutable.Specification
 import org.specs2.specification.BeforeEach
 import uk.gov.homeoffice.drt.ShiftStaffRolling
@@ -29,8 +30,8 @@ class ShiftStaffRollingDaoSpec extends Specification with BeforeEach {
     Await.result(TestDatabase.run(dao.shiftStaffRollingTable.delete), 10.seconds)
   }
 
-  val startDate = SDate("2024-06-01").millisSinceEpoch
-  val endDate = SDate("2024-06-02").millisSinceEpoch
+  val startDate = SDate("2024-06-01", DateTimeZone.UTC).millisSinceEpoch
+  val endDate = SDate("2024-06-02", DateTimeZone.UTC).millisSinceEpoch
 
   def getShiftStaffRolling: ShiftStaffRolling = {
     val currentTimeInMillis = SDate.now().millisSinceEpoch
@@ -66,7 +67,7 @@ class ShiftStaffRollingDaoSpec extends Specification with BeforeEach {
 
       val selectResult: Seq[ShiftStaffRolling] = Await.result(dao.getShiftStaffRolling("LHR", "T5"), 5.seconds)
 
-      selectResult.head === shiftStaffRolling
+      selectResult === Seq(shiftStaffRolling)
     }
 
     "insert multiple port and get for one port" in {
@@ -82,14 +83,18 @@ class ShiftStaffRollingDaoSpec extends Specification with BeforeEach {
 
       val selectResult: Seq[ShiftStaffRolling] = Await.result(dao.getShiftStaffRolling("LHR", "T5"), 5.seconds)
 
-      selectResult.head === shiftStaffRolling
+      selectResult === Seq(shiftStaffRolling)
     }
 
     "insert multiple records and get the latest one" in {
       val currentTimeInMillis = SDate.now().millisSinceEpoch
       val shiftStaffRolling = getShiftStaffRolling.copy(port = "MAN", updatedAt = currentTimeInMillis)
-      val shiftStaffRolling2 = shiftStaffRolling.copy(port = "MAN", updatedAt = currentTimeInMillis + 1000, rollingStartDate = SDate("2024-06-01").millisSinceEpoch, rollingEndDate = SDate("2024-06-05").millisSinceEpoch)
-      val shiftStaffRolling3 = shiftStaffRolling.copy(port = "MAN", updatedAt = currentTimeInMillis + 2000, rollingStartDate = SDate("2024-06-06").millisSinceEpoch, rollingEndDate = SDate("2024-06-10").millisSinceEpoch)
+      val shiftStaffRolling2 = shiftStaffRolling.copy(port = "MAN", updatedAt = currentTimeInMillis + 1000,
+        rollingStartDate = SDate("2024-06-01", DateTimeZone.UTC).millisSinceEpoch,
+        rollingEndDate = SDate("2024-06-05", DateTimeZone.UTC).millisSinceEpoch)
+      val shiftStaffRolling3 = shiftStaffRolling.copy(port = "MAN", updatedAt = currentTimeInMillis + 2000,
+        rollingStartDate = SDate("2024-06-06", DateTimeZone.UTC).millisSinceEpoch,
+        rollingEndDate = SDate("2024-06-10", DateTimeZone.UTC).millisSinceEpoch)
 
       Await.result(dao.upsertShiftStaffRolling(shiftStaffRolling), 5.seconds)
       Await.result(dao.upsertShiftStaffRolling(shiftStaffRolling2), 5.seconds)

@@ -14,7 +14,7 @@ import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 
-class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
+class QueueSlotDaoTest extends AnyWordSpec with Matchers with BeforeAndAfter {
   import TestDatabase.profile.api._
 
   val dao: QueueSlotDao = QueueSlotDao()
@@ -30,11 +30,12 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
   }
 
   "insertOrUpdate" should {
+    val minuteMillis = SDate(UtcDate(2025, 1, 1)).millisSinceEpoch
     "insert records into an empty table" in {
       val crunchMinute = CrunchMinute(
         terminal = T2,
         queue = EeaDesk,
-        minute = 1L,
+        minute = minuteMillis,
         paxLoad = 100.11,
         workLoad = 99.22,
         deskRec = 98,
@@ -48,7 +49,7 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
 
       Await.result(TestDatabase.run(dao.insertOrUpdate(PortCode("LHR"), 15)(crunchMinute)), 2.second)
 
-      val rows = Await.result(TestDatabase.run(dao.get(PortCode("LHR"), 15)(T2, EeaDesk, 1L)), 1.second)
+      val rows = Await.result(TestDatabase.run(dao.get(PortCode("LHR"), 15)(T2, EeaDesk, minuteMillis)), 1.second)
       rows should be(Seq(crunchMinute))
     }
 
@@ -56,7 +57,7 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
       val crunchMinute = CrunchMinute(
         terminal = T2,
         queue = EeaDesk,
-        minute = 1L,
+        minute = minuteMillis,
         paxLoad = 100,
         workLoad = 99,
         deskRec = 98,
@@ -81,29 +82,32 @@ class QueueSlotDaoTest extends AnyWordSpec  with Matchers with BeforeAndAfter {
       Await.result(TestDatabase.run(dao.insertOrUpdate(PortCode("LHR"), 15)(crunchMinute)), 2.second)
       Await.result(TestDatabase.run(dao.insertOrUpdate(PortCode("LHR"), 15)(crunchMinute2)), 2.second)
 
-      val rows = Await.result(TestDatabase.run(dao.get(PortCode("LHR"), 15)(T2, EeaDesk, 1L)), 1.second)
+      val rows = Await.result(TestDatabase.run(dao.get(PortCode("LHR"), 15)(T2, EeaDesk, minuteMillis)), 1.second)
       rows should be(Seq(crunchMinute2))
     }
   }
 
   "removeAllBefore" should {
     "remove all records before the given date" in {
-      val crunchMinutes = Seq(
-        SDate("2024-11-11").millisSinceEpoch,
-        SDate("2024-11-12").millisSinceEpoch,
-        SDate("2024-11-13").millisSinceEpoch,
-      ).map(crunchMinute)
+      val dates = Seq(
+        UtcDate(2024, 11, 11),
+        UtcDate(2024, 11, 12),
+        UtcDate(2024, 11, 13),
+      )
+
+      val crunchMinutes = dates.map(d => crunchMinute(SDate(d).millisSinceEpoch))
 
       Await.result(TestDatabase.run(dao.updateSlots(PortCode("LHR"), 15)(crunchMinutes)), 2.second)
 
       Await.result(TestDatabase.run(dao.removeAllBefore()(UtcDate(2024, 11, 13))), 2.second)
 
-      Seq(
-        (SDate("2024-11-11").millisSinceEpoch, Seq.empty),
-        (SDate("2024-11-12").millisSinceEpoch, Seq.empty),
-        (SDate("2024-11-13").millisSinceEpoch, Seq(crunchMinute(SDate("2024-11-13").millisSinceEpoch))),
-      ).map {
-        case (minute, expected) =>
+      dates.zipWithIndex.foreach {
+        case (date, idx) =>
+          val minute = SDate(date).millisSinceEpoch
+          val expected =
+            if (idx < 2) Seq.empty
+            else Seq(crunchMinute(minute))
+
           val rows = Await.result(TestDatabase.run(dao.get(PortCode("LHR"), 15)(T2, EeaDesk, minute)), 1.second)
           rows should be(expected)
       }
