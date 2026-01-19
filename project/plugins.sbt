@@ -8,4 +8,4 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.20.1")
 
 addSbtPlugin("com.sksamuel.scapegoat" %% "sbt-scapegoat" % "1.2.13")
 
-addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "1.7.2")
+addSbtPlugin("net.nmoncho" % "sbt-dependency-check" % "1.8.1")
