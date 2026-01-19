@@ -139,6 +139,7 @@ object FeatureColumnsV1 {
       (LocalDate(2023, 9, 4), LocalDate(2023, 10, 20)),
       (LocalDate(2024, 9, 2), LocalDate(2024, 10, 25)),
       (LocalDate(2025, 9, 1), LocalDate(2025, 10, 24)),
+      (LocalDate(2026, 9, 1), LocalDate(2026, 10, 23)),
     )
   }
 
@@ -158,6 +159,7 @@ object FeatureColumnsV1 {
       (LocalDate(2023, 10, 21), LocalDate(2023, 10, 29)),
       (LocalDate(2024, 10, 26), LocalDate(2024, 11, 3)),
       (LocalDate(2025, 10, 25), LocalDate(2025, 11, 2)),
+      (LocalDate(2026, 10, 24), LocalDate(2026, 11, 1)),
     )
   }
 
@@ -177,6 +179,7 @@ object FeatureColumnsV1 {
       (LocalDate(2023, 10, 30), LocalDate(2023, 12, 21)),
       (LocalDate(2024, 11, 4), LocalDate(2024, 12, 20)),
       (LocalDate(2025, 11, 3), LocalDate(2025, 12, 19)),
+      (LocalDate(2026, 11, 2), LocalDate(2026, 12, 18)),
     )
   }
 
@@ -196,6 +199,7 @@ object FeatureColumnsV1 {
       (LocalDate(2023, 12, 22), LocalDate(2024, 1, 7)),
       (LocalDate(2024, 12, 21), LocalDate(2025, 1, 5)),
       (LocalDate(2025, 12, 20), LocalDate(2026, 1, 4)),
+      (LocalDate(2026, 12, 19), LocalDate(2027, 1, 4)),
     )
   }
 
@@ -216,6 +220,7 @@ object FeatureColumnsV1 {
       (LocalDate(2024, 1, 8), LocalDate(2024, 2, 11)),
       (LocalDate(2025, 1, 6), LocalDate(2025, 2, 14)),
       (LocalDate(2026, 1, 5), LocalDate(2026, 2, 13)),
+      (LocalDate(2027, 1, 5), LocalDate(2027, 2, 12)),
     )
   }
 
@@ -236,6 +241,7 @@ object FeatureColumnsV1 {
       (LocalDate(2024, 2, 12), LocalDate(2024, 2, 18)),
       (LocalDate(2025, 2, 15), LocalDate(2025, 2, 23)),
       (LocalDate(2026, 2, 14), LocalDate(2026, 2, 22)),
+      (LocalDate(2027, 2, 13), LocalDate(2027, 2, 21)),
     )
   }
 
@@ -256,6 +262,7 @@ object FeatureColumnsV1 {
       (LocalDate(2024, 2, 19), LocalDate(2024, 3, 28)),
       (LocalDate(2025, 2, 24), LocalDate(2025, 4, 4)),
       (LocalDate(2026, 2, 23), LocalDate(2026, 3, 27)),
+      (LocalDate(2027, 2, 22), LocalDate(2027, 3, 25)),
     )
   }
 
@@ -276,6 +283,7 @@ object FeatureColumnsV1 {
       (LocalDate(2024, 3, 29), LocalDate(2024, 4, 14)),
       (LocalDate(2025, 4, 5), LocalDate(2025, 4, 21)),
       (LocalDate(2026, 3, 28), LocalDate(2026, 4, 12)),
+      (LocalDate(2027, 3, 26), LocalDate(2027, 4, 11)),
     )
   }
 
@@ -296,6 +304,7 @@ object FeatureColumnsV1 {
       (LocalDate(2024, 4, 15), LocalDate(2024, 5, 26)),
       (LocalDate(2025, 4, 22), LocalDate(2025, 5, 23)),
       (LocalDate(2026, 4, 13), LocalDate(2026, 5, 22)),
+      (LocalDate(2027, 4, 12), LocalDate(2027, 5, 28)),
     )
   }
 
@@ -316,6 +325,7 @@ object FeatureColumnsV1 {
       (LocalDate(2024, 5, 27), LocalDate(2024, 6, 2)),
       (LocalDate(2025, 5, 24), LocalDate(2025, 6, 1)),
       (LocalDate(2026, 5, 23), LocalDate(2026, 5, 31)),
+      (LocalDate(2027, 5, 29), LocalDate(2027, 6, 6)),
     )
   }
 
@@ -336,6 +346,7 @@ object FeatureColumnsV1 {
       (LocalDate(2024, 6, 3), LocalDate(2024, 7, 24)),
       (LocalDate(2025, 6, 2), LocalDate(2025, 7, 22)),
       (LocalDate(2026, 6, 1), LocalDate(2026, 7, 20)),
+      (LocalDate(2027, 6, 7), LocalDate(2027, 7, 22)),
     )
   }
 
@@ -381,6 +392,7 @@ object FeatureColumnsV1 {
       (LocalDate(2023, 7, 24), LocalDate(2023, 9, 3)),
       (LocalDate(2024, 7, 25), LocalDate(2024, 9, 1)),
       (LocalDate(2025, 7, 23), LocalDate(2025, 8, 31)),
+      (LocalDate(2025, 7, 21), LocalDate(2025, 8, 31)),
     )
   }
 
