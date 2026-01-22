@@ -1,7 +1,7 @@
 import net.nmoncho.sbt.dependencycheck.settings.{AnalyzerSettings, NvdApiSettings}
 import sbt.Keys.libraryDependencies
 
-lazy val scala = "2.13.16"
+lazy val scala = "2.13.18"
 
 ThisBuild / scalaVersion := scala
 ThisBuild / organization := "uk.gov.homeoffice"
@@ -20,18 +20,18 @@ lazy val root = project.in(file(".")).
     logLevel := Level.Debug
   )
 
-lazy val pekkoVersion = "1.1.5"
+lazy val pekkoVersion = "1.4.0"
 lazy val pekkoHttpVersion = "1.2.0"
 lazy val slickVersion = "3.5.2"
 
 lazy val jodaVersion = "2.14.0"
 lazy val upickleVersion = "3.3.1"
-lazy val sparkMlLibVersion = "3.5.7"
+lazy val sparkMlLibVersion = "4.1.1"
 lazy val scalaTestVersion = "3.2.19"
 lazy val specs2Version = "4.23.0"
 lazy val csvCommonsVersion = "1.14.1"
 lazy val catsVersion = "2.13.0"
-lazy val scribeSlf4jVersion = "3.16.1"
+lazy val scribeSlf4jVersion = "3.17.0"
 lazy val h2Version = "2.4.240"
 
 
