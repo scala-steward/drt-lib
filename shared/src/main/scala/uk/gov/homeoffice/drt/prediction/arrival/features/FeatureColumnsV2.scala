@@ -386,7 +386,7 @@ object FeatureColumnsV2 {
       (LocalDate(2023, 7, 24), LocalDate(2023, 9, 3)),
       (LocalDate(2024, 7, 25), LocalDate(2024, 9, 1)),
       (LocalDate(2025, 7, 23), LocalDate(2025, 8, 31)),
-      (LocalDate(2025, 7, 21), LocalDate(2025, 8, 31)),
+      (LocalDate(2026, 7, 21), LocalDate(2026, 8, 31)),
     )
   }
 
